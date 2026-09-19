@@ -57,17 +57,169 @@ completes — never in advance.
 
 | ID | Phase | Title | Outcome | Date |
 | --- | --- | --- | --- | --- |
-| — | — | *No experiments run yet.* | — | — |
+| EXP-001 | 2 | Referential integrity and key uniqueness | **PASS** — 0 errors | 19 Sep 2026 |
+| EXP-002 | 2 | Is `Amount` identical to `CoursePrice`? | **Hypothesis confirmed** — identical on all 10,000 rows | 19 Sep 2026 |
+| EXP-003 | 2 | Per-learner interaction distribution | **Hypothesis partly refuted** — right-skew confirmed, but bimodal with an empty band at 5–8 | 19 Sep 2026 |
+| EXP-004 | 2 | Temporal coverage and split viability | **Hypothesis confirmed** — Protocol A viable (791 ≥ 300) | 19 Sep 2026 |
+| EXP-005 | 2 | Is `TeacherID` an alias for `CourseID`? | **Hypothesis REFUTED** — 887 pairs, not a bijection. EXP-014 proceeds | 19 Sep 2026 |
+| EXP-006 | 2 | Feature distributions; synthetic-data assessment | **Hypothesis confirmed and extended** — near-uniform throughout; **no course-choice signal** | 19 Sep 2026 |
 
-Phase 0 is project initialization. It performs **environment validation**, not
-experimentation, so it produces no entries here. The validation checks it did
-run — dependency imports, a K-Means/hierarchical smoke test on synthetic blobs,
-seed determinism, seaborn/pandas interop, and source-material checksums — are
-recorded as test results in `research/PHASE_0_COMPLETE.md` and are enforced
-continuously by `tests/test_phase0_environment.py`.
+Phase 0 was project initialization: **environment validation**, not
+experimentation, so it produced no entries. Those checks are recorded in
+`research/PHASE_0_COMPLETE.md` and enforced by `tests/test_phase0_environment.py`.
+Phase 1 was literature research and produced no experiments either.
 
-The synthetic-data smoke tests deliberately assert nothing about the EduPro
-dataset. They verify that the *tooling* works. No EduPro finding exists yet.
+---
+
+## Phase 2 results
+
+Full detail in `research/dataset_audit.md`; machine-readable record in
+`artifacts/phase2_audit.json`. Reproduce with `python scripts/run_data_audit.py`
+(seed 42).
+
+### EXP-001 — Referential integrity and key uniqueness
+| Field | Value |
+| --- | --- |
+| Hypothesis | All foreign keys resolve; all primary keys unique. |
+| Method | `edupro.data.validation.validate` — 12 check families across 4 sheets. |
+| Script | `scripts/run_data_audit.py` |
+
+**Result:** 0 errors, 1 warning, 4 info. Zero orphans on all three foreign keys in
+both directions; all four primary keys unique; zero duplicate rows; zero nulls
+across 27 columns; no out-of-domain values.
+
+**Interpretation:** the data requires no cleaning. It does **not** support any
+claim about learner behaviour — integrity is not signal.
+
+**Decision:** proceed with no cleaning step. Warning I-4 (two repeated course
+names, distinct courses) documented; `CourseName` cannot identify a course.
+
+---
+
+### EXP-002 — Is `Amount` identical to `CoursePrice`? (Q-1)
+| Field | Value |
+| --- | --- |
+| Hypothesis | Identical — both have exactly 23 distinct values. |
+| Method | Row-wise join and comparison, 10,000 transactions. |
+
+**Result:** identical on **10,000 / 10,000 rows (100.00%)**.
+
+**Interpretation:** "average spending" is a deterministic function of which
+courses were chosen, not independent behaviour. It does **not** mean spending is
+uninformative — it means it is not *additional* information beyond catalogue choice.
+
+**Decision:** `avg_spend` retained (brief-mandated) with the redundancy documented;
+`total_spend` dropped; `free_ratio` preferred as the interpretable form. **Q-1
+answered.**
+
+---
+
+### EXP-003 — Per-learner interaction distribution (Q-4)
+| Field | Value |
+| --- | --- |
+| Hypothesis | Right-skewed with substantial mass at 1–2 interactions. |
+
+**Result:** mean 3.333, median **1**, max 16. 1 → 1,620 (54.0%); 2 → 612 (20.4%);
+3 → 186; 4 → 128; **5–8 → 0 learners**; 9–16 → 454. Variance 18.94 vs mean 3.33.
+Gini 0.546.
+
+**Interpretation:** the skew hypothesis was right but incomplete — the distribution
+is **bimodal with a hard empty band**. No sampling process produces that; two
+populations were generated with different count distributions. This does **not**
+tell us the cohorts differ behaviourally; measured separately, they do not.
+
+**Decision:** tier boundaries 1 / 2–4 / ≥9, **handed over by the data** rather than
+tuned. **Q-4 answered.**
+
+---
+
+### EXP-004 — Temporal coverage and split viability (Q-6)
+| Field | Value |
+| --- | --- |
+| Hypothesis | ~1 year of data; the 80th-percentile cut leaves enough evaluable learners. |
+| Pre-registered rule | Protocol A is primary if ≥300 learners are evaluable. |
+
+**Result:** 2025-01-01 → 2025-12-30, 358 distinct days, no trend or seasonality
+(monthly variation < 10%). V = 2025-09-12, T = 2025-10-18. Partitions: train 6,992
+· validation 1,000 · fit 7,992 · test 2,008. **791 evaluable learners.**
+
+**Interpretation:** the leakage-free protocol is viable. 791 is comfortably above
+the threshold but is still only 26% of the user base — estimates will be noisier
+than the raw interaction count suggests.
+
+**Decision:** **Protocol A (global temporal) is PRIMARY**, by the pre-registered
+rule. Leave-one-out (1,380 evaluable) retained as the labelled leakage-bearing
+secondary. Split persisted to `data/processed/splits/`. **Q-6 answered.**
+
+---
+
+### EXP-005 — Is `TeacherID` an alias for `CourseID`? (Q-9) — **hypothesis refuted**
+| Field | Value |
+| --- | --- |
+| Hypothesis | Plausibly a bijection (60 teachers, 60 courses), which would make EXP-014 vacuous. |
+
+**Result:** **887 distinct `(course, teacher)` pairs.** 7–30 teachers per course
+(mean 14.8); 7–55 courses per teacher (mean 14.8). Not a bijection. Teacher
+assignment is not independent of course (χ² = 31,867, df = 3,481, p < 0.0001), and
+`Expertise` matches `CourseCategory` on 41.1% of transactions vs 8.3% chance.
+
+**Interpretation:** the Phase 1 hypothesis was **wrong**. The teacher dimension is
+independently structured, so teacher features are not aliases for course features.
+
+**Decision:** **EXP-014 proceeds.** Pre-registered expectation P-6 is half-refuted:
+the cancellation branch is closed.
+
+---
+
+### EXP-006 — Distributions and signal detection
+| Field | Value |
+| --- | --- |
+| Hypothesis | Some features skewed; cardinalities suggest synthetic data. |
+| Method | Chi-square uniformity tests; permutation null (200 replicates, seed 42) for preference statistics; chi-square independence for demographics. |
+
+**Result — course choice carries no signal:**
+
+| Statistic | Observed | Null mean | Null 95% CI | z |
+| --- | --- | --- | --- | --- |
+| Mean distinct categories | 2.5773 | 2.5869 | [2.571, 2.602] | −1.17 |
+| Mean top-category share | 0.7210 | 0.7194 | [0.717, 0.722] | +1.12 |
+| Mean distinct levels | 1.5560 | 1.5707 | [1.560, 1.582] | −2.65 |
+| Mean free-course share | 0.6501 | 0.6394 | [0.626, 0.654] | +1.51 |
+
+Course popularity near-uniform (140–196, Gini 0.042, χ² p = 0.60). Item–item
+co-occurrence std 5.46 vs null 5.87 [5.58, 6.12] — *below* the null. Demographics
+independent of choice (all p > 0.2). No level progression (slope +0.005, p = 0.664).
+
+**Result — one real signal:** distinct teachers per interaction **0.688** vs null
+**0.944** [0.939, 0.950]. Heavy learners take ~13.4 courses from **2.0**
+instructors. But next-course lift is only **1.10×** (49.0% vs 44.7% chance),
+because each teacher covers ~15 of ~55 unseen courses.
+
+**Interpretation:** course selection in this dataset is statistically
+indistinguishable from popularity-weighted random choice. This says nothing about
+whether the *methods* work — it says this dataset contains little for them to find.
+The marginal level result (z = −2.65) is 0.03 levels out of 2.2, at the Bonferroni
+boundary across eight tests, and is **not** treated as a usable signal.
+
+**Decision:** dataset assessed as almost certainly synthetic; registered as threat
+V8. Phase 3 expectations revised (below). **Q-8 answered.**
+
+---
+
+## Pre-registered expectations — status after Phase 2
+
+Phase 1 recorded seven predictions before any data was examined. Comparing them
+against evidence is itself part of the record.
+
+| # | Phase 1 expectation | Phase 2 evidence | Status |
+| --- | --- | --- | --- |
+| P-1 | Popularity hard to beat | Popularity near-uniform, Gini 0.042 | **Revised** — popularity ≈ random; hard to beat *because it is weak*, not strong |
+| P-2 | Item-based CF strongest | Co-occurrence *below* the null | **Revised** — expect ≈ random |
+| P-3 | Hybrid wins by a small margin | — | Unchanged; awaiting EXP-024 |
+| P-4 | Cluster structure weak; gap may say k=1 | Volume dominates; choice is random | **Strengthened** |
+| P-5 | Variant B preferred | Demographics independent of choice | **Strengthened** |
+| P-6 | Teacher signals add nothing; EXP-005 may cancel | EXP-005 refuted the cancellation; teacher reuse is the only real signal, but 1.10× on next-course | **Half-refuted, now genuinely uncertain** |
+| P-7 | Coverage separates methods more than accuracy | — | Unchanged; awaiting EXP-019–024 |
 
 ---
 

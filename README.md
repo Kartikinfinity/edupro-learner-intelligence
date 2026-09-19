@@ -4,12 +4,23 @@ Learner segmentation and personalised course recommendation for the EduPro
 online learning platform — built as a reproducible, explainable research-grade
 system rather than a single notebook.
 
-> **Project status: Phase 1 of 6 complete — research and methodology investigation.**
-> No model has been trained and no data finding has been produced yet. The
-> repository contains the validated environment, the authoritative source
-> materials, the package skeleton, and a research corpus of ~3,000 lines across
-> six documents with 40 verified references and 28 pre-registered experiments.
+> **Project status: Phase 2 of 6 complete — dataset audit and EDA.**
+> No model has been trained yet. The repository contains the validated
+> environment, the authoritative source materials, a research corpus with 40
+> verified references and 28 pre-registered experiments, and a tested data
+> pipeline with a full forensic audit of the dataset.
 > Sections marked *(Phase N)* below describe planned work, not shipped work.
+
+> ### ⚠ Headline finding from the Phase 2 audit
+> **Course choice in this dataset is statistically indistinguishable from
+> popularity-weighted random selection.** Category concentration, top-category
+> share, free-course share and item–item co-occurrence all fall inside a
+> permutation null; course popularity is near-uniform (Gini 0.042); demographics
+> are unrelated to choice. One real signal exists — learners reuse instructors far
+> more than chance — but it lifts next-course prediction only 1.10×.
+> The dataset is also **assessed as almost certainly synthetic**.
+> This is reported up front because it bounds what the project can honestly claim.
+> Full evidence: [`research/dataset_audit.md`](research/dataset_audit.md).
 
 ---
 
@@ -86,7 +97,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **31 passed**. That result confirms the modelling stack is
+A clean run reports **67 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 
@@ -158,7 +169,7 @@ carrying an evidence-backed PASS/FAIL.
 | --- | --- | --- |
 | 0 | Project initialization | ✅ **PASS** |
 | 1 | Research and methodology investigation | ✅ **PASS** |
-| 2 | Dataset audit and EDA | Not started |
+| 2 | Dataset audit and EDA | ✅ **PASS** |
 | 3 | ML experimentation | Not started |
 | 4 | Model selection and architecture freeze | Not started |
 | 5 | Production implementation | Not started |
@@ -236,6 +247,7 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | [`research/recommendation_evaluation_plan.md`](research/recommendation_evaluation_plan.md) | Pre-registered evaluation protocol and metrics |
 | [`research/production_research.md`](research/production_research.md) | Artifacts, deployment, testing strategy |
 | [`research/experiment_plan.md`](research/experiment_plan.md) | 8 research questions, 28 experiments |
+| [`research/dataset_audit.md`](research/dataset_audit.md) | **Full forensic data-quality report and EDA findings** |
 | [`references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md`](references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md) | Verbatim transcript of the official brief |
 | `research/PHASE_N_COMPLETE.md` | Per-phase report with PASS/FAIL and evidence |
 
@@ -258,6 +270,8 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | `scripts/inspect_sources.py` | Read-only structural inventory of the workbook → `artifacts/phase0_source_inventory.json` |
 | `scripts/render_official_pdf.py` | Rasterise the image-based official PDF so its requirements can be read and verified |
 | `scripts/analytical_baselines.py` | Random-ranker and Precision@K ceiling reference values implied by the 60-course catalogue |
+| `scripts/run_data_audit.py` | EXP-001…006 plus permutation signal detection → `artifacts/phase2_audit.json` |
+| `scripts/generate_eda_figures.py` | The ten EDA figures → `artifacts/eda/` |
 
 Both scripts re-verify the source checksum after reading, so even the inspection
 tooling proves it did not mutate its input.

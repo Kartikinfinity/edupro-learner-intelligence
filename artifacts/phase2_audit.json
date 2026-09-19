@@ -1,0 +1,1037 @@
+{
+  "provenance": {
+    "workbook": "EduPro Online Platform.xlsx",
+    "sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
+    "seed": 42,
+    "n_permutations": 200,
+    "sha256_after": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0"
+  },
+  "EXP-001_validation": {
+    "summary": "0 error(s), 1 warning(s), 4 info",
+    "passed": true,
+    "findings": [
+      {
+        "check": "repeat_enrollment",
+        "severity": "info",
+        "sheet": "Transactions",
+        "message": "no repeat (UserID, CourseID) pairs: the signal is purely binary/implicit",
+        "count": 0
+      },
+      {
+        "check": "date_validity",
+        "severity": "info",
+        "sheet": "Transactions",
+        "message": "dates span 2025-01-01 to 2025-12-30 (358 distinct days)",
+        "count": 358
+      },
+      {
+        "check": "amount_vs_price",
+        "severity": "info",
+        "sheet": "Transactions",
+        "message": "Amount equals CoursePrice for every transaction: spending carries no information beyond which courses were taken",
+        "count": 0
+      },
+      {
+        "check": "type_vs_price",
+        "severity": "info",
+        "sheet": "Courses",
+        "message": "CourseType is a deterministic function of CoursePrice (Free <=> price == 0), so the two are redundant",
+        "count": 0
+      },
+      {
+        "check": "duplicate_course_names",
+        "severity": "warning",
+        "sheet": "Courses",
+        "message": "2 repeated course name(s): ['Deep Learning', 'Natural Language Processing'] \u2014 distinct courses sharing a title, so titles cannot identify a course",
+        "count": 2
+      }
+    ]
+  },
+  "sheet_profiles": {
+    "Users": {
+      "n_rows": 3000,
+      "n_columns": 3,
+      "duplicate_rows": 0,
+      "columns": {
+        "UserID": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 3000
+        },
+        "Age": {
+          "dtype": "int64",
+          "n_null": 0,
+          "n_unique": 21
+        },
+        "Gender": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 2
+        }
+      }
+    },
+    "Teachers": {
+      "n_rows": 60,
+      "n_columns": 6,
+      "duplicate_rows": 0,
+      "columns": {
+        "TeacherID": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 60
+        },
+        "Age": {
+          "dtype": "int64",
+          "n_null": 0,
+          "n_unique": 21
+        },
+        "Gender": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 2
+        },
+        "Expertise": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 12
+        },
+        "YearsOfExperience": {
+          "dtype": "int64",
+          "n_null": 0,
+          "n_unique": 16
+        },
+        "TeacherRating": {
+          "dtype": "float64",
+          "n_null": 0,
+          "n_unique": 56
+        }
+      }
+    },
+    "Courses": {
+      "n_rows": 60,
+      "n_columns": 8,
+      "duplicate_rows": 0,
+      "columns": {
+        "CourseID": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 60
+        },
+        "CourseName": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 58
+        },
+        "CourseCategory": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 12
+        },
+        "CourseType": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 2
+        },
+        "CourseLevel": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 3
+        },
+        "CoursePrice": {
+          "dtype": "float64",
+          "n_null": 0,
+          "n_unique": 23
+        },
+        "CourseDuration": {
+          "dtype": "float64",
+          "n_null": 0,
+          "n_unique": 60
+        },
+        "CourseRating": {
+          "dtype": "float64",
+          "n_null": 0,
+          "n_unique": 56
+        }
+      }
+    },
+    "Transactions": {
+      "n_rows": 10000,
+      "n_columns": 7,
+      "duplicate_rows": 0,
+      "columns": {
+        "TransactionID": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 10000
+        },
+        "UserID": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 3000
+        },
+        "CourseID": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 60
+        },
+        "TransactionDate": {
+          "dtype": "datetime64[us]",
+          "n_null": 0,
+          "n_unique": 358
+        },
+        "Amount": {
+          "dtype": "float64",
+          "n_null": 0,
+          "n_unique": 23
+        },
+        "PaymentMethod": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 3
+        },
+        "TeacherID": {
+          "dtype": "string",
+          "n_null": 0,
+          "n_unique": 60
+        }
+      }
+    }
+  },
+  "EXP-002_amount_vs_price": {
+    "n_transactions": 10000,
+    "n_exact_matches": 10000,
+    "match_rate": 1.0,
+    "identical": true,
+    "n_distinct_amounts": 23,
+    "n_distinct_prices": 23,
+    "conclusion": "Amount is identical to CoursePrice for every transaction. Spending features are therefore a deterministic function of which courses were taken, not an independent behavioural signal."
+  },
+  "EXP-003_sparsity": {
+    "n_learners": 3000,
+    "mean": 3.3333,
+    "median": 1.0,
+    "std": 4.3521,
+    "min": 1,
+    "max": 16,
+    "distribution": {
+      "1": 1620,
+      "2": 612,
+      "3": 186,
+      "4": 128,
+      "9": 1,
+      "10": 4,
+      "11": 31,
+      "12": 72,
+      "13": 122,
+      "14": 132,
+      "15": 74,
+      "16": 18
+    },
+    "n_with_1": 1620,
+    "n_with_2": 612,
+    "n_with_3_plus": 768,
+    "n_evaluable_loo": 1380,
+    "pct_with_1": 54.0,
+    "percentiles": {
+      "10": 1.0,
+      "25": 1.0,
+      "50": 1.0,
+      "75": 3.0,
+      "90": 13.0,
+      "95": 14.0,
+      "99": 15.0
+    },
+    "gini_user_activity": 0.5459,
+    "empty_band": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "cohort_light_1_to_4": {
+      "n_learners": 2546,
+      "n_interactions": 3914
+    },
+    "cohort_heavy_9_plus": {
+      "n_learners": 454,
+      "n_interactions": 6086
+    }
+  },
+  "EXP-004_temporal_split": {
+    "validation_date": "2025-09-12",
+    "test_date": "2025-10-18",
+    "n_train": 6992,
+    "n_validation": 1000,
+    "n_test": 2008,
+    "n_evaluable_learners": 791,
+    "protocol_a_viable": true,
+    "threshold": 300,
+    "primary_protocol": "A (global temporal)",
+    "date_min": "2025-01-01",
+    "date_max": "2025-12-30",
+    "n_distinct_dates": 358,
+    "monthly_counts": {
+      "2025-01": 833,
+      "2025-02": 766,
+      "2025-03": 857,
+      "2025-04": 831,
+      "2025-05": 825,
+      "2025-06": 899,
+      "2025-07": 826,
+      "2025-08": 844,
+      "2025-09": 870,
+      "2025-10": 762,
+      "2025-11": 869,
+      "2025-12": 818
+    },
+    "leave_one_out": {
+      "n_train": 8620,
+      "n_test": 1380,
+      "n_excluded_single_interaction": 1620
+    },
+    "persisted_to": "data\\processed\\splits\\split_metadata.json"
+  },
+  "EXP-005_teacher_course_mapping": {
+    "is_bijection": false,
+    "exp_014_cancelled": false,
+    "n_distinct_course_teacher_pairs": 887,
+    "teachers_per_course": {
+      "min": 7,
+      "max": 30,
+      "mean": 14.7833
+    },
+    "courses_per_teacher": {
+      "min": 7,
+      "max": 55,
+      "mean": 14.7833
+    },
+    "independence_chi2": {
+      "chi2": 31867.23,
+      "dof": 3481,
+      "p_value": 0.0
+    },
+    "expertise_matches_category_rate": 0.4111,
+    "expertise_match_random_expectation": 0.083333
+  },
+  "EXP-006_distributions": {
+    "course_popularity": {
+      "min": 140,
+      "max": 196,
+      "mean": 166.6667,
+      "std": 12.5234,
+      "gini": 0.0422,
+      "chi_square_uniform": {
+        "chi2": 55.52,
+        "dof": 59,
+        "p_value": 0.604556
+      }
+    },
+    "uniformity_tests": {
+      "users_age": {
+        "chi2": 16.762,
+        "dof": 20,
+        "p_value": 0.66837
+      },
+      "users_gender": {
+        "chi2": 0.5333,
+        "dof": 1,
+        "p_value": 0.465209
+      },
+      "courses_per_category": {
+        "chi2": 0.0,
+        "dof": 11,
+        "p_value": 1.0
+      },
+      "courses_per_level": {
+        "chi2": 0.3,
+        "dof": 2,
+        "p_value": 0.860708
+      },
+      "payment_method": {
+        "chi2": 1.8482,
+        "dof": 2,
+        "p_value": 0.396888
+      },
+      "transactions_per_day": {
+        "chi2": 380.8544,
+        "dof": 357,
+        "p_value": 0.184486
+      }
+    },
+    "activity_overdispersion": {
+      "mean": 3.3333,
+      "variance": 18.9412,
+      "note": "Poisson would require mean == variance"
+    }
+  },
+  "signal_detection": {
+    "preference_vs_popularity_null": {
+      "mean_distinct_categories": {
+        "observed": 2.577333,
+        "null_mean": 2.586878,
+        "null_ci_95": [
+          2.570983,
+          2.601683
+        ],
+        "z": -1.172,
+        "signal": false
+      },
+      "mean_top_category_share": {
+        "observed": 0.72102,
+        "null_mean": 0.719407,
+        "null_ci_95": [
+          0.716878,
+          0.722259
+        ],
+        "z": 1.125,
+        "signal": false
+      },
+      "mean_distinct_levels": {
+        "observed": 1.556,
+        "null_mean": 1.570662,
+        "null_ci_95": [
+          1.56,
+          1.581667
+        ],
+        "z": -2.6483,
+        "signal": true
+      },
+      "mean_free_share": {
+        "observed": 0.650066,
+        "null_mean": 0.639371,
+        "null_ci_95": [
+          0.626126,
+          0.653867
+        ],
+        "z": 1.5095,
+        "signal": false
+      }
+    },
+    "demographics_vs_choice": {
+      "gender_x_category": {
+        "chi2": 8.774,
+        "dof": 11,
+        "p_value": 0.642741,
+        "dependent": false
+      },
+      "gender_x_level": {
+        "chi2": 0.1978,
+        "dof": 2,
+        "p_value": 0.905841,
+        "dependent": false
+      },
+      "ageband_x_category": {
+        "chi2": 33.1705,
+        "dof": 33,
+        "p_value": 0.458947,
+        "dependent": false
+      },
+      "ageband_x_level": {
+        "chi2": 8.4284,
+        "dof": 6,
+        "p_value": 0.208365,
+        "dependent": false
+      }
+    },
+    "teacher_concentration": {
+      "observed_distinct_teachers_per_interaction": 0.688335,
+      "null_mean": 0.944027,
+      "null_ci_95": [
+        0.940989,
+        0.947973
+      ],
+      "signal": true
+    }
+  },
+  "behavioural_structure": {
+    "cohorts": {
+      "light_1_to_4": {
+        "n_learners": 2546,
+        "n_interactions": 3914,
+        "free_share": 0.6523,
+        "mean_course_rating": 3.1386,
+        "mean_level_ordinal": 1.0082,
+        "mean_age": 24.9792
+      },
+      "heavy_9_to_16": {
+        "n_learners": 454,
+        "n_interactions": 6086,
+        "free_share": 0.6326,
+        "mean_course_rating": 3.1134,
+        "mean_level_ordinal": 0.9786,
+        "mean_age": 24.9471
+      }
+    },
+    "teacher_reuse": {
+      "distinct_teachers_per_learner_mean": 2.2326,
+      "interactions_per_learner_mean": 6.0725,
+      "heavy_cohort_distinct_teachers_mean": 2.0,
+      "heavy_cohort_interactions_mean": 13.4053,
+      "light_multi_ratio": 0.9519,
+      "heavy_ratio": 0.1507
+    },
+    "teacher_predicts_next_course": {
+      "n_learners": 1380,
+      "mean_pool_size": 24.5551,
+      "mean_unseen_courses": 54.9275,
+      "hit_rate": 0.489855,
+      "chance_rate": 0.447045,
+      "lift": 1.0958,
+      "note": "Teacher reuse is strong, but each teacher covers ~25 of ~55 unseen courses, so it barely narrows which course comes next."
+    },
+    "level_progression": {
+      "n_learners": 735,
+      "mean_slope": 0.005264,
+      "t": 0.435,
+      "p_value": 0.663663,
+      "progression": false
+    },
+    "inter_purchase_gap_days": {
+      "mean": 39.2524,
+      "median": 23.0,
+      "max": 347,
+      "same_day_share": 0.016
+    }
+  },
+  "feature_candidates": {
+    "n_learners": 3000,
+    "n_features": 34,
+    "summary": {
+      "total_courses": {
+        "count": 3000.0,
+        "mean": 3.3333333333,
+        "std": 4.3521491959,
+        "min": 1.0,
+        "25%": 1.0,
+        "50%": 1.0,
+        "75%": 3.0,
+        "max": 16.0,
+        "skew": 1.8809,
+        "pct_zero": 0.0,
+        "n_unique": 12
+      },
+      "diversity_score": {
+        "count": 3000.0,
+        "mean": 2.5773333333,
+        "std": 2.7276056961,
+        "min": 1.0,
+        "25%": 1.0,
+        "50%": 1.0,
+        "75%": 2.0,
+        "max": 11.0,
+        "skew": 1.8108,
+        "pct_zero": 0.0,
+        "n_unique": 11
+      },
+      "avg_courses_per_category": {
+        "count": 3000.0,
+        "mean": 1.1129458874,
+        "std": 0.2505003726,
+        "min": 1.0,
+        "25%": 1.0,
+        "50%": 1.0,
+        "75%": 1.0,
+        "max": 3.25,
+        "skew": 2.3581,
+        "pct_zero": 0.0,
+        "n_unique": 33
+      },
+      "activity_span_days": {
+        "count": 3000.0,
+        "mean": 91.589,
+        "std": 124.377058294,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 189.0,
+        "max": 363.0,
+        "skew": 0.9538,
+        "pct_zero": 54.0667,
+        "n_unique": 353
+      },
+      "enrollment_frequency": {
+        "count": 3000.0,
+        "mean": 0.5607722217,
+        "std": 0.4813355106,
+        "min": 0.0057471264,
+        "25%": 0.0357142857,
+        "50%": 1.0,
+        "75%": 1.0,
+        "max": 2.0,
+        "skew": -0.1674,
+        "pct_zero": 0.0,
+        "n_unique": 646
+      },
+      "avg_course_rating": {
+        "count": 3000.0,
+        "mean": 3.1334714186,
+        "std": 0.9501634148,
+        "min": 1.13,
+        "25%": 2.57,
+        "50%": 3.1232589286,
+        "75%": 3.795,
+        "max": 4.94,
+        "skew": -0.0861,
+        "pct_zero": 0.0,
+        "n_unique": 1069
+      },
+      "category_entropy": {
+        "count": 3000.0,
+        "mean": 0.806277617,
+        "std": 1.0818286647,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 1.0,
+        "max": 3.3927474104,
+        "skew": 1.1104,
+        "pct_zero": 55.4667,
+        "n_unique": 94
+      },
+      "top_category_share": {
+        "count": 3000.0,
+        "mean": 0.7210203824,
+        "std": 0.3268167846,
+        "min": 0.125,
+        "25%": 0.5,
+        "50%": 1.0,
+        "75%": 1.0,
+        "max": 1.0,
+        "skew": -0.488,
+        "pct_zero": 0.0,
+        "n_unique": 23
+      },
+      "avg_spend": {
+        "count": 3000.0,
+        "mean": 89.3450124769,
+        "std": 125.054785475,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 26.93,
+        "75%": 133.465,
+        "max": 490.9,
+        "skew": 1.5366,
+        "pct_zero": 46.5,
+        "n_unique": 705
+      },
+      "total_spend": {
+        "count": 3000.0,
+        "mean": 303.77449,
+        "std": 482.5138585044,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 53.86,
+        "75%": 415.51,
+        "max": 3054.37,
+        "skew": 2.1318,
+        "pct_zero": 46.5,
+        "n_unique": 590
+      },
+      "diversity_ratio": {
+        "count": 3000.0,
+        "mean": 0.9305849151,
+        "std": 0.1448717474,
+        "min": 0.3076923077,
+        "25%": 1.0,
+        "50%": 1.0,
+        "75%": 1.0,
+        "max": 1.0,
+        "skew": -1.7895,
+        "pct_zero": 0.0,
+        "n_unique": 33
+      },
+      "learning_depth_index": {
+        "count": 3000.0,
+        "mean": 1.0014982212,
+        "std": 0.6957229017,
+        "min": 0.0,
+        "25%": 0.5,
+        "50%": 1.0,
+        "75%": 1.5,
+        "max": 2.0,
+        "skew": 0.0062,
+        "pct_zero": 21.7667,
+        "n_unique": 75
+      },
+      "free_ratio": {
+        "count": 3000.0,
+        "mean": 0.6500660386,
+        "std": 0.3930217784,
+        "min": 0.0,
+        "25%": 0.4666666667,
+        "50%": 0.75,
+        "75%": 1.0,
+        "max": 1.0,
+        "skew": -0.6607,
+        "pct_zero": 21.3667,
+        "n_unique": 50
+      },
+      "recency_days": {
+        "count": 3000.0,
+        "mean": 135.256,
+        "std": 105.7852603364,
+        "min": 0.0,
+        "25%": 38.0,
+        "50%": 115.0,
+        "75%": 220.0,
+        "max": 363.0,
+        "skew": 0.4977,
+        "pct_zero": 0.8667,
+        "n_unique": 358
+      },
+      "first_interaction_days": {
+        "count": 3000.0,
+        "mean": 226.845,
+        "std": 105.8839275356,
+        "min": 0.0,
+        "25%": 143.0,
+        "50%": 245.0,
+        "75%": 323.25,
+        "max": 363.0,
+        "skew": -0.4778,
+        "pct_zero": 0.2333,
+        "n_unique": 357
+      },
+      "n_teachers": {
+        "count": 3000.0,
+        "mean": 1.567,
+        "std": 0.7423126089,
+        "min": 1.0,
+        "25%": 1.0,
+        "50%": 1.0,
+        "75%": 2.0,
+        "max": 4.0,
+        "skew": 1.3502,
+        "pct_zero": 0.0,
+        "n_unique": 4
+      },
+      "teacher_loyalty": {
+        "count": 3000.0,
+        "mean": 0.1433661246,
+        "std": 0.3076572571,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 0.875,
+        "skew": 1.7781,
+        "pct_zero": 80.9,
+        "n_unique": 12
+      },
+      "avg_teacher_rating": {
+        "count": 3000.0,
+        "mean": 3.0026322448,
+        "std": 1.151081001,
+        "min": 1.05,
+        "25%": 2.0,
+        "50%": 3.07,
+        "75%": 3.945,
+        "max": 4.9142857143,
+        "skew": -0.0052,
+        "pct_zero": 0.0,
+        "n_unique": 479
+      },
+      "age": {
+        "count": 3000.0,
+        "mean": 24.9743333333,
+        "std": 6.0464751034,
+        "min": 15.0,
+        "25%": 20.0,
+        "50%": 25.0,
+        "75%": 30.0,
+        "max": 35.0,
+        "skew": -0.02,
+        "pct_zero": 0.0,
+        "n_unique": 21
+      },
+      "cat_share_artificial_intelligence": {
+        "count": 3000.0,
+        "mean": 0.0792220627,
+        "std": 0.2179434385,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.3124,
+        "pct_zero": 78.7,
+        "n_unique": 24
+      },
+      "cat_share_business": {
+        "count": 3000.0,
+        "mean": 0.0870691128,
+        "std": 0.2346521107,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.1136,
+        "pct_zero": 78.4,
+        "n_unique": 26
+      },
+      "cat_share_cybersecurity": {
+        "count": 3000.0,
+        "mean": 0.0885025932,
+        "std": 0.2382735052,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.0814,
+        "pct_zero": 78.2667,
+        "n_unique": 24
+      },
+      "cat_share_data_science": {
+        "count": 3000.0,
+        "mean": 0.0904557151,
+        "std": 0.2385531958,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.0587,
+        "pct_zero": 77.1667,
+        "n_unique": 27
+      },
+      "cat_share_design": {
+        "count": 3000.0,
+        "mean": 0.0867823279,
+        "std": 0.2314757517,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.1081,
+        "pct_zero": 78.1,
+        "n_unique": 27
+      },
+      "cat_share_digital_marketing": {
+        "count": 3000.0,
+        "mean": 0.0806979636,
+        "std": 0.2230029168,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.2813,
+        "pct_zero": 78.4667,
+        "n_unique": 24
+      },
+      "cat_share_finance": {
+        "count": 3000.0,
+        "mean": 0.0851573787,
+        "std": 0.2327095366,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.1962,
+        "pct_zero": 78.3333,
+        "n_unique": 26
+      },
+      "cat_share_machine_learning": {
+        "count": 3000.0,
+        "mean": 0.0820096214,
+        "std": 0.225402357,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.2448,
+        "pct_zero": 78.7,
+        "n_unique": 27
+      },
+      "cat_share_marketing": {
+        "count": 3000.0,
+        "mean": 0.0767937701,
+        "std": 0.216623619,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.41,
+        "pct_zero": 79.2333,
+        "n_unique": 25
+      },
+      "cat_share_programming": {
+        "count": 3000.0,
+        "mean": 0.0756600871,
+        "std": 0.2162692567,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.4148,
+        "pct_zero": 79.8333,
+        "n_unique": 29
+      },
+      "cat_share_project_management": {
+        "count": 3000.0,
+        "mean": 0.0830336936,
+        "std": 0.2318877133,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.2465,
+        "pct_zero": 78.8,
+        "n_unique": 28
+      },
+      "cat_share_web_development": {
+        "count": 3000.0,
+        "mean": 0.0846156737,
+        "std": 0.2279091654,
+        "min": 0.0,
+        "25%": 0.0,
+        "50%": 0.0,
+        "75%": 0.0,
+        "max": 1.0,
+        "skew": 3.1565,
+        "pct_zero": 78.2667,
+        "n_unique": 25
+      }
+    },
+    "high_correlations": [
+      {
+        "a": "avg_courses_per_category",
+        "b": "diversity_ratio",
+        "r": -0.9838
+      },
+      {
+        "a": "total_courses",
+        "b": "diversity_score",
+        "r": 0.9833
+      },
+      {
+        "a": "total_courses",
+        "b": "teacher_loyalty",
+        "r": 0.9626
+      },
+      {
+        "a": "diversity_score",
+        "b": "category_entropy",
+        "r": 0.955
+      },
+      {
+        "a": "category_entropy",
+        "b": "top_category_share",
+        "r": -0.9507
+      },
+      {
+        "a": "diversity_score",
+        "b": "teacher_loyalty",
+        "r": 0.9332
+      },
+      {
+        "a": "total_courses",
+        "b": "category_entropy",
+        "r": 0.9236
+      },
+      {
+        "a": "enrollment_frequency",
+        "b": "top_category_share",
+        "r": 0.9174
+      },
+      {
+        "a": "activity_span_days",
+        "b": "category_entropy",
+        "r": 0.9101
+      },
+      {
+        "a": "activity_span_days",
+        "b": "top_category_share",
+        "r": -0.8758
+      },
+      {
+        "a": "diversity_ratio",
+        "b": "teacher_loyalty",
+        "r": -0.8725
+      },
+      {
+        "a": "diversity_score",
+        "b": "activity_span_days",
+        "r": 0.8513
+      },
+      {
+        "a": "category_entropy",
+        "b": "teacher_loyalty",
+        "r": 0.8453
+      },
+      {
+        "a": "total_courses",
+        "b": "total_spend",
+        "r": 0.8421
+      },
+      {
+        "a": "total_courses",
+        "b": "activity_span_days",
+        "r": 0.8341
+      },
+      {
+        "a": "total_courses",
+        "b": "diversity_ratio",
+        "r": -0.8323
+      },
+      {
+        "a": "diversity_score",
+        "b": "total_spend",
+        "r": 0.8321
+      },
+      {
+        "a": "enrollment_frequency",
+        "b": "n_teachers",
+        "r": -0.8263
+      },
+      {
+        "a": "diversity_score",
+        "b": "top_category_share",
+        "r": -0.821
+      },
+      {
+        "a": "top_category_share",
+        "b": "n_teachers",
+        "r": -0.8148
+      },
+      {
+        "a": "avg_courses_per_category",
+        "b": "teacher_loyalty",
+        "r": 0.8147
+      },
+      {
+        "a": "total_spend",
+        "b": "teacher_loyalty",
+        "r": 0.8135
+      },
+      {
+        "a": "activity_span_days",
+        "b": "enrollment_frequency",
+        "r": -0.8119
+      },
+      {
+        "a": "avg_spend",
+        "b": "free_ratio",
+        "r": -0.8058
+      },
+      {
+        "a": "category_entropy",
+        "b": "avg_teacher_rating",
+        "r": 0.8028
+      },
+      {
+        "a": "enrollment_frequency",
+        "b": "category_entropy",
+        "r": -0.8027
+      }
+    ]
+  }
+}

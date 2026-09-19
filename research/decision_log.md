@@ -374,6 +374,170 @@ rather than silent.
 
 ---
 
+## Phase 2 — Dataset audit (19 September 2026)
+
+### D-019 — No cleaning step; the raw data needs none
+**Status:** Settled
+
+EXP-001 returned **0 errors**: zero nulls across 27 columns and 13,120 rows, zero
+orphan foreign keys in either direction, zero duplicate keys, zero duplicate rows,
+no out-of-domain values, no negative amounts, no unparseable dates.
+
+**Decision:** the pipeline has **no cleaning stage**. A transformation that does
+nothing is worse than none — it implies the data needed fixing and invites future
+readers to trust a step that was never exercised.
+
+One borderline value was examined and deliberately **left uncorrected**: `CR00028`
+is typed *Paid* at a price of 0.78, the lowest non-zero price in a catalogue where
+38 courses sit at exactly 0.00. It is internally consistent (Paid ⟺ price > 0), and
+rounding it would alter an original value (§8).
+
+---
+
+### D-020 — `avg_spend` kept but documented as degenerate; `total_spend` dropped
+**Status:** Settled — answers Q-1
+
+**Evidence (EXP-002):** `Amount` equals `CoursePrice` on **all 10,000 rows**. There
+is not one discount, promotion, refund or price change in a full year of data.
+
+`avg_spend` is therefore a deterministic function of which courses a learner chose
+— it is the mean price of their basket, not a spending behaviour. The brief
+mandates "average spending per learner", so it is **retained and reported**, with
+the redundancy stated wherever it appears.
+
+`total_spend` is **dropped**: r = +0.84 with `total_courses`, so it adds volume
+information already carried, and nothing else. `free_ratio` is preferred as the
+interpretable form of the same underlying choice.
+
+---
+
+### D-021 — Tier boundaries are set by the data, not tuned
+**Status:** Settled — answers Q-4
+
+**Evidence (EXP-003):** the interaction distribution is bimodal with a **hard empty
+band at 5–8** — not one learner in 3,000. 54.0% have exactly one interaction.
+
+Phase 1 pre-registered a rule for deriving the moderate/rich boundary *t* from
+validation performance. **That rule is not needed for this boundary**: the data
+supplies it. Tiers are 1 (minimal, 54.0%) / 2–4 (moderate, 30.9%) / ≥9 (rich,
+15.1%).
+
+**Why this is better than the pre-registered rule:** a boundary drawn through an
+empty region cannot be accused of being fitted to the outcome. The pre-registered
+rule remains in force for any boundary the data does not hand over.
+
+---
+
+### D-022 — Protocol A (global temporal) confirmed as primary
+**Status:** Settled by the pre-registered rule — answers Q-6
+
+**Evidence (EXP-004):** V = 2025-09-12, T = 2025-10-18, **791 evaluable learners**
+against the threshold of 300 fixed in Phase 1.
+
+The leakage-free protocol is viable, so it is primary, exactly as pre-registered.
+Leave-one-out (1,380 evaluable) is retained as the labelled leakage-bearing
+secondary. The split is persisted to `data/processed/splits/` and **no experiment
+re-derives it**.
+
+**Worth noting:** 791 is above the threshold but is only 26% of the user base, so
+Protocol A estimates will be noisier than the 10,000-interaction headline suggests.
+That is a caveat on precision, not a reason to switch.
+
+---
+
+### D-023 — EXP-014 proceeds: the teacher hypothesis was wrong
+**Status:** Settled — answers Q-9; reverses part of D-007's expectation
+
+**Evidence (EXP-005):** the teacher→course mapping is **not** a bijection. There
+are **887 distinct `(course, teacher)` pairs**; each course has 7–30 teachers and
+each teacher 7–55 courses. Teacher assignment is not independent of course
+(χ² = 31,867, p < 0.0001), and `Expertise` matches `CourseCategory` on 41.1% of
+transactions against an 8.3% chance rate.
+
+Phase 1 hypothesised a bijection, which would have made every teacher-derived
+feature an alias for a course-derived one and cancelled the experiment. **That was
+wrong**, and the cheap prerequisite check is what caught it — which is the argument
+for gating expensive experiments on cheap ones.
+
+The teacher dimension also turns out to hold the **only detectable behavioural
+signal in the dataset** (D-024), so EXP-014 matters more than Phase 1 anticipated,
+not less. Teacher features nonetheless remain **out of the core model** until the
+ablation provides evidence (§11).
+
+---
+
+### D-024 — The central finding: no course-choice signal exists
+**Status:** Settled as a finding; its consequences play out in Phase 3
+
+**Evidence (EXP-006):** against a permutation null in which each learner's courses
+are redrawn from the empirical popularity distribution with history length held
+fixed (200 replicates, seed 42):
+
+| Statistic | Observed | Null 95% CI | z |
+| --- | --- | --- | --- |
+| Mean distinct categories | 2.5773 | [2.571, 2.602] | −1.17 |
+| Mean top-category share | 0.7210 | [0.717, 0.722] | +1.12 |
+| Mean distinct levels | 1.5560 | [1.560, 1.582] | −2.65 |
+| Mean free-course share | 0.6501 | [0.626, 0.654] | +1.51 |
+
+Course popularity is near-uniform (140–196, Gini 0.042, χ² p = 0.60). Item–item
+co-occurrence is *below* the null. Demographics are independent of choice (all
+p > 0.2). There is no level progression (p = 0.664).
+
+**The one real signal is instructor loyalty**: 0.688 distinct teachers per
+interaction against a null of 0.944 — but it lifts next-course prediction only
+**1.10×**, because each teacher covers ~15 of ~55 unseen courses.
+
+**Consequence, stated plainly:** the most likely honest Phase 3 outcome is that **no
+recommender meaningfully beats random on this dataset**. This is a property of the
+data, not a failure of method. §6 requires it be reported as the headline rather
+than buried, and the Phase 1 evaluation design — random baseline in every table,
+coverage co-primary, pre-registered selection rules — exists precisely so this
+outcome can be stated clearly.
+
+**What is *not* concluded:** that the methods do not work, or that personalisation
+is impossible in education. Neither follows. The pipeline, leakage controls and
+evaluation protocol would transfer unchanged to real EduPro data.
+
+---
+
+### D-025 — The dataset is assessed as synthetic
+**Status:** Settled as an assessment — answers Q-8
+
+Empty band at 5–8 · exactly 5 courses in each of 12 categories · zero nulls across
+13,120 rows · zero orphans in any direction · uniform popularity (p = 0.60), age
+(p = 0.67), gender (p = 0.47), payment method (p = 0.40), daily volume (p = 0.18) ·
+sequential gapless IDs · `Amount` ≡ `CoursePrice` all year.
+
+Stated as an **assessment with its evidence**, not as a proven fact: no generation
+metadata accompanies the workbook.
+
+**Consequence:** segment descriptions must be phrased as descriptions of *this
+dataset*, not of learner psychology. Registered as threat V8; must appear in the
+research paper's limitations. It is also why the gap statistic and per-cluster
+stability added in Phase 1 (D-017) became essential — they are the instruments that
+can report "no real structure" if that is the answer.
+
+Instructively, **`Teachers.Expertise` is not uniform** and teacher reuse is strongly
+non-random: whoever generated this data modelled the teacher dimension with
+structure and the course-choice dimension without it.
+
+---
+
+### D-026 — Level-progression feature rejected on measurement
+**Status:** Settled
+
+Phase 1 listed "level progression" as a defensible additional feature candidate.
+**Measured:** within-learner level slope over time is +0.0053, t = 0.435,
+**p = 0.664** across 735 eligible learners; mean first-course level 0.988 vs mean
+last-course level 0.980.
+
+**Decision:** rejected. Learners do not progress from beginner to advanced in this
+data, so the feature would encode noise. Recorded here rather than silently omitted
+— it was proposed, tested, and failed.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were
@@ -383,13 +547,13 @@ questions P-1…P-5 are in `production_research.md` §7.
 
 | # | Question | Raised by | Settles in |
 | --- | --- | --- | --- |
-| Q-1 | Is `Transactions.Amount` simply `Courses.CoursePrice` at purchase time? Both have exactly 23 distinct values. If they are identical, "average spending" and "average course price" are the same feature under two names, and only one belongs in the model. | Phase 0 inventory | Phase 2 |
-| Q-2 | `Courses.CourseName` has 58 distinct values across 60 unique `CourseID`s — two names repeat. Are these genuinely distinct courses, or duplicates? Affects content-based similarity and the de-duplication of recommendations. | Phase 0 inventory | Phase 2 |
-| Q-3 | Should `CoursePrice` and `CourseDuration` be used at all? They are in the workbook but absent from the official field list. Using them needs justification; ignoring them may discard signal. | Phase 0 transcript | Phase 2/3 |
-| Q-4 | Where do the sparse-history tier boundaries fall? The mean is 3.333 courses per learner, but the mean is not the distribution. | CLAUDE.md §15 | Phase 2 |
-| Q-5 | Variant A (behaviour + demographics) or Variant B (behaviour only)? Must be decided on cluster quality, stability, behavioural consistency, interpretability and feature dominance — not assumed. | CLAUDE.md §10 | Phase 3 |
-| Q-6 | Is a temporal hold-out even viable? It requires enough per-learner history; at a mean of 3.333 interactions, a leave-one-out scheme may leave very little to train on, and one-interaction learners must not be evaluated as if personalised (§12). | CLAUDE.md §9, §12 | Phase 2/3 |
+| Q-1 | Is `Transactions.Amount` simply `Courses.CoursePrice` at purchase time? Both have exactly 23 distinct values. If they are identical, "average spending" and "average course price" are the same feature under two names, and only one belongs in the model. | Phase 0 inventory | **ANSWERED (D-020)** — identical on all 10,000 rows |
+| Q-2 | `Courses.CourseName` has 58 distinct values across 60 unique `CourseID`s — two names repeat. Are these genuinely distinct courses, or duplicates? Affects content-based similarity and the de-duplication of recommendations. | Phase 0 inventory | **ANSWERED** — 2 repeated names, distinct courses; no de-duplication |
+| Q-3 | Should `CoursePrice` and `CourseDuration` be used at all? They are in the workbook but absent from the official field list. Using them needs justification; ignoring them may discard signal. | Phase 0 transcript | **ANSWERED** — price enters via `free_ratio`; duration kept as a content attribute only |
+| Q-4 | Where do the sparse-history tier boundaries fall? The mean is 3.333 courses per learner, but the mean is not the distribution. | CLAUDE.md §15 | **ANSWERED (D-021)** — 1 / 2–4 / ≥9, handed over by the empty band |
+| Q-5 | Variant A (behaviour + demographics) or Variant B (behaviour only)? Must be decided on cluster quality, stability, behavioural consistency, interpretability and feature dominance — not assumed. | CLAUDE.md §10 | **Evidence gathered** — demographics independent of choice (all p > 0.2), so Variant A cannot help recommendation. Cluster quality still decided by EXP-011 |
+| Q-6 | Is a temporal hold-out even viable? It requires enough per-learner history; at a mean of 3.333 interactions, a leave-one-out scheme may leave very little to train on, and one-interaction learners must not be evaluated as if personalised (§12). | CLAUDE.md §9, §12 | **ANSWERED (D-022)** — viable; Protocol A primary, 791 evaluable |
 | Q-7 | How is "Engagement Lift (Proxy)" defined so that it is honest? The official document requires the metric but defines no formula. Whatever is used must be labelled a proxy and must not be presented as measured causal impact (§6). | Official doc, p.5 | **Answered by D-014** (definition fixed); magnitude in Phase 3 |
-| Q-8 | **Is the dataset synthetic?** Zero missing values across 27 columns; 21 distinct ages in *both* Users and Teachers; 23 distinct values in *both* Amount and CoursePrice. If generated, learned cluster structure may be a generator artefact rather than real learner behaviour — a material threat to validity. | Phase 1 review of Phase 0 cardinalities | Phase 2 (EXP-006) |
-| Q-9 | **Is `Transactions.TeacherID` a deterministic function of `CourseID`?** With exactly 60 teachers and 60 courses it may be a bijection — in which case every teacher-derived feature is an alias for a course-derived one and the §11 experiment is vacuous. | Phase 1 research on the teacher experiment | Phase 2 (EXP-005) |
+| Q-8 | **Is the dataset synthetic?** Zero missing values across 27 columns; 21 distinct ages in *both* Users and Teachers; 23 distinct values in *both* Amount and CoursePrice. If generated, learned cluster structure may be a generator artefact rather than real learner behaviour — a material threat to validity. | Phase 1 review of Phase 0 cardinalities | **ANSWERED (D-025)** — almost certainly synthetic |
+| Q-9 | **Is `Transactions.TeacherID` a deterministic function of `CourseID`?** With exactly 60 teachers and 60 courses it may be a bijection — in which case every teacher-derived feature is an alias for a course-derived one and the §11 experiment is vacuous. | Phase 1 research on the teacher experiment | **ANSWERED (D-023)** — not a bijection; EXP-014 proceeds |
 | Q-10 | **Does the segmentation improve recommendation at all?** ADR-0005 deliberately made the cluster signal ablatable so this can be measured. If cluster-popularity does not beat global popularity, the segmentation has no demonstrated recommendation value — though it may retain standalone analytical value for the brief's learner-analysis requirement. | ADR-0005; RQ6 | Phase 3 (EXP-023 vs EXP-020) |

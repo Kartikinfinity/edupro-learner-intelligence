@@ -20,10 +20,10 @@ logged experiment, or a reviewable artifact. Not before.
 
 | # | Requirement | Implementation | Verification | Status |
 | --- | --- | --- | --- | --- |
-| A1 | Aggregate transaction data at UserID level | `edupro.features` | Phase 2/3 | Not started |
-| A2 | Learner profiles combining demographics and behaviour | `edupro.features` | Phase 2/3 | Not started |
-| A3 | Engagement features | `edupro.features` | EXP-010+ | Not started |
-| A4 | Preference features | `edupro.features` | EXP-010+ | Not started |
+| A1 | Aggregate transaction data at UserID level | `edupro.features.learner` | 36 pipeline tests | **Implemented** |
+| A2 | Learner profiles combining demographics and behaviour | `edupro.features.learner` | tests + EDA notebook | **Implemented** |
+| A3 | Engagement features | `edupro.features.learner` | EXP-006 distributions | **Implemented** |
+| A4 | Preference features | `edupro.features.learner` | EXP-006 distributions | **Implemented** |
 
 ## B. Feature engineering (official, pp.3–4)
 
@@ -32,20 +32,22 @@ and justified individually; none is dropped without a recorded reason.
 
 | # | Feature | Official group | Status |
 | --- | --- | --- | --- |
-| B1 | Age | (demographic; Users sheet) | Not started |
-| B2 | Gender | (demographic; Users sheet) | Not started |
-| B3 | Total courses enrolled | Engagement | Not started |
-| B4 | Average courses per category | Engagement | Not started |
-| B5 | Enrollment frequency | Engagement | Not started |
-| B6 | Preferred course category | Preference | Not started |
-| B7 | Preferred course level | Preference | Not started |
-| B8 | Average course rating enrolled | Preference | Not started |
-| B9 | Average spending per learner | Behavioural | Not started |
-| B10 | Diversity score (categories explored) | Behavioural | Not started |
-| B11 | Learning depth index (beginner vs advanced ratio) | Behavioural | Not started |
+| B1 | Age | (demographic; Users sheet) | **Implemented** |
+| B2 | Gender | (demographic; Users sheet) | **Implemented** |
+| B3 | Total courses enrolled | Engagement | **Implemented** |
+| B4 | Average courses per category | Engagement | **Implemented** |
+| B5 | Enrollment frequency | Engagement | **Implemented** |
+| B6 | Preferred course category | Preference | **Implemented** |
+| B7 | Preferred course level | Preference | **Implemented** |
+| B8 | Average course rating enrolled | Preference | **Implemented** |
+| B9 | Average spending per learner | Behavioural | **Implemented** |
+| B10 | Diversity score (categories explored) | Behavioural | **Implemented** |
+| B11 | Learning depth index (beginner vs advanced ratio) | Behavioural | **Implemented** |
 
-> **Open:** B9 may be degenerate if `Transactions.Amount` is simply
-> `Courses.CoursePrice` (decision log Q-1). Settled in Phase 2.
+> **RESOLVED (EXP-002).** `Transactions.Amount` **is** `Courses.CoursePrice`, on
+> all 10,000 rows. B9 is therefore a deterministic function of catalogue choice,
+> not independent spending behaviour. It is retained because the brief mandates it,
+> with the redundancy documented wherever it is reported (decision log D-020).
 
 ## C. Data preprocessing (official, p.4)
 
@@ -135,7 +137,7 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | ADR-0001; `app/` | Not started |
 | I15 | Artifacts persisted and version-consistent | 22 | `models/`, `artifacts/` | Not started |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` | In progress |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — 67 tests: environment, loading, schema, validation, joins, features, splits | In progress |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
