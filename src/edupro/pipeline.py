@@ -91,6 +91,9 @@ class ProductionConfig:
 
 PRODUCTION = ProductionConfig()
 
+#: One declared width for cluster labels, everywhere they are produced or stored.
+CLUSTER_DTYPE = "int64"
+
 #: Directory holding the persisted data tables, relative to the project root.
 PRODUCTION_ARTIFACTS: Path = config.ARTIFACTS_DIR / "production"
 
@@ -340,7 +343,11 @@ def train(
             f"K-Means produced {len(set(labels))} non-empty clusters, "
             f"expected {PRODUCTION.n_clusters}."
         )
-    clusters = pd.Series(labels, index=features.index, name="cluster")
+    # Cast explicitly: scikit-learn's label dtype is platform-dependent (int32
+    # here), and inference returns platform int, so two identical answers compared
+    # unequal under a dtype-strict check. Declaring the width in both places makes
+    # "does inference reproduce training?" answerable. Found by the Phase 6A audit.
+    clusters = pd.Series(labels, index=features.index, name="cluster").astype(CLUSTER_DTYPE)
     logger.info("Fitted %d segments", PRODUCTION.n_clusters)
 
     # --- 7. segment profiling and naming ------------------------------------

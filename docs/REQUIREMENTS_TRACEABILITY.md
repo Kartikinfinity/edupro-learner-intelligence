@@ -124,7 +124,7 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | --- | --- | --- | --- | --- |
 | I1 | Raw data immutable | 8 | ADR-0003; checksums in `edupro.config` | **Verified** |
 | I2 | `data/raw/` + `data/processed/` maintained | 8 | Repository layout | **Verified** |
-| I3 | Leakage detection for temporal evaluation | 9 | All six controls verified in-run at both stages; the checker is itself tested able to fail | **Verified** |
+| I3 | Leakage detection for temporal evaluation | 9 | All six controls verified in-run at both stages; the checker is itself tested able to fail; Phase 6A added a future-injection *experiment* — a synthetic post-test-cut interaction changes no training feature | **Verified** |
 | I4 | Variant A vs Variant B segmentation | 10 | EXP-011 run: ARI 1.000, demographic share 0.0004, Variant B by the pre-registered rule (D-029) | **Verified** |
 | I5 | Teachers sheet as explicit experiment | 11 | EXP-005 refuted the bijection; EXP-014 (segmentation) and EXP-022d (recommendation) both run and **rejected on evidence** (D-030); excluded from `edupro-1.0.0` | **Verified** |
 | I6 | Temporal hold-out; sparse users handled separately | 12 | Both protocols run; 350 zero-history learners excluded from personalised evaluation and counted | **Verified** |
@@ -137,11 +137,24 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | `st.cache_resource` around a 0.41 s load; a test asserts no ML call appears anywhere under `app/` | **Verified** |
 | I15 | Artifacts persisted and version-consistent | 22 | `edupro.persistence` — manifest with library versions, workbook checksum and a per-file hash; 11 files; mismatch and half-update both asserted to raise | **Verified** |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **245 tests**; every dashboard page is executed by `AppTest` exactly as the server would | **Verified** |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **257 tests**; every dashboard page executed by `AppTest`, plus 12 regression tests holding the Phase 6A defects | **Verified** |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
 | I20 | Reproducible environment | 3, 26 | `requirements*.txt`, `.venv` | **Verified** |
+
+---
+
+## Phase 6A status summary (19 September 2026)
+
+An adversarial audit (59 probes) and an application smoke test (20 probes) found
+**three real defects**, all now fixed and held by regression tests. Sections A-G
+remain Verified; I3 and I16 are strengthened by the new evidence.
+
+The project installs and runs end to end in a clean environment built from
+`requirements.txt`, and eight stored experiment results recompute exactly in both
+environments. Remaining scope is section **H**: the research paper, the executive
+summary and public deployment.
 
 ---
 

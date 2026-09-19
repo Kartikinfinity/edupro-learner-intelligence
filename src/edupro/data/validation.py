@@ -158,6 +158,37 @@ def validate_sheet(frame: pd.DataFrame, spec: SheetSpec, report: ValidationRepor
 # ---------------------------------------------------------------------------
 # Cross-sheet checks
 # ---------------------------------------------------------------------------
+def _available(
+    frame: pd.DataFrame,
+    columns: tuple[str, ...],
+    check: str,
+    sheet: str,
+    report: ValidationReport,
+) -> bool:
+    """Guard a cross-sheet check against columns that are not there.
+
+    The sheet-level pass has already recorded ``columns_missing`` as an *error* for
+    anything absent, so the report is complete without this check running. What
+    matters is that a missing column must not take the validator down with it: a
+    checker that raises on the first corruption it exists to report is worse than
+    no checker, because the caller gets an opaque ``KeyError`` instead of a
+    validation report naming the problem.
+
+    Found by the Phase 6A adversarial audit, which crashed here on the very first
+    corruption probe.
+    """
+    missing = [column for column in columns if column not in frame.columns]
+    if not missing:
+        return True
+    report.add(
+        check, "info", sheet,
+        f"skipped: required column(s) absent ({sorted(missing)}); "
+        "see the columns_missing error above",
+        len(missing),
+    )
+    return False
+
+
 def validate_referential_integrity(data: EduProData, report: ValidationReport) -> None:
     """Foreign keys resolve, and every parent row is referenced."""
     parents = {
@@ -171,6 +202,12 @@ def validate_referential_integrity(data: EduProData, report: ValidationReport) -
         config.SHEET_TRANSACTIONS
     ].foreign_keys.items():
         parent_frame, key = parents[parent_sheet]
+        if not _available(tx, (column,), "referential_integrity",
+                          config.SHEET_TRANSACTIONS, report):
+            continue
+        if not _available(parent_frame, (key,), "referential_integrity",
+                          parent_sheet, report):
+            continue
         orphans = int((~tx[column].isin(parent_frame[key])).sum())
         if orphans:
             report.add("orphan_fk", "error", config.SHEET_TRANSACTIONS,
@@ -187,6 +224,20 @@ def validate_transactions(data: EduProData, report: ValidationReport) -> None:
     """Interaction-level guarantees the recommendation pipeline relies on."""
     tx = data.transactions
 
+    if _available(tx, (config.KEY_USER, config.KEY_COURSE), "repeat_enrollment",
+                  config.SHEET_TRANSACTIONS, report):
+        _validate_repeat_enrollment(tx, report)
+    if _available(tx, (config.COL_TRANSACTION_DATE,), "date_validity",
+                  config.SHEET_TRANSACTIONS, report):
+        _validate_dates(tx, report)
+    if _available(tx, ("Amount",), "amount_validity", config.SHEET_TRANSACTIONS, report):
+        negative = int((pd.to_numeric(tx["Amount"], errors="coerce") < 0).sum())
+        if negative:
+            report.add("amount_validity", "error", config.SHEET_TRANSACTIONS,
+                       f"{negative} negative Amount value(s)", negative)
+
+
+def _validate_repeat_enrollment(tx: pd.DataFrame, report: ValidationReport) -> None:
     repeat = int(tx.duplicated(subset=[config.KEY_USER, config.KEY_COURSE]).sum())
     if repeat:
         report.add("repeat_enrollment", "warning", config.SHEET_TRANSACTIONS,
@@ -196,6 +247,8 @@ def validate_transactions(data: EduProData, report: ValidationReport) -> None:
                    "no repeat (UserID, CourseID) pairs: the signal is purely binary/implicit",
                    0)
 
+
+def _validate_dates(tx: pd.DataFrame, report: ValidationReport) -> None:
     dates = tx[config.COL_TRANSACTION_DATE]
     if dates.isna().any():
         report.add("date_validity", "error", config.SHEET_TRANSACTIONS,
@@ -205,14 +258,15 @@ def validate_transactions(data: EduProData, report: ValidationReport) -> None:
                    f"dates span {dates.min().date()} to {dates.max().date()} "
                    f"({dates.nunique()} distinct days)", int(dates.nunique()))
 
-    negative = int((pd.to_numeric(tx["Amount"], errors="coerce") < 0).sum())
-    if negative:
-        report.add("amount_validity", "error", config.SHEET_TRANSACTIONS,
-                   f"{negative} negative Amount value(s)", negative)
-
 
 def validate_price_consistency(data: EduProData, report: ValidationReport) -> None:
     """Amount vs CoursePrice, and CourseType vs CoursePrice."""
+    if not _available(data.transactions, (config.KEY_COURSE, "Amount"), "amount_vs_price",
+                      config.SHEET_TRANSACTIONS, report):
+        return
+    if not _available(data.courses, (config.KEY_COURSE, "CoursePrice", "CourseType"),
+                      "amount_vs_price", config.SHEET_COURSES, report):
+        return
     merged = data.transactions.merge(
         data.courses[[config.KEY_COURSE, "CoursePrice"]], on=config.KEY_COURSE, how="left"
     )
@@ -245,6 +299,9 @@ def validate_price_consistency(data: EduProData, report: ValidationReport) -> No
 def validate_course_catalogue(data: EduProData, report: ValidationReport) -> None:
     """Catalogue-level properties that affect content-based similarity."""
     courses = data.courses
+    if not _available(courses, ("CourseName",), "duplicate_course_names",
+                      config.SHEET_COURSES, report):
+        return
     dup_names = int(courses["CourseName"].duplicated().sum())
     if dup_names:
         repeated = sorted(

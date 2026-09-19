@@ -113,7 +113,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **245 passed**. That result confirms the modelling stack is
+A clean run reports **257 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 

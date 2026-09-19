@@ -1076,6 +1076,88 @@ and invisible to a reviewer.
 
 ---
 
+## Phase 6A — Adversarial validation (19 September 2026)
+
+### D-054 — A validator must never raise; it must report
+**Status:** Settled by a critical defect found under attack
+
+The Phase 6A audit's *first* corruption probe — dropping a column — crashed the
+validator. Four cross-sheet checks indexed columns without checking they existed,
+so a missing column raised `KeyError` from inside `validate_transactions` and the
+run died before returning the report that named the problem.
+
+**Why this is worse than it looks.** The sheet-level pass had *already* recorded
+`columns_missing` as an error. The verdict existed; the crash destroyed it. A
+caller feeding the pipeline a malformed file got an opaque `KeyError` that looks
+like a bug in the loader, and the pipeline's "refuse to train on invalid data"
+guard never ran — so the most basic corruption defeated both the validator and the
+protection built on top of it.
+
+**Rule adopted:** a validation function reports; it does not raise on the input it
+is validating. Cross-sheet checks now guard on the columns they need and record an
+informational skip, because the error that matters has already been recorded.
+
+**Guarded by** 8 regression tests over 6 column/sheet combinations, a
+multi-column case, and the pipeline-refusal path.
+
+---
+
+### D-055 — An error message must name its own cause
+**Status:** Settled
+
+A learner who had taken all 60 courses was told: *"No candidate courses remain
+after filtering (category=None, level=None) and excluding 0 already-enrolled
+courses."* Two things wrong: it blamed a filter that was never applied, and it
+counted from the history table rather than from the exclusion set the scorer used.
+
+**Why it matters more than its size suggests.** A wrong diagnosis is worse than a
+generic one. "No candidates after filtering" sends whoever reads it to look at the
+filters, which are fine. The message now distinguishes catalogue exhaustion,
+over-narrow filters and an empty unseen set, and counts from the structure that
+produced the result.
+
+**Guarded by** 2 regression tests, one asserting the message must *not* mention a
+filter that was not applied.
+
+---
+
+### D-056 — One declared dtype for cluster labels
+**Status:** Settled
+
+`assign_segment(...).equals(features["cluster"])` was `False` while
+`(... == ...).all()` was `True`. The pipeline persisted scikit-learn's
+platform-dependent label dtype (`int32` here); inference returned platform `int`.
+
+Nothing was wrong with the labels. What was wrong is that **the obvious way to ask
+"does inference reproduce training?" gave the wrong answer** — and any future
+comparison, merge or artifact check written the obvious way would have failed
+silently. `CLUSTER_DTYPE = "int64"` is now declared once and applied in both
+places.
+
+**Guarded by** 2 regression tests, one requiring the strict comparison to hold.
+
+---
+
+### D-057 — An audit records its own mistakes
+**Status:** Methodological rule adopted in Phase 6A
+
+Five of the audit's initial "failures" were the harness's fault, not the system's:
+a probe expecting the wrong check name; a probe treating a correct refusal as a
+weakness; a probe using a dtype-strict comparison to ask a value question; a probe
+reading the wrong element type; and a probe defeated by `st.cache_resource`
+serving it a warm model.
+
+All five are recorded in `research/final_validation_report.md` rather than quietly
+deleted. An audit that files its own bugs as system defects inflates its findings;
+one that deletes them hides how much of its coverage was illusory. The third case
+is the instructive one — a probe that was wrong about *what it was testing* still
+surfaced a real inconsistency underneath (D-056).
+
+**Rule:** a probe that cannot fail proves nothing, and a probe that fails for its
+own reasons is reported as such.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were

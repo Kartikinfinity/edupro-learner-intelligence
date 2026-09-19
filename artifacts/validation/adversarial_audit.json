@@ -1,0 +1,479 @@
+{
+  "provenance": {
+    "workbook_sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
+    "artifact_set": "530e28eb1793",
+    "model_version": "edupro-1.0.0",
+    "mode": "exhaustive",
+    "elapsed_seconds": 149.0
+  },
+  "summary": {
+    "n_probes": 59,
+    "n_pass": 59,
+    "n_warn": 0,
+    "n_fail": 0
+  },
+  "findings": [
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "clean data passes",
+      "severity": "pass",
+      "detail": "0 errors, 1 warning(s)",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "missing column",
+      "severity": "pass",
+      "detail": "rejected by columns_missing",
+      "evidence": {
+        "n_errors": 1
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "missing values",
+      "severity": "pass",
+      "detail": "rejected by nulls",
+      "evidence": {
+        "n_errors": 2
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "duplicate records",
+      "severity": "pass",
+      "detail": "rejected by duplicate_rows",
+      "evidence": {
+        "n_errors": 2
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "duplicate primary key",
+      "severity": "pass",
+      "detail": "rejected by uniqueness",
+      "evidence": {
+        "n_errors": 2
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "malformed identifier",
+      "severity": "pass",
+      "detail": "rejected by id_format",
+      "evidence": {
+        "n_errors": 2
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "orphan foreign key",
+      "severity": "pass",
+      "detail": "rejected by orphan_fk",
+      "evidence": {
+        "n_errors": 1
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "malformed dates",
+      "severity": "pass",
+      "detail": "rejected by nulls",
+      "evidence": {
+        "n_errors": 2
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "invalid category",
+      "severity": "pass",
+      "detail": "rejected by value_domain",
+      "evidence": {
+        "n_errors": 1
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "out-of-range course values",
+      "severity": "pass",
+      "detail": "rejected by range",
+      "evidence": {
+        "n_errors": 2
+      }
+    },
+    {
+      "check": "CHECK 1 - DATA: does validation actually reject bad input?",
+      "probe": "pipeline refuses invalid data",
+      "severity": "pass",
+      "detail": "training aborted on a validation error",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "single-interaction learner",
+      "severity": "pass",
+      "detail": "1 courses, all features finite",
+      "evidence": {
+        "user": "U00001"
+      }
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "median learner",
+      "severity": "pass",
+      "detail": "1 courses, all features finite",
+      "evidence": {
+        "user": "U00001"
+      }
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "maximum-history learner",
+      "severity": "pass",
+      "detail": "16 courses, all features finite",
+      "evidence": {
+        "user": "U00018"
+      }
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "no nulls across 3,000 learners",
+      "severity": "pass",
+      "detail": "3000 x 34 matrix, 0 nulls",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "every active learner has features",
+      "severity": "pass",
+      "detail": "3000 of 3000 learners",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "deterministic output",
+      "severity": "pass",
+      "detail": "two builds are byte-identical",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "row order does not change features",
+      "severity": "pass",
+      "detail": "identical under a shuffled input frame",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "empty input",
+      "severity": "pass",
+      "detail": "rejected with a typed, actionable error: Cannot build learner features from an empty interaction frame.",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 2 - FEATURE PIPELINE: edge cases and determinism",
+      "probe": "zero-span learner",
+      "severity": "pass",
+      "detail": "span 0 handled; enrollment_frequency=11.000",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 3 - LEAKAGE: can future information reach a historical feature?",
+      "probe": "future interactions do not reach training features",
+      "severity": "pass",
+      "detail": "a post-test-cut interaction changes nothing in the training window",
+      "evidence": {
+        "n_learners": 2450
+      }
+    },
+    {
+      "check": "CHECK 3 - LEAKAGE: can future information reach a historical feature?",
+      "probe": "split windows are disjoint",
+      "severity": "pass",
+      "detail": "train 6992, validation 1000, test 2008, no overlap",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 3 - LEAKAGE: can future information reach a historical feature?",
+      "probe": "training precedes test in time",
+      "severity": "pass",
+      "detail": "train ends 2025-09-11, test begins 2025-10-18",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 3 - LEAKAGE: can future information reach a historical feature?",
+      "probe": "held-out items remain candidates",
+      "severity": "pass",
+      "detail": "347 learners checked; every held-out course was still eligible to be recommended",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 3 - LEAKAGE: can future information reach a historical feature?",
+      "probe": "popularity is window-scoped",
+      "severity": "pass",
+      "detail": "training counts sum to 6,992 against 10,000 for the full history",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 3 - LEAKAGE: can future information reach a historical feature?",
+      "probe": "tiering uses training history",
+      "severity": "pass",
+      "detail": "430 learners would be routed differently on full history, so the two sources are distinguishable and the code uses the training one",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 3 - LEAKAGE: can future information reach a historical feature?",
+      "probe": "inference reuses the training scaler",
+      "severity": "pass",
+      "detail": "a single learner scored alone reproduces their persisted segment",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "artifact set loads",
+      "severity": "pass",
+      "detail": "set 530e28eb1793, 12 files, 0 problem(s)",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "inference reproduces training labels",
+      "severity": "pass",
+      "detail": "all 3,000 persisted labels reproduced exactly",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "every learner has a segment",
+      "severity": "pass",
+      "detail": "3,000 learners across 4 segments",
+      "evidence": {
+        "sizes": {
+          "0": 841,
+          "1": 1030,
+          "2": 607,
+          "3": 522
+        }
+      }
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "cluster label dtype is consistent",
+      "severity": "pass",
+      "detail": "both int64; equals() holds exactly",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "labels are stable across loads",
+      "severity": "pass",
+      "detail": "two independent loads agree",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "column order cannot corrupt scaling",
+      "severity": "pass",
+      "detail": "reordered input produced a bit-identical scaled matrix (max deviation 0) and the same labels; the builder selects columns by name, so input order cannot mis-scale a feature",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "cluster profiles match their members",
+      "severity": "pass",
+      "detail": "stored means match recomputed means to 4.85e-05",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
+      "probe": "segment names use model features only",
+      "severity": "pass",
+      "detail": "4 names, none referencing an excluded feature",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "minimal",
+      "severity": "pass",
+      "detail": "10 recommendations, 59 candidates, route=content_based",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "rich",
+      "severity": "pass",
+      "detail": "10 recommendations, 49 candidates, route=cluster_popularity",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "moderate",
+      "severity": "pass",
+      "detail": "10 recommendations, 58 candidates, route=cluster_popularity",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "insufficient (new learner)",
+      "severity": "pass",
+      "detail": "10 recommendations, 60 candidates, route=diversified_fallback",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "learner with 59 of 60 courses",
+      "severity": "pass",
+      "detail": "exactly 1 recommendation (CR00060), k silently truncated rather than padded",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "learner who has taken everything",
+      "severity": "pass",
+      "detail": "typed error naming the real cause: No candidate courses for 'AUDIT-EXHAUSTED': this learner has already taken all 60 courses in the catalogue.",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "ranking is deterministic",
+      "severity": "pass",
+      "detail": "three runs identical",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "ties are broken stably",
+      "severity": "pass",
+      "detail": "21 tied adjacent pairs, all resolved deterministically",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "category and level filters",
+      "severity": "pass",
+      "detail": "12 categories and 3 levels, every result matched",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "impossible filter combination",
+      "severity": "pass",
+      "detail": "raises a typed error naming the filters",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "hostile arguments",
+      "severity": "pass",
+      "detail": "k<=0 rejected; k=10,000 truncated to 59 available candidates",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "unknown identifier",
+      "severity": "pass",
+      "detail": "flagged is_known_learner=False and routed to the cold-start tier",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
+      "probe": "no learner is shown a course they took",
+      "severity": "pass",
+      "detail": "all 3,000 learners checked in 49s: 0 empty lists, 0 already-enrolled courses",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 6 - EXPLAINABILITY: does every sentence match the scoring logic?",
+      "probe": "explanations name only signals the model used",
+      "severity": "pass",
+      "detail": "30,000 explanations, none citing an unused component",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 6 - EXPLAINABILITY: does every sentence match the scoring logic?",
+      "probe": "quoted numbers equal the scorer's contribution",
+      "severity": "pass",
+      "detail": "every segment-popularity count matches the value the ranking used",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 6 - EXPLAINABILITY: does every sentence match the scoring logic?",
+      "probe": "category claims are true of the learner's history",
+      "severity": "pass",
+      "detail": "no explanation claimed a shared category the history lacks",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 6 - EXPLAINABILITY: does every sentence match the scoring logic?",
+      "probe": "cold-start lists do not claim personalisation",
+      "severity": "pass",
+      "detail": "no cold-start explanation referenced a segment",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 6 - EXPLAINABILITY: does every sentence match the scoring logic?",
+      "probe": "explanation scan",
+      "severity": "pass",
+      "detail": "30,000 explanations checked over 3,000 learners in 43s (exhaustive)",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 6 - EXPLAINABILITY: does every sentence match the scoring logic?",
+      "probe": "measured-quality caveat travels with every result",
+      "severity": "pass",
+      "detail": "no result can be displayed without the random-reference caveat",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 7 - PRIVACY: search the artifacts for the real values",
+      "probe": "real names and emails absent from artifacts",
+      "severity": "pass",
+      "detail": "119 real values searched across 97 files, 0 occurrences",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 7 - PRIVACY: search the artifacts for the real values",
+      "probe": "no PII column in any served frame",
+      "severity": "pass",
+      "detail": "4 frames, none carrying ['UserName', 'Email', 'TeacherName']",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 7 - PRIVACY: search the artifacts for the real values",
+      "probe": "learner profile is minimal",
+      "severity": "pass",
+      "detail": "13 fields, identifier is the pseudonymous UserID",
+      "evidence": {
+        "fields": [
+          "age",
+          "avg_course_rating",
+          "avg_spend",
+          "diversity_score",
+          "gender",
+          "learning_depth_index",
+          "preferred_category",
+          "preferred_level",
+          "segment",
+          "segment_name",
+          "tier",
+          "total_courses",
+          "user_id"
+        ]
+      }
+    },
+    {
+      "check": "CHECK 7 - PRIVACY: search the artifacts for the real values",
+      "probe": "email is not a modelling feature",
+      "severity": "pass",
+      "detail": "no identity-derived column in the feature matrix",
+      "evidence": {}
+    },
+    {
+      "check": "CHECK 7 - PRIVACY: search the artifacts for the real values",
+      "probe": "PII dropped at ingestion",
+      "severity": "pass",
+      "detail": "PII is absent from the default load, so it cannot reach a downstream frame by accident",
+      "evidence": {}
+    }
+  ]
+}

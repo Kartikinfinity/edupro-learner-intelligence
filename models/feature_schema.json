@@ -63,7 +63,7 @@
     "cat_share_programming": "float64",
     "cat_share_project_management": "float64",
     "cat_share_web_development": "float64",
-    "cluster": "int32",
+    "cluster": "int64",
     "tier": "str",
     "segment_name": "str"
   },

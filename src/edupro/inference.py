@@ -39,7 +39,7 @@ import pandas as pd
 from edupro import config
 from edupro.explainability.explanations import QUALITY_CAVEAT, Explanation, build_explanation
 from edupro.persistence import Manifest, verify_artifacts
-from edupro.pipeline import PRODUCTION, artifact_files
+from edupro.pipeline import CLUSTER_DTYPE, PRODUCTION, artifact_files
 from edupro.recommendation.base import FitContext, build_fit_context
 from edupro.recommendation.baselines import ClusterPopularity, ContentBased, DiversifiedFallback
 from edupro.recommendation.hybrid import TieredRecommender, tier_of
@@ -285,7 +285,7 @@ class RecommendationService:
         """
         representation = build_representation(features, self.spec, scaler=self.scaler)
         labels = self.clusterer.predict(representation.matrix)
-        return pd.Series(labels.astype(int), index=features.index, name="cluster")
+        return pd.Series(labels, index=features.index, name="cluster").astype(CLUSTER_DTYPE)
 
     def segment_summary(self) -> pd.DataFrame:
         """One row per segment: size, share, label and headline behaviour."""
@@ -451,11 +451,25 @@ class RecommendationService:
 
         candidates = self._filtered_candidates(user_id, category, level)
         if len(candidates) == 0:
-            raise InferenceError(
-                "No candidate courses remain after filtering "
-                f"(category={category!r}, level={level!r}) and excluding "
-                f"{len(history)} already-enrolled courses."
-            )
+            # Name the actual cause. The count comes from the exclusion set the
+            # scorer used, not from the history table, because the two can differ
+            # for a learner constructed at runtime — and blaming a filter that was
+            # never applied sends the caller looking in the wrong place.
+            excluded = len(self.context.seen.get(user_id, set()))
+            filters = {k: v for k, v in (("category", category), ("level", level)) if v}
+            if excluded >= len(self.catalogue):
+                reason = (
+                    f"this learner has already taken all {len(self.catalogue)} courses "
+                    "in the catalogue"
+                )
+            elif filters:
+                reason = (
+                    f"no unseen course matches {filters} "
+                    f"({excluded} course(s) already taken)"
+                )
+            else:
+                reason = f"only {excluded} course(s) taken, but none remain unseen"
+            raise InferenceError(f"No candidate courses for {user_id!r}: {reason}.")
 
         _, recommender = self.router.route_for(user_id)
         scores = recommender.score(user_id, candidates)

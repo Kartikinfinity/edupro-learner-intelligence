@@ -1,0 +1,128 @@
+{
+  "summary": {
+    "n_probes": 20,
+    "n_fail": 0
+  },
+  "findings": [
+    {
+      "probe": "page renders: 1_Executive_Overview",
+      "severity": "pass",
+      "detail": "1 title, 5 sections, 8 metrics, 0 tables, 3.2s",
+      "evidence": {}
+    },
+    {
+      "probe": "page renders: 2_Learner_Profile",
+      "severity": "pass",
+      "detail": "1 title, 4 sections, 4 metrics, 1 tables, 0.4s",
+      "evidence": {}
+    },
+    {
+      "probe": "page renders: 3_Recommendations",
+      "severity": "pass",
+      "detail": "1 title, 0 sections, 3 metrics, 0 tables, 0.4s",
+      "evidence": {}
+    },
+    {
+      "probe": "page renders: 4_Segment_Intelligence",
+      "severity": "pass",
+      "detail": "1 title, 5 sections, 0 metrics, 5 tables, 0.5s",
+      "evidence": {}
+    },
+    {
+      "probe": "page renders: 5_Cluster_Visualization",
+      "severity": "pass",
+      "detail": "1 title, 1 sections, 4 metrics, 0 tables, 0.4s",
+      "evidence": {}
+    },
+    {
+      "probe": "page renders: 6_Segment_Comparison",
+      "severity": "pass",
+      "detail": "1 title, 4 sections, 0 metrics, 1 tables, 0.5s",
+      "evidence": {}
+    },
+    {
+      "probe": "page renders: 7_Model_Analytics",
+      "severity": "pass",
+      "detail": "1 title, 11 sections, 11 metrics, 5 tables, 0.5s",
+      "evidence": {}
+    },
+    {
+      "probe": "learner selection changes the page",
+      "severity": "pass",
+      "detail": "selected U00006 (from U00001); the profile header follows the selection",
+      "evidence": {}
+    },
+    {
+      "probe": "segment filter narrows the learner pool",
+      "severity": "pass",
+      "detail": "filtering to 'Advanced-level Non-repeating learners' leaves 'Learner (1,030 available)'",
+      "evidence": {}
+    },
+    {
+      "probe": "recommendations render",
+      "severity": "pass",
+      "detail": "metrics: {'History': '1 course', 'Route': 'minimal', 'Candidates': '59'}",
+      "evidence": {}
+    },
+    {
+      "probe": "category filter applies",
+      "severity": "pass",
+      "detail": "every rendered recommendation is in Data Science",
+      "evidence": {}
+    },
+    {
+      "probe": "cold-start mode reaches the fallback route",
+      "severity": "pass",
+      "detail": "route metric reads 'insufficient', so the diversified fallback is reachable from the UI",
+      "evidence": {}
+    },
+    {
+      "probe": "list length control works",
+      "severity": "pass",
+      "detail": "k slider re-ran the page without error",
+      "evidence": {}
+    },
+    {
+      "probe": "segment visualization renders",
+      "severity": "pass",
+      "detail": "1 caveat block(s) shown before the chart",
+      "evidence": {}
+    },
+    {
+      "probe": "visualisation filter works",
+      "severity": "pass",
+      "detail": "restricted to 'Advanced-level Non-repeating learners' without error",
+      "evidence": {}
+    },
+    {
+      "probe": "empty selection shows an empty state",
+      "severity": "pass",
+      "detail": "deselecting every segment gives guidance, not a crash",
+      "evidence": {}
+    },
+    {
+      "probe": "measured metrics render",
+      "severity": "pass",
+      "detail": "5 evidence tables, 11 metrics",
+      "evidence": {}
+    },
+    {
+      "probe": "comparison handles an empty selection",
+      "severity": "pass",
+      "detail": "clearing every characteristic gives guidance, not a crash",
+      "evidence": {}
+    },
+    {
+      "probe": "missing artifacts produce an instruction, not a stack trace",
+      "severity": "pass",
+      "detail": "a cold process with no model shows the page that names the fixing command",
+      "evidence": {}
+    },
+    {
+      "probe": "artifact set restored",
+      "severity": "pass",
+      "detail": "the manifest is back in place after the failure probe",
+      "evidence": {}
+    }
+  ]
+}
