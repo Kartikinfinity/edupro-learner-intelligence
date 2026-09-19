@@ -122,14 +122,14 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | --- | --- | --- | --- | --- |
 | I1 | Raw data immutable | 8 | ADR-0003; checksums in `edupro.config` | **Verified** |
 | I2 | `data/raw/` + `data/processed/` maintained | 8 | Repository layout | **Verified** |
-| I3 | Leakage detection for temporal evaluation | 9 | `edupro.evaluation` | Not started |
-| I4 | Variant A vs Variant B segmentation | 10 | EXP-011 | Not started |
+| I3 | Leakage detection for temporal evaluation | 9 | Protocol pre-registered (`recommendation_evaluation_plan.md` §2); controls L1-L6 specified as tests | In progress |
+| I4 | Variant A vs Variant B segmentation | 10 | EXP-011 specified; dominance diagnostic + pre-registered decision rule | In progress |
 | I5 | Teachers sheet as explicit experiment | 11 | D-007; EXP-014 | In progress |
-| I6 | Temporal hold-out; sparse users handled separately | 12 | EXP-004, EXP-025 | Not started |
-| I7 | Five recommendation baselines | 13 | EXP-020…024 | Not started |
-| I8 | Hybrid weights justified, not asserted | 14 | EXP-024 | Not started |
-| I9 | Sparse-history recommendation tiers | 15 | EXP-003, EXP-025 | Not started |
-| I10 | Explanations consistent with scoring logic | 16 | `edupro.explainability` | Not started |
+| I6 | Temporal hold-out; sparse users handled separately | 12 | Dual protocol pre-registered (D-011); tiered evaluation specified | In progress |
+| I7 | Five recommendation baselines | 13 | EXP-019–024 specified with equal tuning budget; 3 further baselines added (D-017) | In progress |
+| I8 | Hybrid weights justified, not asserted | 14 | EXP-024 search + ablation specified; hand-chosen weights named as a failure condition | In progress |
+| I9 | Sparse-history recommendation tiers | 15 | Four tiers specified; boundary set by pre-registered rule (EXP-025) | In progress |
+| I10 | Explanations consistent with scoring logic | 16 | Model-intrinsic explanation required; scorer must return components (D-015) | In progress |
 | I11 | Email never a modelling feature; UI anonymised | 17 | ADR-0006; `PII_COLUMNS` | In progress |
 | I12 | Modular source; app independent of notebooks | 18, 19 | ADR-0001 | **Verified** |
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |

@@ -62,12 +62,17 @@ The venv was **first built on 3.14.0**, the system default, and the full stack
 installed and passed a modelling smoke test there. It was then **rebuilt on
 3.13.9**.
 
-The reason is a deployment constraint, not a technical failure: CLAUDE.md §20
-prohibits Docker and §21 requires the app to be public-deployment ready, which
-points at Streamlit Community Cloud — supporting Python 3.9–3.13. Shipping a
-3.14-only local environment would have surfaced as an undeployable app in Phase
-6, the phase with the least slack before the 20 September deadline. The rebuild
-cost minutes now; the same discovery later would have cost a deliverable.
+The reason is a deployment risk, not a technical failure: CLAUDE.md §20 prohibits
+Docker and §21 requires the app to be public-deployment ready, which points at
+Streamlit Community Cloud.
+
+> **Corrected in Phase 1.** This report originally stated that Community Cloud
+> supports "Python 3.9-3.13". That was an **unverified claim**. The documented
+> policy is that it supports all Python versions still receiving security updates
+> and defaults to 3.12, so 3.14 would in fact be permitted. The rebuild to 3.13
+> is still the right call - it stays near the platform default and off the newest
+> interpreter - but it was not, as originally written, a hard platform limit. See
+> the corrected ADR-0002.
 
 Recorded as ADR-0002 and decision-log D-002. Enforced by
 `test_python_version_is_within_supported_range` and by `requires-python` in

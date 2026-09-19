@@ -29,8 +29,9 @@ def sha256(path: Path) -> str:
 # Environment
 # ---------------------------------------------------------------------------
 def test_python_version_is_within_supported_range():
-    """Python must be >=3.11 and <3.14 (see ADR-0002: Streamlit Cloud tops out
-    at 3.13, so targeting 3.14 would make the app undeployable)."""
+    """Python must be >=3.11 and <3.14 (see ADR-0002: Streamlit Community Cloud
+    defaults to 3.12, so the project stays near that default rather than on the
+    newest interpreter)."""
     assert (3, 11) <= sys.version_info[:2] < (3, 14), (
         f"Unsupported Python {sys.version_info[:3]}; expected >=3.11,<3.14"
     )

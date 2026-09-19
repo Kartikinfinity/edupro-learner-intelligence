@@ -73,38 +73,76 @@ dataset. They verify that the *tooling* works. No EduPro finding exists yet.
 
 ## Planned experiments
 
-Registered now so the plan is on record before any results exist, and so a
-disappointing result cannot be quietly dropped from the programme. Nothing below
-has been run.
+Registered in Phase 1 so the programme is on record **before** any result exists,
+and so a disappointing result cannot be quietly dropped. **Nothing below has been
+run.** Full specifications — hypotheses, methods, metrics and acceptance criteria
+— are in `research/experiment_plan.md`; this is the index.
 
-### Phase 2 — dataset audit
-- **EXP-001** Referential integrity and key uniqueness across all four sheets.
-- **EXP-002** Is `Transactions.Amount` identical to `Courses.CoursePrice`? (Q-1)
-- **EXP-003** Per-learner interaction distribution; derive sparse-history tier
-  boundaries from the actual distribution. (Q-4)
-- **EXP-004** Temporal coverage of `TransactionDate`; is a temporal hold-out
-  viable at this history depth? (Q-6)
+### Phase 2 — dataset audit (prerequisites)
+
+| ID | Title | Blocks |
+| --- | --- | --- |
+| EXP-001 | Referential integrity and key uniqueness | everything |
+| EXP-002 | Is `Amount` identical to `CoursePrice`? (Q-1) | feature B9 |
+| EXP-003 | Per-learner interaction distribution (Q-4) | tier boundaries |
+| EXP-004 | Temporal coverage and split viability | **the split protocol decision** |
+| EXP-005 | Is `TeacherID` an alias for `CourseID`? | **go/no-go on EXP-014** |
+| EXP-006 | Feature distributions; synthetic-data assessment (V8) | scaler choice |
 
 ### Phase 3 — segmentation
-- **EXP-010** Cluster-count selection: elbow + silhouette sweep over k.
-- **EXP-011** Variant A (behaviour + demographics) vs Variant B (behaviour only),
-  on cluster quality, stability, behavioural consistency and feature
-  dominance. (Q-5, CLAUDE.md §10)
-- **EXP-012** Hierarchical clustering as an independent validation of the
-  K-Means structure.
-- **EXP-013** Cluster stability under resampling and reseeding.
-- **EXP-014** Core model vs core model + teacher-derived signals. (D-007, §11)
+
+| ID | Title |
+| --- | --- |
+| EXP-010 | Cluster-count sweep: elbow, silhouette, CH, DB |
+| EXP-010b | **Gap statistic — can falsify the existence of structure** |
+| EXP-010c | GMM/BIC cross-check on k |
+| EXP-011 | **Variant A (behaviour+demographics) vs Variant B (behaviour only)** |
+| EXP-011a | Encoding comparison: one-hot vs proportion vector vs reduced facets vs Gower |
+| EXP-011b | Feature-block weighting ablation |
+| EXP-011c | Feature-dominance diagnostic (eta-squared per block) |
+| EXP-011d | PCA before clustering |
+| EXP-011e | Correlated-feature ablation |
+| EXP-011f | Does history length dominate the segmentation? |
+| EXP-012 / 012b | Hierarchical validation: Ward, then average linkage / Gower |
+| EXP-013 / 013b | Per-cluster bootstrap Jaccard stability; subsample consensus |
+| EXP-014 | Core model vs core + teacher signals (blocked on EXP-005) |
 
 ### Phase 3 — recommendation
-- **EXP-020** Global popularity baseline.
-- **EXP-021** Content-based filtering.
-- **EXP-022** Similar-learner recommendation.
-- **EXP-023** Cluster-popularity recommendation.
-- **EXP-024** Hybrid, with weights justified by experiment rather than asserted
-  (§14).
-- **EXP-025** Cold-start / sparse-history tier behaviour, evaluated separately
-  from the personalised path so that one-interaction learners are not scored as
-  if they were personalised (§12).
 
-All recommendation experiments share one leakage-controlled temporal split,
-defined once in Phase 2 and never re-derived per experiment.
+| ID | Title |
+| --- | --- |
+| EXP-019 | Random reference floor |
+| EXP-020 | Global popularity |
+| EXP-021 | Content-based filtering |
+| EXP-022a | User-user similarity over interaction history |
+| EXP-022b | User-user similarity over engineered profile features |
+| EXP-022c | Item-based collaborative filtering |
+| EXP-023 | **Cluster popularity — does segmentation help recommendation?** |
+| EXP-024 | Weighted hybrid + component ablation (determines weights) |
+| EXP-025 | Tiered switching; sparse-history boundary *t* |
+| EXP-026 | Leakage demonstration: random vs temporal split |
+| EXP-027 | Demographic-stratified evaluation |
+
+All recommendation experiments share **one** leakage-controlled split, computed
+once in EXP-004 and persisted — never re-derived per experiment.
+
+---
+
+## Pre-registered expectations
+
+Recorded in Phase 1, before any experiment, so that hindsight cannot later be
+presented as foresight. **These are predictions, not findings.** Each will be
+compared against its actual outcome when the corresponding experiment runs.
+
+| # | Expectation | Settled by |
+| --- | --- | --- |
+| P-1 | Global popularity will be hard to beat on raw accuracy | EXP-020 vs others |
+| P-2 | Item-based CF will be the strongest single personalised method | EXP-022c |
+| P-3 | The hybrid will win by a small margin, possibly losing the parsimony tiebreak | EXP-024 |
+| P-4 | Cluster structure will be weak; the gap statistic may indicate k=1 | EXP-010b |
+| P-5 | Variant B (behaviour only) will be preferred | EXP-011 |
+| P-6 | Teacher signals will add nothing; EXP-005 may cancel the experiment | EXP-005, EXP-014 |
+| P-7 | Coverage will separate methods more sharply than accuracy | EXP-019…024 |
+
+If the experiments contradict these, **the experiments win** and the contradiction
+is recorded here as a finding.

@@ -178,8 +178,9 @@ thresholds**. Every such value must come from experiment.
 | git | 2.51.2.windows.1 |
 | Containerisation | **none** — Docker is prohibited (CLAUDE.md §20) |
 
-3.13 was chosen over the system-default 3.14 because Streamlit Community Cloud
-supports up to Python 3.13; see ADR-0002.
+3.13 was chosen over the system-default 3.14 to stay close to the Streamlit
+Community Cloud default (3.12) and away from newest-interpreter risk; see
+ADR-0002, whose original rationale was corrected in Phase 1.
 
 ### Runtime dependencies (exact, validated)
 

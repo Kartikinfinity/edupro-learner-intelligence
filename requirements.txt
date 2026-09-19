@@ -7,8 +7,9 @@
 # Direct dependencies only. Transitive dependencies are resolved by pip; the
 # fully-frozen environment is recorded separately in requirements.lock.txt.
 #
-# Python: >=3.11, <3.14  (see ADR-0002 - Streamlit Community Cloud supports
-# up to 3.13, so the project deliberately does not target 3.14.)
+# Python: >=3.11, <3.14  (see ADR-0002 - Streamlit Community Cloud defaults to
+# 3.12, so the project stays near that default rather than on the newest
+# interpreter. The cap is a risk choice, not a platform limit.)
 # ===========================================================================
 
 # --- data handling ---------------------------------------------------------

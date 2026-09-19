@@ -67,25 +67,53 @@ it was viable on technical grounds.
 
 CLAUDE.md §20 prohibits Docker, and §21 requires the application to be
 public-deployment ready. Together these point at Streamlit Community Cloud as the
-deployment target, which supports Python 3.9–3.13.
+deployment target.
+
+> **Correction (Phase 1).** This ADR originally justified the choice by asserting
+> that Streamlit Community Cloud "supports Python 3.9–3.13". That claim was
+> written from prior knowledge and **was not verified against the documentation**.
+> On checking in Phase 1, the documented policy is different: Community Cloud
+> "supports all released versions of Python that are still receiving security
+> updates" and "defaults to version 3.12" [R37b]. Under that policy Python 3.14
+> would in fact be permitted. The original rationale is therefore withdrawn. The
+> decision below is retained on the corrected rationale, which is weaker but
+> accurate.
 
 ### Decision
 Pin the project to `>=3.11,<3.14` and build `.venv` on **3.13.9**. Enforced by
 `requires-python` in `pyproject.toml` and asserted by
 `test_python_version_is_within_supported_range`.
 
+### Rationale (corrected)
+1. **The platform default is 3.12.** The default is the best-trodden path on any
+   hosting platform. 3.13 is one minor version above it — comfortably inside the
+   documented policy, and not the frontier.
+2. **The support policy is a moving target, not a fixed list.** "Still receiving
+   security updates" means the supported set changes over time without the
+   project being consulted. The documentation warns that an app on a version that
+   becomes unsupported may be forcibly upgraded and may break. A version near the
+   platform default is the least exposed to that.
+3. **Newest-interpreter risk is real and asymmetric.** On a just-released
+   interpreter, some dependency in a 130-package tree may lack a wheel or ship a
+   less-exercised build. The upside of 3.14 is zero here — the project uses no
+   3.14-only feature — so any risk at all is a bad trade.
+
 ### Consequences
-- The local environment matches the deployment environment's major/minor version,
-  so deployment cannot fail on an interpreter incompatibility discovered at
-  Phase 6 — the phase with the least schedule slack before the 20 September
-  deadline.
 - The project forgoes 3.14-only features. It uses none.
+- The cap must be revisited if a dependency ever requires 3.14+, or if Community
+  Cloud's default moves past 3.13.
 
 ### Alternatives rejected
-- **Develop on 3.14, deploy on 3.13.** Two environments, and any divergence
-  surfaces at the worst possible moment.
-- **Target 3.11 for maximum compatibility.** Unnecessarily old; 3.13 is within
-  the supported deployment range already.
+- **Target 3.14 (the system default).** Permitted under the documented policy,
+  but furthest from the platform default with no compensating benefit.
+- **Target 3.11 for maximum compatibility.** Unnecessarily old, and closer to
+  falling out of the security-update window that defines platform support.
+
+### Note on process
+The original version of this ADR reached the right decision via a false premise.
+That is worth recording rather than quietly overwriting: an unverified claim that
+happens to support a sound conclusion is still an unverified claim, and it was
+found only because Phase 1 set out to attach a citation to it.
 
 ---
 

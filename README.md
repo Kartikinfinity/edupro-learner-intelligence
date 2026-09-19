@@ -4,10 +4,11 @@ Learner segmentation and personalised course recommendation for the EduPro
 online learning platform — built as a reproducible, explainable research-grade
 system rather than a single notebook.
 
-> **Project status: Phase 0 of 6 complete — project initialization.**
+> **Project status: Phase 1 of 6 complete — research and methodology investigation.**
 > No model has been trained and no data finding has been produced yet. The
-> repository currently contains the validated environment, the authoritative
-> source materials, the package skeleton and the research governance documents.
+> repository contains the validated environment, the authoritative source
+> materials, the package skeleton, and a research corpus of ~3,000 lines across
+> six documents with 40 verified references and 28 pre-registered experiments.
 > Sections marked *(Phase N)* below describe planned work, not shipped work.
 
 ---
@@ -54,7 +55,8 @@ Full structural inventory: [`PROJECT_MANIFEST.md`](PROJECT_MANIFEST.md) §3.
 
 ## Quickstart
 
-Requires **Python 3.11–3.13** (3.13 recommended; see ADR-0002 for why not 3.14).
+Requires **Python 3.11–3.13** (3.13 recommended; see ADR-0002 for the reasoning,
+including a Phase 1 correction to its original rationale).
 
 ```bash
 python -m venv .venv
@@ -155,7 +157,7 @@ carrying an evidence-backed PASS/FAIL.
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 0 | Project initialization | ✅ **PASS** |
-| 1 | Research and methodology investigation | Not started |
+| 1 | Research and methodology investigation | ✅ **PASS** |
 | 2 | Dataset audit and EDA | Not started |
 | 3 | ML experimentation | Not started |
 | 4 | Model selection and architecture freeze | Not started |
@@ -228,6 +230,12 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | [`research/decision_log.md`](research/decision_log.md) | Decisions with evidence; open questions |
 | [`research/architecture_decision_record.md`](research/architecture_decision_record.md) | Durable architectural decisions (ADRs) |
 | [`research/experiment_log.md`](research/experiment_log.md) | Experiment results, successes and failures |
+| [`research/literature_review.md`](research/literature_review.md) | Eight research areas; 40 verified references |
+| [`research/methodology_comparison.md`](research/methodology_comparison.md) | 40 methods compared; decision status for each |
+| [`research/segmentation_research.md`](research/segmentation_research.md) | Feature design, encoding, k-selection, stability |
+| [`research/recommendation_evaluation_plan.md`](research/recommendation_evaluation_plan.md) | Pre-registered evaluation protocol and metrics |
+| [`research/production_research.md`](research/production_research.md) | Artifacts, deployment, testing strategy |
+| [`research/experiment_plan.md`](research/experiment_plan.md) | 8 research questions, 28 experiments |
 | [`references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md`](references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md) | Verbatim transcript of the official brief |
 | `research/PHASE_N_COMPLETE.md` | Per-phase report with PASS/FAIL and evidence |
 
@@ -249,6 +257,7 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | --- | --- |
 | `scripts/inspect_sources.py` | Read-only structural inventory of the workbook → `artifacts/phase0_source_inventory.json` |
 | `scripts/render_official_pdf.py` | Rasterise the image-based official PDF so its requirements can be read and verified |
+| `scripts/analytical_baselines.py` | Random-ranker and Precision@K ceiling reference values implied by the 60-course catalogue |
 
 Both scripts re-verify the source checksum after reading, so even the inspection
 tooling proves it did not mutate its input.

@@ -45,11 +45,19 @@ paths space-laden and ambiguous).
 **Status:** Settled — see ADR-0002
 
 **Why:** The system default is Python 3.14.0 and the full scientific stack
-installs cleanly on it, so 3.14 was the path of least resistance. It was
-rejected because CLAUDE.md §21 requires the application to be **public-deployment
-ready**, and Streamlit Community Cloud — the intended zero-cost deployment
-target given the Docker prohibition in §20 — supports up to Python 3.13.
-Discovering that at Phase 6 would be an expensive, deadline-adjacent failure.
+installs cleanly on it, so 3.14 was the path of least resistance. It was rejected
+because CLAUDE.md §21 requires the application to be **public-deployment ready**,
+and Streamlit Community Cloud is the intended zero-cost deployment target given
+the Docker prohibition in §20.
+
+> **Corrected in Phase 1.** The original wording of this entry claimed Community
+> Cloud "supports up to Python 3.13". That was **not verified** when written.
+> The documented policy is that Community Cloud supports all Python versions
+> still receiving security updates, and defaults to 3.12 [R37b] — so 3.14 would
+> in fact be permitted. The decision to target 3.13 stands, but on the corrected
+> rationale in ADR-0002: 3.13 sits one minor version above the platform default,
+> inside a support policy that moves over time, and avoids newest-interpreter
+> wheel risk for no forgone benefit.
 
 **Evidence:** Both environments were actually built and smoke-tested. The stack
 resolves and passes the modelling smoke test on 3.13.9 (`31 passed`), so nothing
@@ -174,9 +182,204 @@ recommender design in Phase 3.
 
 ---
 
+## Phase 1 — Dense research (19 September 2026)
+
+Reference keys `[Rxx]` resolve in `research/literature_review.md` §10.
+
+### D-009 — Correction: an unverified platform claim from Phase 0
+**Status:** Settled — correction applied
+
+Phase 0 asserted in ADR-0002, D-002, the manifest, the README, `requirements.txt`
+and a test docstring that Streamlit Community Cloud "supports Python 3.9–3.13".
+Phase 1 set out to attach a citation and found the documentation says something
+different: Community Cloud supports all released Python versions still receiving
+security updates, and **defaults to 3.12** [R37b]. Under that policy Python 3.14
+would in fact have been permitted.
+
+**Action:** the claim was withdrawn from all six locations and ADR-0002 rewritten
+with an accurate rationale. The decision (target 3.13) stands, because it remains
+correct for different reasons: 3.13 sits one minor version above the platform
+default, inside a support policy that moves over time, and avoids
+newest-interpreter wheel risk for no forgone benefit.
+
+**Why this is recorded rather than quietly fixed:** the original reasoning reached
+a sound conclusion through a false premise, and it survived Phase 0 precisely
+because the conclusion looked right. It was caught only because Phase 1 required
+a citation for every claim — which is an argument for the citation discipline
+itself.
+
+---
+
+### D-010 — Reject latent-factor and neural recommenders before experimentation
+**Status:** Settled, with stated reversal conditions
+
+iALS [R13], BPR [R14] and neural recommenders are **excluded from the Phase 3
+baseline set** — not silently omitted, but excluded with reasons:
+
+- **iALS:** its distinctive contribution is confidence weighting derived from
+  *repeated* observations. EduPro has **zero repeat `(user, course)` pairs**
+  (Phase 0, verified), so the confidence function is constant and the method
+  degenerates to weighted binary matrix factorisation. Implementing it and
+  describing it as [R13] would misrepresent what the model does.
+- **BPR:** 10,000 positives over 60 items under-identifies a conventional
+  latent-factor model.
+- **All three:** latent factors are uninterpretable, conflicting with §16's
+  requirement that explanations correspond to signals actually used.
+- **[R26]** reproduced only 7 of 18 neural recommendation papers and found most of
+  those beaten by properly-tuned simple baselines. The same paper argues the
+  higher-value use of a fixed tuning budget is giving strong simple baselines a
+  fair run — which is where this project spends it.
+
+**Reversal:** if Phase 2 contradicts the zero-repeat finding, reconsider iALS.
+
+---
+
+### D-011 — Dual evaluation protocol with a pre-registered primary
+**Status:** Settled
+
+Both a global temporal split (Protocol A, leakage-free) and per-user
+leave-one-out (Protocol B, leakage-bearing) will be run and reported. A is the
+pre-registered primary; B is reported for comparability with published work and
+is explicitly labelled as leaking.
+
+**Why both:** [R25] shows per-user leave-one-out violates the global timeline and
+that leakage can make relative method orderings unpredictable — so B alone cannot
+be trusted to select the production model. But A may leave few evaluable learners
+at a mean of 3.333 interactions, and dropping B entirely would make the results
+incomparable with the literature. [R24] shows the splitting strategy alone can
+reorder systems, so **disagreement between A and B is itself a reportable
+finding**.
+
+**Pre-registered fallback:** if EXP-004 shows Protocol A yields fewer than 300
+evaluable learners, the primary switches to B and every figure is labelled
+leakage-bearing. The threshold is fixed now so the choice cannot be made by
+looking at which protocol gives better numbers.
+
+---
+
+### D-012 — NDCG@10 as primary accuracy metric; Precision reported with its ceiling
+**Status:** Settled
+
+**Evidence (arithmetic, `scripts/analytical_baselines.py`):** with 60 courses and
+one held-out item, **Precision@10 is capped at 0.10** and Precision@20 at 0.05.
+A random ranker achieves **HR@10 ≈ 0.175**.
+
+The brief mandates "Recommendation Precision", so it is computed and reported —
+but reported bare it would make a strong model look like a failure and a weak
+model look adequate. Every accuracy figure is therefore reported **against the
+random baseline and the analytical ceiling**, and NDCG@10 [R23] is the primary
+metric because it is rank-sensitive and not ceiling-limited in the same way.
+
+---
+
+### D-013 — Catalogue coverage is co-primary, with a disqualifying gate
+**Status:** Settled
+
+Coverage@10 below **25%** (15 of 60 courses) disqualifies a method regardless of
+accuracy. The brief's stated purpose is helping learners *discover relevant
+content*; a system routing every learner to the same handful of courses defeats
+that while scoring well on accuracy — exactly the failure mode [R27] and [R29]
+describe. The threshold is set in advance so it cannot later be relaxed to admit
+a preferred method.
+
+---
+
+### D-014 — "Engagement Lift (Proxy)" defined before results are seen
+**Status:** Settled
+
+Defined as the ratio of the recommender's HR@10 to the global-popularity
+baseline's HR@10, on the same population and split. Defining it now prevents
+choosing, later, the formulation that flatters the model.
+
+**Guard rails (§6):** the word "Proxy" is part of the metric's name everywhere
+including chart axes; every appearance states it is an offline agreement ratio and
+**not** measured causal impact; and no statement of the form "this system would
+increase engagement by X%" appears anywhere in the project. The data is
+observational with no impressions and no control group — no offline computation
+can support that claim.
+
+---
+
+### D-015 — The scorer must return per-component contributions
+**Status:** Settled — a Phase 5 interface requirement, decided in Phase 1
+
+The hybrid recommender's scoring function must return the **decomposition**
+(content, similarity, cluster-popularity and rating contributions), not just a
+scalar total.
+
+**Why decided now:** §16 requires explanations that correspond to the signals the
+recommender actually used. [R31] distinguishes model-intrinsic from post-hoc
+explanation; only the former can guarantee faithfulness. If the scorer returns
+only a total, faithful explanation becomes impossible after the fact, and the
+alternative is a post-hoc explainer that can assert reasons the model did not use
+— the precise §16 violation. Retrofitting this interface later would be
+expensive, so it is fixed before implementation begins.
+
+**Consequence:** this is also why the uninterpretable methods in D-010 were
+rejected rather than merely deprioritised.
+
+---
+
+### D-016 — Teacher Age and Gender excluded before experimentation
+**Status:** Settled — not subject to experiment
+
+`Teachers.Age` and `Teachers.Gender` are excluded from every model and every
+experiment. They are demographics of a **third party** who is not the subject of
+the recommendation. Clustering learners by their instructors' gender, or routing
+recommendations by it, would be discriminatory allocation with no legitimate
+rationale [R38].
+
+This is distinct from the §11 teacher experiment, which proceeds for
+`TeacherRating`, `Expertise` and learner–teacher affinity. Some hypotheses should
+not be run, and recording the exclusion is more honest than testing and then
+discarding.
+
+---
+
+### D-017 — Methods added beyond the brief's minimum, with justification
+**Status:** Settled
+
+Three methods not required by the official documentation are added, each because
+a mandated method cannot do the job:
+
+1. **Gap statistic [R02]** — elbow, silhouette, CH and DB all *assume* structure
+   exists and merely locate the best k. **None can return "there is no cluster
+   structure".** Given short histories and the synthetic-data risk (Q-8), that is
+   a live possibility, and a project unable to detect it would be structurally
+   incapable of reporting it.
+2. **Per-cluster bootstrap Jaccard [R03]** — the deliverable is segments a
+   stakeholder will act on. A per-segment reliability figure prevents
+   recommending a strategy for a segment that dissolves under resampling.
+3. **Item-based CF [R15][R16]** — items have ~167 interactions each; users have
+   ~3.3. The mandated user-similarity method is estimated from far less evidence,
+   and [R26] argues strong simple baselines are essential to a valid comparison.
+
+None of these replaces a mandated method; all are additions.
+
+---
+
+### D-018 — Pre-registration of every decision rule
+**Status:** Settled
+
+The k-selection rule, the Variant A/B rule, the model-selection rule (including a
+**parsimony tiebreak** selecting the simpler method when the margin is <0.01
+NDCG@10), the coverage gate, the tier-boundary rule and the split-protocol
+fallback are all written down in Phase 1, **before any result exists**.
+
+**Why:** §6 prohibits selectively reporting favourable results. The most reliable
+defence is to fix the decision rules before the numbers are visible, so no rule
+can be chosen because it favours a preferred outcome. Any later change must be
+recorded here with its reason and date, making post-hoc modification visible
+rather than silent.
+
+---
+
 ## Open questions carried into later phases
 
-These are recorded now so they are not quietly forgotten. None is answered yet.
+Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were
+raised in Phase 0; Q-8…Q-10 were added by the Phase 1 research. Segmentation-
+specific questions S-1…S-10 are in `segmentation_research.md` §10; production
+questions P-1…P-5 are in `production_research.md` §7.
 
 | # | Question | Raised by | Settles in |
 | --- | --- | --- | --- |
@@ -186,4 +389,7 @@ These are recorded now so they are not quietly forgotten. None is answered yet.
 | Q-4 | Where do the sparse-history tier boundaries fall? The mean is 3.333 courses per learner, but the mean is not the distribution. | CLAUDE.md §15 | Phase 2 |
 | Q-5 | Variant A (behaviour + demographics) or Variant B (behaviour only)? Must be decided on cluster quality, stability, behavioural consistency, interpretability and feature dominance — not assumed. | CLAUDE.md §10 | Phase 3 |
 | Q-6 | Is a temporal hold-out even viable? It requires enough per-learner history; at a mean of 3.333 interactions, a leave-one-out scheme may leave very little to train on, and one-interaction learners must not be evaluated as if personalised (§12). | CLAUDE.md §9, §12 | Phase 2/3 |
-| Q-7 | How is "Engagement Lift (Proxy)" defined so that it is honest? The official document requires the metric but defines no formula. Whatever is used must be labelled a proxy and must not be presented as measured causal impact (§6). | Official doc, p.5 | Phase 3 |
+| Q-7 | How is "Engagement Lift (Proxy)" defined so that it is honest? The official document requires the metric but defines no formula. Whatever is used must be labelled a proxy and must not be presented as measured causal impact (§6). | Official doc, p.5 | **Answered by D-014** (definition fixed); magnitude in Phase 3 |
+| Q-8 | **Is the dataset synthetic?** Zero missing values across 27 columns; 21 distinct ages in *both* Users and Teachers; 23 distinct values in *both* Amount and CoursePrice. If generated, learned cluster structure may be a generator artefact rather than real learner behaviour — a material threat to validity. | Phase 1 review of Phase 0 cardinalities | Phase 2 (EXP-006) |
+| Q-9 | **Is `Transactions.TeacherID` a deterministic function of `CourseID`?** With exactly 60 teachers and 60 courses it may be a bijection — in which case every teacher-derived feature is an alias for a course-derived one and the §11 experiment is vacuous. | Phase 1 research on the teacher experiment | Phase 2 (EXP-005) |
+| Q-10 | **Does the segmentation improve recommendation at all?** ADR-0005 deliberately made the cluster signal ablatable so this can be measured. If cluster-popularity does not beat global popularity, the segmentation has no demonstrated recommendation value — though it may retain standalone analytical value for the brief's learner-analysis requirement. | ADR-0005; RQ6 | Phase 3 (EXP-023 vs EXP-020) |
