@@ -55,7 +55,7 @@ and justified individually; none is dropped without a recorded reason.
 | --- | --- | --- | --- |
 | C1 | Normalize numerical features | `edupro.segmentation.representations` — StandardScaler, chosen on evidence (D-028) | **Implemented** |
 | C2 | Encode categorical variables | `edupro.segmentation.representations` — 4 encodings compared (EXP-011a) | **Implemented** |
-| C3 | Reduce noise from sparse enrollments | `edupro.features` | Not started |
+| C3 | Reduce noise from sparse enrollments | Four-tier routing on training-window history; sparse learners never scored as personalised | **Implemented** |
 
 ## D. Segmentation (official, p.4)
 
@@ -72,12 +72,12 @@ and justified individually; none is dropped without a recorded reason.
 
 | # | Requirement | Implementation | Verification | Status |
 | --- | --- | --- | --- | --- |
-| E1 | Content-based filtering | `edupro.recommendation` | EXP-021 | Not started |
-| E2 | Similar learner profiles | `edupro.recommendation` | EXP-022 | Not started |
-| E3 | Course popularity within cluster | `edupro.recommendation` | EXP-023 | Not started |
-| E4 | Rating-weighted relevance | `edupro.recommendation` | EXP-024 | Not started |
-| E5 | Personalized ranking | `edupro.recommendation` | EXP-024 | Not started |
-| E6 | Cold-start / fallback logic | `edupro.recommendation` | EXP-025 | Not started |
+| E1 | Content-based filtering | `edupro.recommendation.baselines.ContentBased` | EXP-021 — best single baseline on test (0.1191) | **Verified** |
+| E2 | Similar learner profiles | `UserUserHistory` + `UserUserProfile` (two arms) | EXP-022a/b | **Verified** |
+| E3 | Course popularity within cluster | `edupro.recommendation.baselines.ClusterPopularity` | EXP-023 — selected method; answers Q-10 | **Verified** |
+| E4 | Rating-weighted relevance | `RatingRecommender` standalone + weight 0.249 in the hybrid | EXP-024 — largest ablation loss | **Verified** |
+| E5 | Personalized ranking | `WeightedHybrid` with searched weights | EXP-024 — 400-sample search + ablation | **Verified** |
+| E6 | Cold-start / fallback logic | `TieredRecommender`, four tiers | EXP-025 — 100% of learners receive a recommendation | **Verified** |
 
 ## F. Evaluation (official, p.5)
 
@@ -85,8 +85,8 @@ and justified individually; none is dropped without a recorded reason.
 | --- | --- | --- | --- | --- |
 | F1 | Silhouette Score | Cluster quality | `edupro.segmentation.metrics` | **Verified** |
 | F2 | Intra-Cluster Similarity | Behavioural consistency | `edupro.segmentation.metrics` — behavioural cosine, formula defined in `segmentation_research.md` §5 | **Verified** |
-| F3 | Recommendation Precision | Relevance | `edupro.evaluation` | Not started |
-| F4 | Engagement Lift (Proxy) | Impact estimate | `edupro.evaluation` | Not started |
+| F3 | Recommendation Precision | Relevance | `edupro.evaluation.metrics` — always reported against its analytical ceiling | **Verified** |
+| F4 | Engagement Lift (Proxy) | Impact estimate | `edupro.evaluation.metrics.engagement_lift_proxy` — reported with random's own lift beside it (D-038) | **Verified** |
 
 Additional metrics where scientifically appropriate (CLAUDE.md §3): Recall@K,
 Hit Rate@K, NDCG@K, catalogue coverage.
@@ -124,20 +124,20 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | --- | --- | --- | --- | --- |
 | I1 | Raw data immutable | 8 | ADR-0003; checksums in `edupro.config` | **Verified** |
 | I2 | `data/raw/` + `data/processed/` maintained | 8 | Repository layout | **Verified** |
-| I3 | Leakage detection for temporal evaluation | 9 | Protocol pre-registered (`recommendation_evaluation_plan.md` §2); controls L1-L6 specified as tests | In progress |
+| I3 | Leakage detection for temporal evaluation | 9 | All six controls verified in-run at both stages; the checker is itself tested able to fail | **Verified** |
 | I4 | Variant A vs Variant B segmentation | 10 | EXP-011 run: ARI 1.000, demographic share 0.0004, Variant B by the pre-registered rule (D-029) | **Verified** |
 | I5 | Teachers sheet as explicit experiment | 11 | EXP-005 refuted the bijection; EXP-014 run and **rejected on evidence** (D-030) | **Verified** for segmentation |
-| I6 | Temporal hold-out; sparse users handled separately | 12 | Dual protocol pre-registered (D-011); tiered evaluation specified | In progress |
-| I7 | Five recommendation baselines | 13 | EXP-019–024 specified with equal tuning budget; 3 further baselines added (D-017) | In progress |
-| I8 | Hybrid weights justified, not asserted | 14 | EXP-024 search + ablation specified; hand-chosen weights named as a failure condition | In progress |
-| I9 | Sparse-history recommendation tiers | 15 | Four tiers specified; boundary set by pre-registered rule (EXP-025) | In progress |
-| I10 | Explanations consistent with scoring logic | 16 | Model-intrinsic explanation required; scorer must return components (D-015) | In progress |
+| I6 | Temporal hold-out; sparse users handled separately | 12 | Both protocols run; 350 zero-history learners excluded from personalised evaluation and counted | **Verified** |
+| I7 | Five recommendation baselines | 13 | Ten baselines evaluated on both splits with identical treatment | **Verified** |
+| I8 | Hybrid weights justified, not asserted | 14 | 400-sample simplex search on validation + 6-component ablation + sensitivity spread | **Verified** |
+| I9 | Sparse-history recommendation tiers | 15 | Four tiers implemented and routed on training-window history (L3); per-tier metrics reported | **Verified** |
+| I10 | Explanations consistent with scoring logic | 16 | Scorer returns per-component contributions; tests assert the decomposition sums to the total and that zero-weighted components never appear | **Verified** |
 | I11 | Email never a modelling feature; UI anonymised | 17 | ADR-0006; `PII_COLUMNS` | In progress |
 | I12 | Modular source; app independent of notebooks | 18, 19 | ADR-0001 | **Verified** |
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | ADR-0001; `app/` | Not started |
 | I15 | Artifacts persisted and version-consistent | 22 | `models/`, `artifacts/` | Not started |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **104 tests**: environment, loading, schema, validation, joins, features, splits, representations, clustering, metrics, stability, profiling | In progress |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **160 tests** across environment, pipeline, segmentation and recommendation | In progress |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |

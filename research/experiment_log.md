@@ -74,6 +74,18 @@ completes — never in advance.
 | EXP-012 | 3A | Hierarchical validation | **Negative** — average linkage agrees at ARI 0.019 | 19 Sep 2026 |
 | EXP-013 | 3A | Cluster stability | All four clusters >=0.98 bootstrap Jaccard | 19 Sep 2026 |
 | EXP-014 | 3A | Core vs core + teacher signals | **Rejected** — +0.0009 silhouette, ARI 0.990 | 19 Sep 2026 |
+| EXP-019 | 3B | Random reference floor | NDCG@10 **0.1102** on test — ranks 7th of 12 | 19 Sep 2026 |
+| EXP-020 | 3B | Global popularity | **Worse than random** on test (0.1072) | 19 Sep 2026 |
+| EXP-021 | 3B | Content-based filtering | Best single baseline on test (0.1191), not significant | 19 Sep 2026 |
+| EXP-022a | 3B | User-user over interaction history | Worst method on test (0.0947) | 19 Sep 2026 |
+| EXP-022b | 3B | User-user over profile features | **Prediction refuted** — worse than the history arm | 19 Sep 2026 |
+| EXP-022c | 3B | Item-based CF | **Prediction refuted** — 8th of 12 on test | 19 Sep 2026 |
+| EXP-022d | 3B | Teacher affinity | Not retained — 8th, CI contains zero | 19 Sep 2026 |
+| EXP-023 | 3B | **Cluster popularity — does segmentation help?** | Beats popularity, **not** random. Q-10 answered | 19 Sep 2026 |
+| EXP-024 | 3B | Weighted hybrid + ablation | Weights searched; **lost the parsimony tiebreak** | 19 Sep 2026 |
+| EXP-025 | 3B | Tiered switching recommender | Full coverage; recommended for deployment | 19 Sep 2026 |
+| EXP-026 | 3B | Protocol A vs B | **Rankings differ** — [R24] reproduced | 19 Sep 2026 |
+| EXP-027 | 3B | Demographic-stratified evaluation | Gender gap nominally significant; bounded | 19 Sep 2026 |
 
 Phase 0 was project initialization: **environment validation**, not
 experimentation, so it produced no entries. Those checks are recorded in
@@ -375,15 +387,108 @@ for the Phase 3B recommender.
 
 ---
 
-## Pre-registered expectations — status after Phase 3A
+## Phase 3B results
+
+Full detail in `research/recommendation_results.md` and
+`research/recommendation_error_analysis.md`; machine-readable record in
+`artifacts/recommendation/recommendation_results.json`. Reproduce with
+`python scripts/run_recommendation_experiments.py` (seed 42).
+
+**Protocol:** train < 2025-09-12 | validation 09-12 to 10-18 (all selection) |
+fit < 2025-10-18 | test >= 2025-10-18 (**used exactly once**). 511 evaluable
+learners at validation, 791 at test. All six leakage controls passed at both
+stages.
+
+### The headline result
+| Field | Value |
+| --- | --- |
+| Question | Does any recommendation method beat random ranking on this dataset? |
+| Method | Paired bootstrap of per-learner NDCG@10 differences vs random, 2,000 resamples |
+
+**Result:** **0 of 11 methods** are significantly better than random. Every 95%
+interval contains zero, in aggregate and within every history tier. Random ranks
+**7th of 12** on the test window; global popularity is **worse** than random
+(0.1072 vs 0.1102).
+
+**Interpretation:** this is what Phase 2's signal detection predicted. It does
+**not** show the methods are wrong or the pipeline broken — every component is
+tested and transfers unchanged. It shows the dataset contains no course-choice
+signal to find.
+
+**Decision:** reported as the project headline (CLAUDE.md §6), not a footnote.
+
+---
+
+### EXP-023 — Does the segmentation help recommendation? (**answers Q-10**)
+| Comparison | Validation | Test |
+| --- | --- | --- |
+| cluster_popularity vs global_popularity | +0.0044 | **+0.0066** |
+| cluster_popularity vs random | +0.0125 | +0.0036 |
+| Paired CI vs random (test) | — | **[-0.0092, +0.0271] — contains zero** |
+
+**Interpretation:** segmenting learners and recommending within segment beats
+recommending globally popular courses — but global popularity is itself worse than
+random here, so that is a low bar. **The Phase 3A segmentation has not
+demonstrated recommendation value.** It retains standalone analytical value for
+the brief's learner-analysis requirement; the distinction must be drawn rather
+than blurred.
+
+---
+
+### EXP-024 — Hybrid weight search and ablation
+**Result:** best validation NDCG@10 **0.1148** with weights cluster_popularity
+0.557, rating 0.249, item_item_cf 0.173, preference_match 0.021, and **zero** for
+content_based and user_user_profile. Across 400 samples NDCG ranged 0.0832-0.1148,
+sd **0.0057**.
+
+Ablation: removing `rating` costs -0.0102 (largest), `cluster_popularity` -0.0088,
+`item_item_cf` -0.0036; the two zero-weight components cost nothing.
+
+**Interpretation:** `rating` is useless alone (below random, 0.0956) yet takes the
+second-largest weight — it works as a tie-break on another signal. Isolating it as
+its own baseline is what made that visible.
+
+**Decision:** the hybrid won validation by **0.0051** over `cluster_popularity`,
+inside the pre-registered 0.01 parsimony margin, so the rule selected the simpler
+method. Expectation **P-3** confirmed exactly.
+
+---
+
+### EXP-026 — Protocol A vs Protocol B
+**Result:** five methods move three or more ranks between protocols. `item_item_cf`
+rises 9th -> 3rd; `random` falls 6th -> 11th.
+
+**Interpretation:** Meng et al. [R24] reproduced on EduPro. A project using
+leave-one-out alone would have concluded item-based CF was top-three and random
+bottom-ranked; neither holds under the leakage-free protocol. **Caution:** Protocol
+B's lower absolute scores are an artefact of holding out one course instead of
+2.05, **not** evidence of leakage deflation.
+
+---
+
+### EXP-027 — Demographic strata
+**Result:** female NDCG@10 0.1002 vs male 0.1285. Gap **-0.0283**, CI
+[-0.0543, -0.0010], consistent in direction across all three tiers.
+
+**Interpretation:** nominally significant and reported, but bounded: no demographic
+feature enters any model; Phase 2 found gender independent of course choice
+(p = 0.643); the interval barely excludes zero and is uncorrected for four strata
+tests; and no method beats random at all.
+
+**Decision:** recorded as requiring monitoring on real data, **not** as a finding
+of discrimination.
+
+---
+
+## Pre-registered expectations — status after Phase 3B
 
 Phase 1 recorded seven predictions before any data was examined. Comparing them
 against evidence is itself part of the record.
 
 | # | Phase 1 expectation | Phase 2 evidence | Status |
 | --- | --- | --- | --- |
-| P-1 | Popularity hard to beat | Popularity near-uniform, Gini 0.042 | **Revised** — popularity ≈ random; hard to beat *because it is weak*, not strong |
-| P-2 | Item-based CF strongest | Co-occurrence *below* the null | **Revised** — expect ≈ random |
+| P-1 | Popularity hard to beat | **Refuted as stated, confirmed as revised** — global popularity is *worse* than random on test (0.1072 vs 0.1102) | **Settled (EXP-020)** |
+| P-2 | Item-based CF strongest | **REFUTED** — 8th of 12 on test (0.1047); content-based led the baselines | **Settled (EXP-022c)** |
 | P-3 | Hybrid wins by a small margin | — | Unchanged; awaiting EXP-024 |
 | P-4 | Cluster structure weak; gap may say k=1 | Silhouette 0.195 at k=4 is weak, as predicted. But the gap statistic **failed** — it could not deliver any verdict, so the k=1 half is untestable with this instrument | **Half-confirmed, half-untestable** |
 | P-5 | Variant B preferred | **CONFIRMED** — ARI 1.000, demographic share 0.0004 | **Confirmed (EXP-011)** |

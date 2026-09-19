@@ -4,7 +4,7 @@ Learner segmentation and personalised course recommendation for the EduPro
 online learning platform — built as a reproducible, explainable research-grade
 system rather than a single notebook.
 
-> **Project status: Phase 3A complete — learner segmentation experiments.**
+> **Project status: Phase 3B complete — recommendation experiments.**
 > No model has been trained yet. The repository contains the validated
 > environment, the authoritative source materials, a research corpus with 40
 > verified references and 28 pre-registered experiments, and a tested data
@@ -19,8 +19,17 @@ system rather than a single notebook.
 > are unrelated to choice. One real signal exists — learners reuse instructors far
 > more than chance — but it lifts next-course prediction only 1.10×.
 > The dataset is also **assessed as almost certainly synthetic**.
+>
+> **Phase 3B confirmed the consequence: no recommendation method beats random
+> ranking.** Across eleven methods on a leakage-free temporal split of 791
+> learners, every 95% confidence interval on the paired NDCG@10 difference against
+> random contains zero. Global popularity is *worse* than random.
+>
 > This is reported up front because it bounds what the project can honestly claim.
-> Full evidence: [`research/dataset_audit.md`](research/dataset_audit.md).
+> It does **not** mean the methods or the pipeline are wrong — every component is
+> tested and transfers unchanged to real data.
+> Full evidence: [`research/dataset_audit.md`](research/dataset_audit.md) and
+> [`research/recommendation_results.md`](research/recommendation_results.md).
 
 ---
 
@@ -97,7 +106,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **104 passed**. That result confirms the modelling stack is
+A clean run reports **160 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 
@@ -171,7 +180,7 @@ carrying an evidence-backed PASS/FAIL.
 | 1 | Research and methodology investigation | ✅ **PASS** |
 | 2 | Dataset audit and EDA | ✅ **PASS** |
 | 3A | ML experimentation — segmentation | ✅ **PASS** |
-| 3B | ML experimentation — recommendation | Not started |
+| 3B | ML experimentation — recommendation | ✅ **PASS** |
 | 4 | Model selection and architecture freeze | Not started |
 | 5 | Production implementation | Not started |
 | 6 | Validation, documentation, deployment | Not started |
@@ -252,6 +261,8 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | [`research/segmentation_results.md`](research/segmentation_results.md) | All segmentation experiments, including the negative results |
 | [`research/segmentation_feature_decision.md`](research/segmentation_feature_decision.md) | The chosen representation and its reversal conditions |
 | [`research/cluster_profiles.md`](research/cluster_profiles.md) | The four segments, with limitations |
+| [`research/recommendation_results.md`](research/recommendation_results.md) | **All recommendation experiments and the headline negative result** |
+| [`research/recommendation_error_analysis.md`](research/recommendation_error_analysis.md) | Where recommendations miss, and which failure modes are ruled out |
 | [`references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md`](references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md) | Verbatim transcript of the official brief |
 | `research/PHASE_N_COMPLETE.md` | Per-phase report with PASS/FAIL and evidence |
 
@@ -278,6 +289,8 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | `scripts/generate_eda_figures.py` | The ten EDA figures → `artifacts/eda/` |
 | `scripts/run_segmentation_experiments.py` | EXP-010…014 → `artifacts/segmentation/segmentation_results.json` |
 | `scripts/generate_segmentation_figures.py` | The ten segmentation figures → `artifacts/segmentation/` |
+| `scripts/run_recommendation_experiments.py` | EXP-019…027 → `artifacts/recommendation/recommendation_results.json` |
+| `scripts/generate_recommendation_figures.py` | The eight recommendation figures → `artifacts/recommendation/` |
 
 Both scripts re-verify the source checksum after reading, so even the inspection
 tooling proves it did not mutate its input.

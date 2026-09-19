@@ -648,6 +648,140 @@ carries the wording, and the limitation travels with the profiles wherever they 
 
 ---
 
+## Phase 3B — Recommendation experiments (19 September 2026)
+
+### D-033 — The headline finding: no method beats random
+**Status:** Settled as a finding
+
+**Evidence:** paired bootstrap of per-learner NDCG@10 differences against random,
+2,000 resamples, on 791 evaluable learners under the leakage-free temporal split.
+**All eleven 95% intervals contain zero**, in aggregate and within every history
+tier (minimal, moderate, rich). Random ranks **7th of 12** on the test window, and
+global popularity is **worse** than random (0.1072 vs 0.1102).
+
+**Why this was foreseeable and still had to be measured:** Phase 2 established
+that course choice is statistically indistinguishable from popularity-weighted
+chance, that popularity is near-uniform (Gini 0.042), and that demographics are
+independent of choice. A recommender cannot find structure that is not there.
+
+**What is NOT concluded:** that the methods are wrong, the pipeline is broken, or
+personalisation is impossible in education. Every component is unit-tested and
+would transfer unchanged to real EduPro data. The limitation is the dataset, which
+Phase 2 assessed as almost certainly synthetic (D-025).
+
+**Consequence:** this is the project's headline result. §6 requires it be reported
+as such rather than buried behind a favourable-looking metric, and the Phase 1
+evaluation design — random baseline in every table, coverage co-primary,
+pre-registered rules, a paired significance test — exists precisely so it could be
+stated plainly.
+
+---
+
+### D-034 — `cluster_popularity` selected by the parsimony tiebreak
+**Status:** Settled by the pre-registered rule
+
+The hybrid led validation NDCG@10 at 0.1148 against `cluster_popularity`'s 0.1098
+— a margin of **0.0051**, inside the **0.01** parsimony margin fixed in Phase 1
+(D-018). The rule therefore selects the simpler method.
+
+**Why the rule is right here:** a six-signal hybrid that adds 0.005 NDCG carries
+real maintenance and explanation cost for a gain that the significance test shows
+is indistinguishable from zero. Phase 1's pre-registered expectation P-3 predicted
+this outcome exactly.
+
+**Reversal:** none needed on this data. On data with real signal the margin could
+exceed 0.01 and the rule would select the hybrid.
+
+---
+
+### D-035 — Recommend the tiered recommender for deployment, despite ranking lower
+**Status:** Recommendation to Phase 4, not a reversal of D-034
+
+| | cluster_popularity | tiered |
+| --- | --- | --- |
+| Test NDCG@10 | 0.1138 | 0.1117 |
+| Catalogue coverage | 0.75 | **1.00** |
+| Zero-history handling | global fallback | **explicit tier, labelled as such** |
+| Explanation faithfulness | popularity only | **routes by the signal actually used** |
+
+The 0.0021 accuracy difference is far inside the noise band established in D-033.
+**Where accuracy cannot distinguish two options, coverage, transparency and honest
+cold-start handling should** — and those are what §15 and §16 actually require.
+`cluster_popularity` leaves 15 of 60 courses permanently unrecommended for no
+accuracy gain.
+
+The pre-registered selection stands; this is a separate, documented deployment
+decision for Phase 4 to confirm.
+
+---
+
+### D-036 — Q-10 answered: the segmentation has not demonstrated recommendation value
+**Status:** Settled — answers Q-10
+
+**Evidence (EXP-023):** `cluster_popularity` beats `global_popularity` by +0.0066
+NDCG@10 on test, but beats random by only +0.0036 with a CI of [-0.0092, +0.0271].
+
+**Interpretation:** recommending within segment is better than recommending
+globally popular courses — but global popularity is itself worse than random here,
+so that is a low bar and not evidence of value.
+
+ADR-0005 deliberately made the cluster signal ablatable so this question could be
+answered rather than assumed. The segmentation retains **standalone analytical
+value** for the brief's learner-analysis requirement; that distinction must be
+drawn carefully in the research paper rather than blurred.
+
+---
+
+### D-037 — Four Phase 1 predictions recorded as wrong
+**Status:** Settled — recorded rather than dropped
+
+1. **P-1 (popularity hard to beat)** — refuted as stated. Global popularity is
+   *worse* than random on the test window.
+2. **P-2 (item-based CF strongest single personalised method)** — refuted. 8th of
+   12 on test; content-based led the baselines.
+3. **User-user over profile features would beat the raw-history arm** — refuted on
+   both splits (0.0944 vs 0.1065 validation; 0.1105 vs 0.0947 test, i.e. the
+   ordering even reverses between splits, which is itself a noise signature).
+4. **Item-based CF better-conditioned than user-based** — not borne out.
+
+Two predictions were confirmed: **P-3** (hybrid wins narrowly and loses the
+tiebreak) exactly, and **P-7** (coverage separates methods more than accuracy) —
+accuracy spans 1.3x, coverage 3.3x.
+
+---
+
+### D-038 — The Engagement Lift proxy is reported with random's own lift beside it
+**Status:** Settled
+
+The selected method scores a proxy lift of **1.084**. **Random scores 1.046 on the
+same measure.**
+
+Reporting 1.084 alone would invite the reading "8% better engagement". Printing
+random's 1.046 next to it makes the interpretation unavoidable: the measure is an
+offline agreement ratio against a weak incumbent, not an effect size. This
+operationalises the guard rails fixed in D-014 and is why no statement of the form
+"this system would increase engagement by X%" appears anywhere in the project.
+
+---
+
+### D-039 — The gender gap is reported and bounded, not called discrimination
+**Status:** Settled as an observation requiring monitoring
+
+**Evidence:** female NDCG@10 0.1002 vs male 0.1285; gap **-0.0283**, CI
+[-0.0543, -0.0010], consistent in direction across all three tiers.
+
+**Reported**, because [R30] is explicit that aggregate numbers hide group
+differences and because not looking is a weaker position than looking.
+
+**Bounded**, because: no demographic feature enters any model; Phase 2 found gender
+independent of course choice (p = 0.643); the interval barely excludes zero and is
+**uncorrected for four strata tests**; and no method beats random at all, so this
+is a disparity in chance-level performance.
+
+**Decision:** monitor on real data. Not a finding of discrimination.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were
@@ -666,4 +800,4 @@ questions P-1…P-5 are in `production_research.md` §7.
 | Q-7 | How is "Engagement Lift (Proxy)" defined so that it is honest? The official document requires the metric but defines no formula. Whatever is used must be labelled a proxy and must not be presented as measured causal impact (§6). | Official doc, p.5 | **Answered by D-014** (definition fixed); magnitude in Phase 3 |
 | Q-8 | **Is the dataset synthetic?** Zero missing values across 27 columns; 21 distinct ages in *both* Users and Teachers; 23 distinct values in *both* Amount and CoursePrice. If generated, learned cluster structure may be a generator artefact rather than real learner behaviour — a material threat to validity. | Phase 1 review of Phase 0 cardinalities | **ANSWERED (D-025)** — almost certainly synthetic |
 | Q-9 | **Is `Transactions.TeacherID` a deterministic function of `CourseID`?** With exactly 60 teachers and 60 courses it may be a bijection — in which case every teacher-derived feature is an alias for a course-derived one and the §11 experiment is vacuous. | Phase 1 research on the teacher experiment | **ANSWERED (D-023)** — not a bijection; EXP-014 proceeds |
-| Q-10 | **Does the segmentation improve recommendation at all?** ADR-0005 deliberately made the cluster signal ablatable so this can be measured. If cluster-popularity does not beat global popularity, the segmentation has no demonstrated recommendation value — though it may retain standalone analytical value for the brief's learner-analysis requirement. | ADR-0005; RQ6 | Phase 3 (EXP-023 vs EXP-020) |
+| Q-10 | **Does the segmentation improve recommendation at all?** | ADR-0005; RQ6 | **ANSWERED (D-036)** — it beats global popularity (+0.0066) but not random (+0.0036, CI contains zero). No demonstrated recommendation value |
