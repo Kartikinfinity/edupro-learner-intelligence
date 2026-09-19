@@ -297,6 +297,60 @@ class TeacherAffinity(BaseRecommender):
         ], dtype=float)
 
 
+class DiversifiedFallback(BaseRecommender):
+    """The cold-start fallback CLAUDE.md §15 prescribes: popularity, rating **and
+    diversity**.
+
+    A plain popularity-and-rating blend fails the diversity half. Measured on the
+    validation window it reached only **17%** of the catalogue for zero-history
+    learners — *worse* than global popularity alone (32%), because popularity and
+    rating concentrate on the same courses and blending them compounds rather than
+    offsets the concentration.
+
+    This recommender keeps the same quality blend but re-ranks it **round-robin
+    across course categories**: the best unshown course from each category, then
+    the second-best from each, and so on. A top-12 therefore spans all twelve
+    categories.
+
+    That is the right behaviour for a learner the system knows nothing about.
+    There is no preference to exploit, so the useful thing to offer is breadth —
+    and Phase 2 showed the accuracy cost is nil, because course popularity is
+    near-uniform (Gini 0.042) and nothing beats random anyway.
+    """
+
+    name = "diversified_fallback"
+    component = "popularity_rating_diversity"
+
+    def __init__(self, popularity_weight: float = 0.5) -> None:
+        super().__init__()
+        self.popularity_weight = popularity_weight
+
+    def _fit(self, context: FitContext) -> None:
+        self.popularity = GlobalPopularity().fit(context).popularity
+        self.ratings = RatingRecommender().fit(context).ratings
+        indexed = context.courses.set_index(config.KEY_COURSE).reindex(context.course_ids)
+        self.categories = indexed["CourseCategory"].tolist()
+
+        quality = (
+            self.popularity_weight * minmax(self.popularity)
+            + (1 - self.popularity_weight) * minmax(self.ratings)
+        )
+        # Rank within category: 0 for each category's best course, 1 for its
+        # second-best, and so on. The round-robin ordering falls out of sorting by
+        # this rank first and quality second.
+        self.within_category_rank = np.zeros(context.n_items, dtype=float)
+        for category in set(self.categories):
+            members = [i for i, c in enumerate(self.categories) if c == category]
+            for rank, position in enumerate(sorted(members, key=lambda i: -quality[i])):
+                self.within_category_rank[position] = rank
+        self.quality = quality
+
+    def _raw_scores(self, user: str, candidates: np.ndarray) -> np.ndarray:
+        # Higher is better: a low within-category rank dominates, and quality
+        # orders the courses that share a rank.
+        return -self.within_category_rank[candidates] + self.quality[candidates]
+
+
 class PreferenceMatch(BaseRecommender):
     """How well a course matches the learner's category and level preferences.
 

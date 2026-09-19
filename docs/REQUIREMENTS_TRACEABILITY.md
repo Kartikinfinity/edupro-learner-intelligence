@@ -55,7 +55,7 @@ and justified individually; none is dropped without a recorded reason.
 | --- | --- | --- | --- |
 | C1 | Normalize numerical features | `edupro.segmentation.representations` — StandardScaler, chosen on evidence (D-028) | **Implemented** |
 | C2 | Encode categorical variables | `edupro.segmentation.representations` — 4 encodings compared (EXP-011a) | **Implemented** |
-| C3 | Reduce noise from sparse enrollments | Four-tier routing on training-window history; sparse learners never scored as personalised | **Implemented** |
+| C3 | Reduce noise from sparse enrollments | Four-tier routing on training-window history (L3); sparse learners never scored as personalised | **Verified** (EXP-025, EXP-028) |
 
 ## D. Segmentation (official, p.4)
 
@@ -75,9 +75,9 @@ and justified individually; none is dropped without a recorded reason.
 | E1 | Content-based filtering | `edupro.recommendation.baselines.ContentBased` | EXP-021 — best single baseline on test (0.1191) | **Verified** |
 | E2 | Similar learner profiles | `UserUserHistory` + `UserUserProfile` (two arms) | EXP-022a/b | **Verified** |
 | E3 | Course popularity within cluster | `edupro.recommendation.baselines.ClusterPopularity` | EXP-023 — selected method; answers Q-10 | **Verified** |
-| E4 | Rating-weighted relevance | `RatingRecommender` standalone + weight 0.249 in the hybrid | EXP-024 — largest ablation loss | **Verified** |
+| E4 | Rating-weighted relevance | `RatingRecommender` standalone + weight 0.249 in the hybrid + quality signal in `DiversifiedFallback` | EXP-024 — largest ablation loss; EXP-029 | **Verified** |
 | E5 | Personalized ranking | `WeightedHybrid` with searched weights | EXP-024 — 400-sample search + ablation | **Verified** |
-| E6 | Cold-start / fallback logic | `TieredRecommender`, four tiers | EXP-025 — 100% of learners receive a recommendation | **Verified** |
+| E6 | Cold-start / fallback logic | `TieredRecommender`, four tiers; `DiversifiedFallback` for zero history | EXP-025 — 100% of learners receive a recommendation; EXP-029 — 10/12 categories at cold start | **Verified** |
 
 ## F. Evaluation (official, p.5)
 
@@ -126,7 +126,7 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I2 | `data/raw/` + `data/processed/` maintained | 8 | Repository layout | **Verified** |
 | I3 | Leakage detection for temporal evaluation | 9 | All six controls verified in-run at both stages; the checker is itself tested able to fail | **Verified** |
 | I4 | Variant A vs Variant B segmentation | 10 | EXP-011 run: ARI 1.000, demographic share 0.0004, Variant B by the pre-registered rule (D-029) | **Verified** |
-| I5 | Teachers sheet as explicit experiment | 11 | EXP-005 refuted the bijection; EXP-014 run and **rejected on evidence** (D-030) | **Verified** for segmentation |
+| I5 | Teachers sheet as explicit experiment | 11 | EXP-005 refuted the bijection; EXP-014 (segmentation) and EXP-022d (recommendation) both run and **rejected on evidence** (D-030); excluded from `edupro-1.0.0` | **Verified** |
 | I6 | Temporal hold-out; sparse users handled separately | 12 | Both protocols run; 350 zero-history learners excluded from personalised evaluation and counted | **Verified** |
 | I7 | Five recommendation baselines | 13 | Ten baselines evaluated on both splits with identical treatment | **Verified** |
 | I8 | Hybrid weights justified, not asserted | 14 | 400-sample simplex search on validation + 6-component ablation + sensitivity spread | **Verified** |
@@ -137,11 +137,34 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | ADR-0001; `app/` | Not started |
 | I15 | Artifacts persisted and version-consistent | 22 | `models/`, `artifacts/` | Not started |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **160 tests** across environment, pipeline, segmentation and recommendation | In progress |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **163 tests** across environment, pipeline, segmentation and recommendation | In progress |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
 | I20 | Reproducible environment | 3, 26 | `requirements*.txt`, `.venv` | **Verified** |
+
+---
+
+## Phase 4 status summary (19 September 2026)
+
+The architecture is frozen as `edupro-1.0.0`. Sections **A–F are complete**: every
+official learner-analysis, feature, preprocessing, segmentation, recommendation and
+evaluation requirement is implemented, measured and evidenced.
+
+Section **G (Streamlit) and H (deliverables) remain Not started**, which is correct
+— CLAUDE.md §4 gates them behind the architecture freeze, and the Phase 4 brief
+explicitly forbids writing production UI code yet.
+
+Requirements **investigated and not retained as the primary mechanism** — Age and
+Gender as clustering features, similar-learner recommendation, rating-weighted
+relevance standalone, the weighted hybrid, the elbow method as a decision rule, and
+the entire teacher block — are individually accounted for in
+`research/ARCHITECTURE_FREEZE.md` §"Official requirements evaluated but not
+retained", with how each is still addressed. **None was skipped.**
+
+Two engineering requirements remain **In progress** by design: I14/I15 (artifact
+persistence and the app loading them) land in Phase 5; I11's UI half lands with the
+app, its data half already Verified at the ingestion layer.
 
 ---
 

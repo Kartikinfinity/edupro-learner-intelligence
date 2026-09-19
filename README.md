@@ -4,11 +4,11 @@ Learner segmentation and personalised course recommendation for the EduPro
 online learning platform — built as a reproducible, explainable research-grade
 system rather than a single notebook.
 
-> **Project status: Phase 3B complete — recommendation experiments.**
-> No model has been trained yet. The repository contains the validated
-> environment, the authoritative source materials, a research corpus with 40
-> verified references and 28 pre-registered experiments, and a tested data
-> pipeline with a full forensic audit of the dataset.
+> **Project status: Phase 4 complete — 🔒 architecture frozen as `edupro-1.0.0`.**
+> The ML design is settled and documented in
+> [`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md): a
+> four-segment K-Means segmentation feeding a four-tier switching recommender.
+> The production system and dashboard are **not built yet** — that is Phase 5.
 > Sections marked *(Phase N)* below describe planned work, not shipped work.
 
 > ### ⚠ Headline finding from the Phase 2 audit
@@ -106,7 +106,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **160 passed**. That result confirms the modelling stack is
+A clean run reports **163 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 
@@ -137,7 +137,7 @@ pip install -r requirements.lock.txt
 │   └── processed/        modelling-ready datasets
 ├── docs/                 technical docs, requirements traceability, deliverables
 ├── experiments/          experiment configs and results               (Phase 3)
-├── models/               persisted model artifacts                    (Phase 4+)
+├── models/               persisted model artifacts                     (Phase 5)
 ├── notebooks/            exploration only — never the sole implementation
 ├── references/official/  authoritative PDF + verbatim transcript
 ├── reports/figures/      generated figures
@@ -181,25 +181,44 @@ carrying an evidence-backed PASS/FAIL.
 | 2 | Dataset audit and EDA | ✅ **PASS** |
 | 3A | ML experimentation — segmentation | ✅ **PASS** |
 | 3B | ML experimentation — recommendation | ✅ **PASS** |
-| 4 | Model selection and architecture freeze | Not started |
+| 4 | Model selection and architecture freeze | ✅ **PASS** — 🔒 `edupro-1.0.0` |
 | 5 | Production implementation | Not started |
 | 6 | Validation, documentation, deployment | Not started |
 
-### Segmentation *(Phase 3)*
+### Segmentation — **frozen**
 
-K-Means as the primary method, with cluster count selected by elbow and
-silhouette analysis, and hierarchical clustering as an independent structural
-validation. Two feature variants are compared on evidence — behaviour +
-demographics vs behaviour only — because demographic features must not dominate
-learner segmentation without justification.
+Behaviour-only features (25 columns, all 11 brief-mandated features present), a
+12-dimensional category share vector, StandardScaler, **K-Means at k = 4**.
 
-### Recommendation *(Phase 3)*
+Ten representations were swept across k = 2…10. Demographics were excluded on
+evidence: Variant A and Variant B produce **identical partitions** (ARI 1.000) and
+the demographic block explains 0.04% of between-cluster variance. k = 4 was chosen
+by a pre-registered rule requiring every cluster to hold ≥5% of learners **and**
+reach bootstrap Jaccard ≥0.60 — silhouette alone would have chosen k = 10, where
+half the clusters fail to reappear under resampling. Hierarchical clustering was
+run as validation and **returned a negative result**, reported as one.
 
-Five baselines are evaluated before any hybrid is proposed: global popularity,
-content-based, similar-learner, cluster-popularity, and hybrid. Hybrid weights
-are set by ablation, not by assertion. Evaluation uses a leakage-controlled
-temporal hold-out, and learners with insufficient history are evaluated
-separately rather than being scored as if personalisation had applied to them.
+### Recommendation — **frozen**
+
+A **four-tier switching recommender**, routed on training-window history only:
+
+| Training history | Learners | Route |
+| --- | --- | --- |
+| 0 | 11.7% | `DiversifiedFallback` — popularity + rating, re-ranked round-robin by category |
+| 1 | 50.5% | `ContentBased` |
+| 2–8 | 24.4% | `ClusterPopularity` |
+| ≥ 9 | 13.5% | `ClusterPopularity` |
+
+Eleven methods were evaluated on a leakage-free temporal split before any hybrid
+was proposed. The weighted hybrid *led* the comparison and was **rejected** by a
+pre-registered parsimony margin it failed to clear. The tiered assembly was then
+measured against the flat scorer and reaches **full catalogue coverage (1.00 vs
+0.78) at equal accuracy**. 100% of learners receive a recommendation; none has an
+empty candidate pool.
+
+Full evidence: [`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md)
+· [`docs/technical_architecture.md`](docs/technical_architecture.md) ·
+[`research/architecture_diagram.md`](research/architecture_diagram.md)
 
 ---
 

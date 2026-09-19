@@ -374,3 +374,57 @@ def test_per_user_ndcg_covers_the_evaluation_set(pieces):
     scores = per_user_ndcg(GlobalPopularity().fit(context), context, evaluation_set)
     assert set(scores) == set(evaluation_set.relevant)
     assert all(0.0 <= v <= 1.0 for v in scores.values())
+
+
+# ---------------------------------------------------------------------------
+# Cold-start fallback (Phase 4)
+# ---------------------------------------------------------------------------
+def test_diversified_fallback_spans_more_categories_than_popularity(pieces):
+    """§15 prescribes popularity + rating + **diversity**.
+
+    A plain popularity-and-rating blend fails the diversity half: measured, it
+    shows a cold-start learner 7 of 12 categories against the diversified
+    fallback's 10, and concentrates 20% of its list in one category against 10%.
+    """
+    from edupro.recommendation.baselines import DiversifiedFallback
+
+    context, _, _, _ = pieces
+    categories = (
+        context.courses.set_index(config.KEY_COURSE)
+        .reindex(context.course_ids)["CourseCategory"]
+        .tolist()
+    )
+
+    popular = GlobalPopularity().fit(context).recommend("U99999", k=10)
+    diverse = DiversifiedFallback().fit(context).recommend("U99999", k=10)
+
+    popular_categories = {categories[int(i)] for i in popular}
+    diverse_categories = {categories[int(i)] for i in diverse}
+    assert len(diverse_categories) > len(popular_categories)
+
+
+def test_diversified_fallback_never_repeats_a_category_within_the_catalogue_width(pieces):
+    """With 12 categories, a top-10 from the round-robin must be all-distinct."""
+    from edupro.recommendation.baselines import DiversifiedFallback
+
+    context, _, _, _ = pieces
+    categories = (
+        context.courses.set_index(config.KEY_COURSE)
+        .reindex(context.course_ids)["CourseCategory"]
+        .tolist()
+    )
+    top = DiversifiedFallback().fit(context).recommend("U99999", k=10)
+    chosen = [categories[int(i)] for i in top]
+    assert len(set(chosen)) == len(chosen)
+
+
+def test_diversified_fallback_still_orders_by_quality_within_a_round(pieces):
+    """Diversity re-ranks; it must not discard the popularity/rating signal."""
+    from edupro.recommendation.baselines import DiversifiedFallback
+
+    context, _, _, _ = pieces
+    fallback = DiversifiedFallback().fit(context)
+    top = fallback.recommend("U99999", k=12)
+    qualities = [fallback.quality[int(i)] for i in top]
+    # The first full round covers every category, ordered by quality.
+    assert qualities == sorted(qualities, reverse=True)

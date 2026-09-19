@@ -782,6 +782,112 @@ is a disparity in chance-level performance.
 
 ---
 
+## Phase 4 — Model selection and architecture freeze (19 September 2026)
+
+### D-040 — The frozen architecture is the tiered router, not the flat scorer
+**Status:** Settled by measurement (EXP-028). Reconciles D-034 and D-035.
+
+Phase 3B left a genuine tension. The pre-registered parsimony rule selected
+`cluster_popularity` as the best *method* (D-034); the coverage evidence
+recommended the *tiered* recommender for deployment (D-035). Neither decision was
+wrong, because they answer different questions — but an architecture cannot be
+frozen on an unresolved tension, and **no Phase 3B row measured the assembly that
+would actually be deployed**.
+
+So it was measured. Three candidates, validation window, 511 evaluable learners:
+
+| Architecture | NDCG@10 | HR@10 | Coverage | Gini |
+| --- | --- | --- | --- | --- |
+| A — flat `cluster_popularity` | 0.1098 | 0.3033 | 0.78 | 0.606 |
+| B — tiered, hybrid core | 0.1135 | 0.3327 | **1.00** | 0.608 |
+| **C — tiered, `cluster_popularity` core** | 0.1104 | 0.3053 | **1.00** | **0.581** |
+
+**C dominates A**: +0.0006 NDCG (noise), **+0.22 coverage**, lower concentration,
+and a labelled cold-start route instead of an implicit one. B is +0.0031 over C but
+re-introduces the six-signal hybrid the parsimony rule rejected — and its margin is
+smaller than the margin that rule already judged too small to pay for.
+
+**Resolution:** the tiering is not a competing *method*; it is the *routing* around
+the selected method. D-034 chose the core, D-035 chose the shell, and C is both.
+None of the three differences is statistically significant against random.
+
+---
+
+### D-041 — The cold-start fallback is diversified, because the naive reading failed §15
+**Status:** Settled by measurement (EXP-029)
+
+CLAUDE.md §15 specifies "popularity/rating/diversity fallback" for learners with
+insufficient history. The obvious implementation — blend popularity and rating —
+was built first, and **measured to fail the diversity third of that requirement**:
+it showed a cold-start learner **7 of 12 categories**, fewer than plain popularity's
+8, because the two signals concentrate on the same courses.
+
+`DiversifiedFallback` keeps the same quality blend but re-ranks it round-robin
+across categories:
+
+| Fallback | Distinct categories in top 10 | Largest category share |
+| --- | --- | --- |
+| global_popularity | 8 | 0.30 |
+| rating | 8 | 0.20 |
+| popularity + rating blend | 7 | 0.20 |
+| **DiversifiedFallback** | **10** | **0.10** |
+
+**Why the accuracy cost is acceptable:** for a learner with no history there is no
+preference to exploit, so breadth is the useful offer — and Phase 2 established
+that on this data there is no ranking signal to sacrifice in the first place.
+Three tests now guard the property.
+
+---
+
+### D-042 — A measurement was discarded for being meaningless, not for being inconvenient
+**Status:** Recorded as a method correction
+
+The first attempt to compare cold-start fallbacks used cross-user catalogue
+coverage. It returned **0.17 for all three candidates**. That is not a tie: learners
+with zero history are indistinguishable, so every deterministic ranker hands all of
+them the *same* list, fixing cross-user coverage at K/60 ≈ 0.17 by construction.
+The metric could not vary and therefore measured nothing.
+
+It was replaced with within-list category spread, which does vary (7 to 10
+categories) and is the property §15 actually names. Recorded because a metric that
+returns identical numbers for every candidate is easy to read as "no difference"
+rather than "wrong instrument".
+
+---
+
+### D-043 — Validation, not test: the architecture comparison spends no new test budget
+**Status:** Settled by the Phase 1 pre-registration
+
+EXP-028 and EXP-029 run on the **validation** window only. The test window was
+opened once in Phase 3B, as pre-registered (D-018, L6), and re-opening it to
+compare three architectures would convert a held-out estimate into a selection
+surface — the exact failure the single-use rule exists to prevent.
+
+The consequence is stated rather than hidden: the frozen architecture's *assembled*
+metrics are validation-window estimates. Its *components* carry Phase 3B test
+metrics, which remain the best out-of-sample evidence available and are quoted as
+such throughout `ARCHITECTURE_FREEZE.md`.
+
+---
+
+### D-044 — The methodology is frozen
+**Status:** Freeze in force from 19 September 2026
+
+`edupro-1.0.0` is frozen: representation `B_proportion`, StandardScaler, K-Means
+k=4, tiered router with `DiversifiedFallback` / `ContentBased` / `ClusterPopularity`,
+explanations from score decomposition, Protocol A evaluation.
+
+**Reopening requires all four of:** a decision-log entry naming the change and its
+evidence; new experimental evidence (not a preference or a better-looking number); a
+recorded impact assessment across every affected layer — re-fitting the clustering
+invalidates the cluster-popularity inputs and any hybrid weights tuned against them;
+and a full test-suite re-run.
+
+**What would legitimately reopen it:** real, non-synthetic EduPro data. That would
+invalidate none of the methodology and all of the findings.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were
@@ -797,7 +903,7 @@ questions P-1…P-5 are in `production_research.md` §7.
 | Q-4 | Where do the sparse-history tier boundaries fall? The mean is 3.333 courses per learner, but the mean is not the distribution. | CLAUDE.md §15 | **ANSWERED (D-021)** — 1 / 2–4 / ≥9, handed over by the empty band |
 | Q-5 | Variant A (behaviour + demographics) or Variant B (behaviour only)? Must be decided on cluster quality, stability, behavioural consistency, interpretability and feature dominance — not assumed. | CLAUDE.md §10 | **ANSWERED (D-029)** — ARI 1.000 between variants; demographic share 0.0004. Variant B |
 | Q-6 | Is a temporal hold-out even viable? It requires enough per-learner history; at a mean of 3.333 interactions, a leave-one-out scheme may leave very little to train on, and one-interaction learners must not be evaluated as if personalised (§12). | CLAUDE.md §9, §12 | **ANSWERED (D-022)** — viable; Protocol A primary, 791 evaluable |
-| Q-7 | How is "Engagement Lift (Proxy)" defined so that it is honest? The official document requires the metric but defines no formula. Whatever is used must be labelled a proxy and must not be presented as measured causal impact (§6). | Official doc, p.5 | **Answered by D-014** (definition fixed); magnitude in Phase 3 |
+| Q-7 | How is "Engagement Lift (Proxy)" defined so that it is honest? The official document requires the metric but defines no formula. Whatever is used must be labelled a proxy and must not be presented as measured causal impact (§6). | Official doc, p.5 | **ANSWERED (D-014, D-038)** — definition fixed in Phase 1; magnitude 1.084 against random's own 1.046, reported side by side |
 | Q-8 | **Is the dataset synthetic?** Zero missing values across 27 columns; 21 distinct ages in *both* Users and Teachers; 23 distinct values in *both* Amount and CoursePrice. If generated, learned cluster structure may be a generator artefact rather than real learner behaviour — a material threat to validity. | Phase 1 review of Phase 0 cardinalities | **ANSWERED (D-025)** — almost certainly synthetic |
 | Q-9 | **Is `Transactions.TeacherID` a deterministic function of `CourseID`?** With exactly 60 teachers and 60 courses it may be a bijection — in which case every teacher-derived feature is an alias for a course-derived one and the §11 experiment is vacuous. | Phase 1 research on the teacher experiment | **ANSWERED (D-023)** — not a bijection; EXP-014 proceeds |
 | Q-10 | **Does the segmentation improve recommendation at all?** | ADR-0005; RQ6 | **ANSWERED (D-036)** — it beats global popularity (+0.0066) but not random (+0.0036, CI contains zero). No demonstrated recommendation value |

@@ -86,6 +86,8 @@ completes — never in advance.
 | EXP-025 | 3B | Tiered switching recommender | Full coverage; recommended for deployment | 19 Sep 2026 |
 | EXP-026 | 3B | Protocol A vs B | **Rankings differ** — [R24] reproduced | 19 Sep 2026 |
 | EXP-027 | 3B | Demographic-stratified evaluation | Gender gap nominally significant; bounded | 19 Sep 2026 |
+| EXP-028 | 4 | **Assembled architecture: flat vs tiered** | **Tiered dominates** — equal NDCG, coverage 1.00 vs 0.78 | 19 Sep 2026 |
+| EXP-029 | 4 | Cold-start fallback diversity | Naive blend **fails** §15; `DiversifiedFallback` reaches 10/12 categories | 19 Sep 2026 |
 
 Phase 0 was project initialization: **environment validation**, not
 experimentation, so it produced no entries. Those checks are recorded in
@@ -489,11 +491,81 @@ against evidence is itself part of the record.
 | --- | --- | --- | --- |
 | P-1 | Popularity hard to beat | **Refuted as stated, confirmed as revised** — global popularity is *worse* than random on test (0.1072 vs 0.1102) | **Settled (EXP-020)** |
 | P-2 | Item-based CF strongest | **REFUTED** — 8th of 12 on test (0.1047); content-based led the baselines | **Settled (EXP-022c)** |
-| P-3 | Hybrid wins by a small margin | — | Unchanged; awaiting EXP-024 |
+| P-3 | Hybrid wins by a small margin | **CONFIRMED, including the caveat** — the hybrid led validation by 0.0051, inside the 0.01 parsimony margin, so it won the comparison and lost the selection | **Settled (EXP-024)** |
 | P-4 | Cluster structure weak; gap may say k=1 | Silhouette 0.195 at k=4 is weak, as predicted. But the gap statistic **failed** — it could not deliver any verdict, so the k=1 half is untestable with this instrument | **Half-confirmed, half-untestable** |
 | P-5 | Variant B preferred | **CONFIRMED** — ARI 1.000, demographic share 0.0004 | **Confirmed (EXP-011)** |
 | P-6 | Teacher signals add nothing; EXP-005 may cancel | EXP-005 refuted the cancellation; teacher reuse is the only real signal, but 1.10× on next-course | **Half-refuted, now genuinely uncertain** |
-| P-7 | Coverage separates methods more than accuracy | — | Unchanged; awaiting EXP-019–024 |
+| P-7 | Coverage separates methods more than accuracy | **CONFIRMED** — NDCG@10 spans 0.095–0.121 across eleven methods while coverage spans 0.30–1.00; coverage also separated the four cold-start fallbacks that accuracy could not (EXP-029) | **Settled (EXP-019–024, EXP-029)** |
+
+---
+
+## Phase 4 results
+
+Two experiments, both on the **validation** window. The test budget was spent once
+in Phase 3B and is not re-opened (D-043).
+
+Script: `scripts/validate_final_architecture.py` ·
+Artifact: `artifacts/architecture/architecture_validation.json`
+
+---
+
+### EXP-028 — The assembled architecture — **the comparison Phase 3B never ran**
+**Question:** Phase 3B evaluated eleven *methods*. The system to be frozen is an
+*assembly* — a tiered router whose personalised route is the selected method. No
+Phase 3B row represents it. Does the assembly beat the flat scorer?
+
+**Result** (511 evaluable learners: rich 231, moderate 178, minimal 102):
+
+| Architecture | NDCG@10 | HR@10 | Coverage | Gini | Δ random |
+| --- | --- | --- | --- | --- | --- |
+| A — flat `cluster_popularity` | 0.1098 | 0.3033 | 0.78 | 0.606 | +0.0125 n.s. |
+| B — tiered, hybrid core | 0.1135 | 0.3327 | 1.00 | 0.608 | +0.0162 n.s. |
+| **C — tiered, selected core** | 0.1104 | 0.3053 | **1.00** | **0.581** | +0.0131 n.s. |
+
+Per-tier for C: rich 0.1109 (coverage 0.32) · moderate 0.1139 (0.75) ·
+minimal **0.1030 (1.00)**.
+
+**Interpretation:** C dominates A — equal accuracy, full catalogue coverage against
+0.78, lower concentration. The gain comes from the minimal tier, half the learner
+base, where content-based routing reaches the whole catalogue and a cluster-popularity
+scorer does not. B's +0.0031 over C does not buy back the six-signal hybrid the
+parsimony rule rejected at a larger margin.
+
+**Consistent with the headline:** none of the three is significantly better than
+random. Architecture C is selected for coverage, robustness and honest degradation,
+not for accuracy.
+
+---
+
+### EXP-029 — Cold-start fallback diversity — **and a discarded metric**
+**Question:** which fallback should serve the 350 learners with no training history?
+Accuracy is undefined for them — no history means nothing to personalise from and
+nothing to hold out — so the choice must be made on catalogue reach.
+
+**First attempt, discarded.** Cross-user catalogue coverage returned **0.17 for
+every candidate**. Zero-history learners are indistinguishable, so any deterministic
+ranker gives all of them the same list and coverage is pinned at K/60. The
+instrument could not vary; it was replaced, and the replacement is recorded here
+rather than quietly substituted (D-042).
+
+**Result** (within-list category spread, top 10, all 12 categories available):
+
+| Fallback | Distinct categories | Distinct levels | Largest category share |
+| --- | --- | --- | --- |
+| global_popularity | 8 | 3 | 0.30 |
+| rating | 8 | 3 | 0.20 |
+| popularity + rating blend | 7 | 3 | 0.20 |
+| **DiversifiedFallback** | **10** | 3 | **0.10** |
+
+**Interpretation:** the naive blend is *worse* than plain popularity on breadth,
+because popularity and rating concentrate on the same courses — so §15's prescribed
+"popularity/rating/diversity" fallback is not satisfied by blending the first two.
+`DiversifiedFallback` re-ranks the blend round-robin across categories and reaches
+10 of 12.
+
+**Prediction P-7 settled here too:** coverage separated these four candidates
+(7–10 categories, 0.10–0.30 concentration) while accuracy could not separate them
+at all.
 
 ---
 
