@@ -449,7 +449,8 @@ recommendation quality. "Hit Rate 36%" without "random achieves 35%" would misle
 Python 3.13 + Streamlit Community Cloud. **No Docker** (§20). Artifacts committed
 to the repository — the platform deploys from the repo and cannot run the training
 pipeline, so the `.gitignore` rule for `models/` must be relaxed for the final
-artifact set (open item P-2).
+artifact set. *(**Resolved in Phase 5A**: the 276 KB artifact set is tracked;
+`.gitignore` relaxed for five named files. Open item P-2 closed, D-047.)*
 
 ## Model Artifacts
 

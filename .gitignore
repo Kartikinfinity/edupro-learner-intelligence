@@ -78,6 +78,15 @@ data/processed/*
 # directories present so the pipeline can always write into them.
 models/*
 !models/.gitkeep
+# The frozen production artifact set IS tracked (276 KB in total). Streamlit
+# Community Cloud deploys from the repository and cannot run the training
+# pipeline, so an untracked artifact set would mean no deployed application.
+# This resolves the open item recorded as P-2 in ARCHITECTURE_FREEZE.md.
+!models/manifest.json
+!models/model_config.json
+!models/feature_schema.json
+!models/scaler.joblib
+!models/clusterer.joblib
 reports/figures/*
 !reports/figures/.gitkeep
 

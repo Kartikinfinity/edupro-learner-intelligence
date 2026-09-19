@@ -1,0 +1,121 @@
+{
+  "segments": {
+    "0": {
+      "label": "Beginner-level Single-course learners",
+      "evidence": [
+        {
+          "feature": "learning_depth_index",
+          "deviation": -1.271,
+          "phrase": "Beginner-leaning"
+        },
+        {
+          "feature": "total_courses",
+          "deviation": -0.425,
+          "phrase": "Single-course"
+        },
+        {
+          "feature": "preferred_level",
+          "deviation": null,
+          "phrase": "100% prefer Beginner"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 1.0,
+      "dominant_level": "Beginner",
+      "n_learners": 841,
+      "share": 0.2803
+    },
+    "1": {
+      "label": "Advanced-level Non-repeating learners",
+      "evidence": [
+        {
+          "feature": "learning_depth_index",
+          "deviation": 1.056,
+          "phrase": "Advanced-leaning"
+        },
+        {
+          "feature": "diversity_ratio",
+          "deviation": 0.42,
+          "phrase": "Non-repeating"
+        },
+        {
+          "feature": "preferred_level",
+          "deviation": null,
+          "phrase": "100% prefer Advanced"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 1.0,
+      "dominant_level": "Advanced",
+      "n_learners": 1030,
+      "share": 0.3433
+    },
+    "2": {
+      "label": "Intermediate-level Single-session Single-course learners",
+      "evidence": [
+        {
+          "feature": "activity_span_days",
+          "deviation": -0.507,
+          "phrase": "Single-session"
+        },
+        {
+          "feature": "total_courses",
+          "deviation": -0.456,
+          "phrase": "Single-course"
+        },
+        {
+          "feature": "preferred_level",
+          "deviation": null,
+          "phrase": "100% prefer Intermediate"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 1.0,
+      "dominant_level": "Intermediate",
+      "n_learners": 607,
+      "share": 0.2023
+    },
+    "3": {
+      "label": "Category-repeating High-volume learners",
+      "evidence": [
+        {
+          "feature": "diversity_ratio",
+          "deviation": -2.001,
+          "phrase": "Category-repeating"
+        },
+        {
+          "feature": "total_courses",
+          "deviation": 1.986,
+          "phrase": "High-volume"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 0.4521,
+      "dominant_level": "Advanced",
+      "n_learners": 522,
+      "share": 0.174
+    }
+  },
+  "stability": {
+    "assessed": true,
+    "k": 4,
+    "n_bootstrap": 100,
+    "per_cluster_jaccard": {
+      "0": 0.971,
+      "1": 0.9941,
+      "2": 0.9674,
+      "3": 0.9895
+    },
+    "mean_jaccard": 0.9805,
+    "n_unstable_below_0.60": 0,
+    "n_reliable_above_0.75": 4,
+    "subsample_ari_mean": 0.972,
+    "subsample_ari_std": 0.0865,
+    "all_clusters_reliable": true
+  },
+  "naming_method": "Deviation-ranked over the clustering's own columns, with a level prefix where a cluster is at least 90% pure on one level."
+}

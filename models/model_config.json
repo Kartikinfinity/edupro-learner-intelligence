@@ -1,0 +1,47 @@
+{
+  "model_version": "edupro-1.0.0",
+  "seed": 42,
+  "segmentation": {
+    "representation": "B_proportion",
+    "n_clusters": 4,
+    "scaler": "standard",
+    "algorithm": "KMeans(init=k-means++, n_init=10)"
+  },
+  "recommendation": {
+    "architecture": "tiered switching recommender",
+    "routes": {
+      "insufficient": "DiversifiedFallback",
+      "minimal": "ContentBased",
+      "moderate": "ClusterPopularity",
+      "rich": "ClusterPopularity"
+    },
+    "tier_boundaries": [
+      {
+        "tier": "insufficient",
+        "min_history": 0,
+        "max_history": 0
+      },
+      {
+        "tier": "minimal",
+        "min_history": 1,
+        "max_history": 1
+      },
+      {
+        "tier": "moderate",
+        "min_history": 2,
+        "max_history": 8
+      },
+      {
+        "tier": "rich",
+        "min_history": 9,
+        "max_history": null
+      }
+    ],
+    "default_k": 10,
+    "teacher_signals": "excluded (ARCHITECTURE_FREEZE.md, decision 10)"
+  },
+  "evaluation_reference": {
+    "protocol": "A - global temporal split",
+    "note": "Metrics in research/ come from the temporal-split fit. These artifacts are fitted on the full history, as recorded in the manifest's training block."
+  }
+}

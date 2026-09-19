@@ -4,12 +4,19 @@ Learner segmentation and personalised course recommendation for the EduPro
 online learning platform — built as a reproducible, explainable research-grade
 system rather than a single notebook.
 
-> **Project status: Phase 4 complete — 🔒 architecture frozen as `edupro-1.0.0`.**
-> The ML design is settled and documented in
-> [`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md): a
-> four-segment K-Means segmentation feeding a four-tier switching recommender.
-> The production system and dashboard are **not built yet** — that is Phase 5.
-> Sections marked *(Phase N)* below describe planned work, not shipped work.
+> **Project status: Phase 5A complete — the production ML system runs.**
+> The ML design is frozen as `edupro-1.0.0`
+> ([`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md)) and is now
+> implemented as reusable modules with a versioned artifact set. Recommendations
+> are generated from the command line; **no notebook is required**:
+>
+> ```bash
+> python scripts/train_production_model.py     # once, writes models/ + artifacts/
+> python scripts/recommend.py --user U00001    # explained top-10
+> ```
+>
+> The **Streamlit dashboard is not built yet** — that is Phase 5B. Sections marked
+> *(Phase N)* below describe planned work, not shipped work.
 
 > ### ⚠ Headline finding from the Phase 2 audit
 > **Course choice in this dataset is statistically indistinguishable from
@@ -106,7 +113,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **163 passed**. That result confirms the modelling stack is
+A clean run reports **219 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 
@@ -129,7 +136,7 @@ pip install -r requirements.lock.txt
 
 ```
 .
-├── app/                  Streamlit application                      (Phase 5)
+├── app/                  Streamlit application                     (Phase 5B)
 ├── artifacts/            generated artifacts: source inventory, rendered PDF pages
 ├── data/
 │   ├── raw/              IMMUTABLE authoritative dataset
@@ -137,7 +144,7 @@ pip install -r requirements.lock.txt
 │   └── processed/        modelling-ready datasets
 ├── docs/                 technical docs, requirements traceability, deliverables
 ├── experiments/          experiment configs and results               (Phase 3)
-├── models/               persisted model artifacts                     (Phase 5)
+├── models/               persisted model artifacts             (frozen v1.0.0)
 ├── notebooks/            exploration only — never the sole implementation
 ├── references/official/  authoritative PDF + verbatim transcript
 ├── reports/figures/      generated figures
@@ -182,7 +189,8 @@ carrying an evidence-backed PASS/FAIL.
 | 3A | ML experimentation — segmentation | ✅ **PASS** |
 | 3B | ML experimentation — recommendation | ✅ **PASS** |
 | 4 | Model selection and architecture freeze | ✅ **PASS** — 🔒 `edupro-1.0.0` |
-| 5 | Production implementation | Not started |
+| 5A | Production ML implementation | ✅ **PASS** |
+| 5B | Streamlit application | Not started |
 | 6 | Validation, documentation, deployment | Not started |
 
 ### Segmentation — **frozen**
@@ -292,7 +300,7 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | # | Deliverable | Status |
 | --- | --- | --- |
 | 1 | Research paper (EDA, insights, recommendations) | Phase 6 |
-| 2 | Streamlit dashboard (live analytics) | Phase 5 |
+| 2 | Streamlit dashboard (live analytics) | Phase 5B |
 | 3 | Executive summary for non-technical stakeholders | Phase 6 |
 
 ---

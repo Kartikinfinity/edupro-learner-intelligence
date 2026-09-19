@@ -29,9 +29,26 @@ import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 from edupro import config
-from edupro.data.schema import COURSE_CATEGORIES, COURSE_LEVELS, LEVEL_ORDER
+from edupro.data.schema import LEVEL_ORDER
+from edupro.features.course import build_course_vectors
 from edupro.features.learner import CATEGORY_SHARE_COLUMNS
 from edupro.recommendation.base import BaseRecommender, FitContext, minmax
+
+__all__ = [
+    "build_course_vectors",  # re-exported: the canonical definition lives in
+                             # edupro.features.course, beside the learner features.
+    "RandomRecommender",
+    "GlobalPopularity",
+    "RatingRecommender",
+    "ContentBased",
+    "ItemItemCF",
+    "UserUserHistory",
+    "UserUserProfile",
+    "ClusterPopularity",
+    "TeacherAffinity",
+    "DiversifiedFallback",
+    "PreferenceMatch",
+]
 
 
 class RandomRecommender(BaseRecommender):
@@ -90,32 +107,6 @@ class RatingRecommender(BaseRecommender):
 
     def _raw_scores(self, user: str, candidates: np.ndarray) -> np.ndarray:
         return self.ratings[candidates]
-
-
-def build_course_vectors(courses: pd.DataFrame, course_ids: list[str]) -> np.ndarray:
-    """Content feature matrix: category one-hot, level ordinal, type, rating, duration.
-
-    ``CourseName`` is deliberately absent: 58 distinct names across 60 courses with
-    no descriptive text, so TF-IDF over titles would be near-degenerate (Phase 1,
-    `literature_review.md` §2.2). Numeric attributes are min-max scaled so no single
-    one dominates cosine similarity through its raw range.
-    """
-    indexed = courses.set_index(config.KEY_COURSE).reindex(course_ids)
-    category = pd.get_dummies(
-        indexed["CourseCategory"].astype("string"), dtype=float
-    ).reindex(columns=list(COURSE_CATEGORIES), fill_value=0.0)
-    level = pd.get_dummies(
-        indexed["CourseLevel"].astype("string"), dtype=float
-    ).reindex(columns=list(COURSE_LEVELS), fill_value=0.0)
-    numeric = pd.DataFrame(
-        {
-            "is_free": (indexed["CourseType"] == "Free").astype(float),
-            "rating": minmax(indexed["CourseRating"].to_numpy(dtype=float)),
-            "duration": minmax(indexed["CourseDuration"].to_numpy(dtype=float)),
-        },
-        index=indexed.index,
-    )
-    return pd.concat([category, level, numeric], axis=1).to_numpy(dtype=float)
 
 
 class ContentBased(BaseRecommender):

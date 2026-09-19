@@ -20,10 +20,10 @@ logged experiment, or a reviewable artifact. Not before.
 
 | # | Requirement | Implementation | Verification | Status |
 | --- | --- | --- | --- | --- |
-| A1 | Aggregate transaction data at UserID level | `edupro.features.learner` | 36 pipeline tests | **Implemented** |
-| A2 | Learner profiles combining demographics and behaviour | `edupro.features.learner` | tests + EDA notebook | **Implemented** |
-| A3 | Engagement features | `edupro.features.learner` | EXP-006 distributions | **Implemented** |
-| A4 | Preference features | `edupro.features.learner` | EXP-006 distributions | **Implemented** |
+| A1 | Aggregate transaction data at UserID level | `edupro.features.learner` | 36 pipeline tests; exercised by the production pipeline | **Verified** |
+| A2 | Learner profiles combining demographics and behaviour | `edupro.features.learner`, surfaced by `RecommendationService.learner_profile` | tests + EDA notebook + production tests | **Verified** |
+| A3 | Engagement features | `edupro.features.learner` | EXP-006 distributions; persisted in `learner_features.parquet` | **Verified** |
+| A4 | Preference features | `edupro.features.learner` | EXP-006 distributions; persisted in `learner_features.parquet` | **Verified** |
 
 ## B. Feature engineering (official, pp.3–4)
 
@@ -132,16 +132,32 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I8 | Hybrid weights justified, not asserted | 14 | 400-sample simplex search on validation + 6-component ablation + sensitivity spread | **Verified** |
 | I9 | Sparse-history recommendation tiers | 15 | Four tiers implemented and routed on training-window history (L3); per-tier metrics reported | **Verified** |
 | I10 | Explanations consistent with scoring logic | 16 | Scorer returns per-component contributions; tests assert the decomposition sums to the total and that zero-weighted components never appear | **Verified** |
-| I11 | Email never a modelling feature; UI anonymised | 17 | ADR-0006; `PII_COLUMNS` | In progress |
+| I11 | Email never a modelling feature; UI anonymised | 17 | ADR-0006; `PII_COLUMNS`; every persisted artifact asserted PII-free by test | In progress — UI half lands with the app |
 | I12 | Modular source; app independent of notebooks | 18, 19 | ADR-0001 | **Verified** |
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
-| I14 | App loads artifacts; never retrains on startup | 21 | ADR-0001; `app/` | Not started |
-| I15 | Artifacts persisted and version-consistent | 22 | `models/`, `artifacts/` | Not started |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **163 tests** across environment, pipeline, segmentation and recommendation | In progress |
+| I14 | App loads artifacts; never retrains on startup | 21 | `edupro.inference.RecommendationService` loads in 0.41 s and never fits the segmentation (D-046) | In progress — the app itself is Phase 5B |
+| I15 | Artifacts persisted and version-consistent | 22 | `edupro.persistence` — manifest with library versions, workbook checksum and a per-file hash; 11 files; mismatch and half-update both asserted to raise | **Verified** |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **219 tests** across environment, pipeline, segmentation, recommendation and production | In progress — UI workflow tests land with the app |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
 | I20 | Reproducible environment | 3, 26 | `requirements*.txt`, `.venv` | **Verified** |
+
+---
+
+## Phase 5A status summary (19 September 2026)
+
+The frozen architecture is implemented as reusable production modules and a
+versioned artifact set. **Sections A-F are Verified**; section **I** advances I15
+to Verified and I14/I16 to In progress.
+
+Evidence: 219 tests pass; the artifact set loads in 0.41 s and serves ~8 ms per
+learner; all 3,000 learners receive a recommendation with none containing an
+already-enrolled course; and `scripts/verify_reproducibility.py` reproduces eight
+stored experiment results exactly after the refactor.
+
+Section **G (Streamlit)** and the UI halves of I11, I14 and I16 remain the Phase 5B
+scope. Section **H (deliverables)** is Phase 6.
 
 ---
 

@@ -95,6 +95,10 @@ class Representation:
     blocks: dict[str, list[str]]
     index: pd.Index
     raw: pd.DataFrame = field(repr=False)
+    #: The scaler used to produce ``matrix``. Newly fitted unless one was passed
+    #: in, in which case it is that same object. Persisted for inference so a new
+    #: learner is scaled with the training statistics rather than their own.
+    scaler: StandardScaler | RobustScaler | None = field(default=None, repr=False)
 
     @property
     def n_features(self) -> int:
@@ -142,9 +146,20 @@ def _one_hot(series: pd.Series, prefix: str, categories: tuple[str, ...]) -> pd.
 
 
 def build_representation(
-    features: pd.DataFrame, spec: RepresentationSpec
+    features: pd.DataFrame,
+    spec: RepresentationSpec,
+    scaler: StandardScaler | RobustScaler | None = None,
 ) -> Representation:
     """Assemble, weight and scale a representation from the learner feature table.
+
+    Scaling
+        With ``scaler=None`` (the default, and what every Phase 3A experiment uses)
+        a new scaler is fitted on ``features``. Passing a **fitted** scaler instead
+        transforms without refitting, which is what inference requires: a learner
+        arriving one at a time must be scaled by the training population's mean and
+        standard deviation, not by their own. The column order is verified against
+        the scaler before transforming, because a silent column reordering would
+        scale each feature by another feature's statistics and fail no test.
 
     Missingness
         The Phase 2 audit found **zero missing values** in the source data, and the
@@ -213,8 +228,22 @@ def build_representation(
     if frame.isna().any().any():
         frame = frame.fillna(0.0)
 
-    scaler = StandardScaler() if spec.scaler == "standard" else RobustScaler()
-    matrix = scaler.fit_transform(frame.to_numpy(dtype=float))
+    # Fitted on the frame rather than a bare array so the scaler records
+    # `feature_names_in_`; that is what lets inference verify column order instead
+    # of trusting it. The numeric result is identical either way.
+    frame = frame.astype(float)
+    if scaler is None:
+        scaler = StandardScaler() if spec.scaler == "standard" else RobustScaler()
+        matrix = scaler.fit_transform(frame)
+    else:
+        expected = list(getattr(scaler, "feature_names_in_", []))
+        if expected and list(frame.columns) != expected:
+            raise ValueError(
+                "Feature columns do not match the fitted scaler. "
+                f"Expected {expected}; received {list(frame.columns)}."
+            )
+        matrix = scaler.transform(frame)
+    matrix = np.asarray(matrix, dtype=float)
 
     if spec.block_weighting:
         for members in blocks.values():
@@ -231,6 +260,7 @@ def build_representation(
         blocks=blocks,
         index=features.index,
         raw=frame,
+        scaler=scaler,
     )
 
 

@@ -1,0 +1,89 @@
+{
+  "model_version": "edupro-1.0.0",
+  "artifact_set_version": "50c48678d4e5",
+  "created_at": "2026-09-19T14:19:30+00:00",
+  "seed": 42,
+  "workbook_sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
+  "libraries": {
+    "python": "3.13.9",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "joblib": "1.6.0"
+  },
+  "training": {
+    "window": "full history",
+    "window_note": "Fitted on all interactions. Reported metrics come from the temporal-split fit described in research/ARCHITECTURE_FREEZE.md.",
+    "n_learners": 3000,
+    "n_interactions": 10000,
+    "n_courses": 60,
+    "first_interaction": "2025-01-01",
+    "last_interaction": "2025-12-30"
+  },
+  "segmentation": {
+    "representation": "B_proportion",
+    "n_clusters": 4,
+    "n_model_features": 25,
+    "columns": [
+      "total_courses",
+      "avg_courses_per_category",
+      "enrollment_frequency",
+      "avg_course_rating",
+      "avg_spend",
+      "diversity_score",
+      "learning_depth_index",
+      "free_ratio",
+      "diversity_ratio",
+      "activity_span_days",
+      "cat_share_artificial_intelligence",
+      "cat_share_business",
+      "cat_share_cybersecurity",
+      "cat_share_data_science",
+      "cat_share_design",
+      "cat_share_digital_marketing",
+      "cat_share_finance",
+      "cat_share_machine_learning",
+      "cat_share_marketing",
+      "cat_share_programming",
+      "cat_share_project_management",
+      "cat_share_web_development",
+      "preflevel_Beginner",
+      "preflevel_Intermediate",
+      "preflevel_Advanced"
+    ],
+    "sizes": {
+      "0": 841,
+      "1": 1030,
+      "2": 607,
+      "3": 522
+    }
+  },
+  "recommendation": {
+    "architecture": "tiered",
+    "routes": {
+      "insufficient": "DiversifiedFallback",
+      "minimal": "ContentBased",
+      "moderate": "ClusterPopularity",
+      "rich": "ClusterPopularity"
+    },
+    "tiers": {
+      "minimal": 1620,
+      "moderate": 926,
+      "rich": 454
+    },
+    "default_k": 10
+  },
+  "files": {
+    "models\\scaler.joblib": "14d3cdfb8b051b662c213ff963fff19f90be12c30c818c271ff059a7c99f70e1",
+    "models\\clusterer.joblib": "82080ff06bf08a4d0f8d3ec0f85c0dd5bbb6ead300ad89767abeb05476eac02d",
+    "models\\feature_schema.json": "8529bccaf031986585e8f0ad89274460aa0aac5dc7b5c3c3ac431990bdf9577f",
+    "models\\model_config.json": "0d8eef7454c19fd3009a604054f1da2eab7ce819672636ad9555055d6d749e90",
+    "artifacts\\production\\learner_features.parquet": "f95d54b593532b263a5dab30f68df332c4d300bc6406f3bbb1aaa1bb614c1f78",
+    "artifacts\\production\\cluster_profiles.parquet": "29c673ffee349b7c7a7a415cbfbf442e7cbf62f3ebd69d23c3da2a8de24f2358",
+    "artifacts\\production\\segments.json": "45176c05a3f7d00dcb436b569ebd2409a2bd9e220a694fd6e80b260a5f8f59f1",
+    "artifacts\\production\\course_catalogue.parquet": "bccd9a9583d04b60464ac8a22b21b5f673522f911ac1c25b83dc7e0b46439fe6",
+    "artifacts\\production\\course_vectors.npy": "b47f98f7b32fae3eb6bc7660762d469677125a6f584a55921ca12038f9ab3c61",
+    "artifacts\\production\\interactions.parquet": "bae3b58a6e4ebcd6c4c2d17799eaa7444a517c71d6877a38aa5f3deed9b2c6cc",
+    "artifacts\\production\\popularity.parquet": "b6f55784a16480bb7055d44c32e4eb278d6c86bad2fe864b8c6faf78b8e217b0"
+  }
+}

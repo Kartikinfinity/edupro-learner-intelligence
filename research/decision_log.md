@@ -888,6 +888,104 @@ invalidate none of the methodology and all of the findings.
 
 ---
 
+## Phase 5A — Production ML implementation (19 September 2026)
+
+### D-045 — The deployed model is fitted on the full history; the reported metrics are not
+**Status:** Settled; recorded in the manifest so the two can never be conflated
+
+Model *selection* used the Protocol A temporal split so that every reported metric
+is out-of-sample. The *deployed* artifact set is fitted on all 10,000 interactions.
+That is standard practice after selection, and it is what a platform serving live
+learners would do: there is nothing to hold out at serving time, and discarding the
+most recent two months of behaviour would make recommendations worse for no benefit.
+
+The risk is that someone later reads the artifact set's segment sizes as if they
+were the evaluated model's. They are not identical:
+
+| | Fit window (evaluated) | Full history (deployed) |
+| --- | --- | --- |
+| Learners | 2,650 | 3,000 |
+| Segment sizes | 715 / 522 / 881 / 532 | 841 / 1,030 / 607 / 522 |
+| Smallest segment | 19.7% | 17.4% |
+| Mean bootstrap Jaccard | 0.9892 | 0.9805 |
+
+**The four segment names are identical** — Beginner-level single-course,
+Category-repeating high-volume, Advanced-level non-repeating, Intermediate-level
+single-session — which is the useful evidence here: the structure is the same
+structure, found again on 350 more learners. Cluster *numbering* differs, because
+K-Means labels are arbitrary.
+
+**Mitigation:** `manifest.json` records `training.window = "full history"` and a
+note pointing at the temporal-split provenance of the reported metrics. A test
+asserts both are present.
+
+---
+
+### D-046 — Load what was learned; recompute what is merely counted
+**Status:** Settled
+
+CLAUDE.md §21 forbids retraining the model at application start. The serving path
+loads the fitted scaler and the fitted K-Means from disk and never refits them.
+
+It does rebuild the *counting* structures — per-segment enrollment counts, learner
+content profiles, the category round-robin order — from the persisted tables at
+load time. Measured cost: **0.41 s**, once per process, behind
+`st.cache_resource`.
+
+**Why not persist those too.** A serving path that reads precomputed arrays needs a
+second implementation of the scoring logic, which can drift from the evaluated one.
+An explanation generated from a drifted scorer is precisely the failure §16 exists
+to prevent. Here the code that produced the reported metrics is the code that
+serves, and the redundantly persisted `popularity.parquet` is compared against the
+recomputed counts by test — so a drift fails loudly instead of silently.
+
+---
+
+### D-047 — The frozen artifact set is committed to the repository
+**Status:** Settled; resolves open item P-2
+
+Streamlit Community Cloud deploys from the repository and cannot run the training
+pipeline, so an untracked artifact set means no deployed application. The whole set
+is **276 KB** (60×60 content matrix, a few thousand-row tables), which is not a
+reason to reach for Git LFS.
+
+The `.gitignore` rule for `models/` is relaxed to five named files rather than
+un-ignoring the directory, so a stray experiment written into `models/` is still
+ignored by default.
+
+---
+
+### D-048 — The tier frame is stated once per list, the caveat once per list
+**Status:** Settled after seeing the rendered output
+
+The first implementation prefixed every recommendation with its tier frame ("You
+are new here, so these are broad..."), which made a ten-item list repeat the same
+clause ten times. The frame is a property of the *list*, not of each course, so it
+moved to `Explanation.tier_frame` and is rendered once; `full_sentence` recombines
+them when an explanation is shown alone.
+
+The measured-quality caveat is on `RecommendationResult`, not on each item, for the
+same reason. It is never omitted: a quality figure shown without the random
+reference would mislead (§6, D-035).
+
+---
+
+### D-049 — On the full history no existing learner is in the cold-start tier
+**Status:** Recorded as a finding with a consequence for Phase 5B
+
+All 3,000 learners have at least one interaction, so the full-history tier
+distribution is **minimal 1,620 / moderate 926 / rich 454 / insufficient 0**. The
+`insufficient` route is not dead code — it serves genuinely *new* learners, and the
+service reaches it by design when an identifier is absent from the artifact set,
+flagging `is_known_learner = False` rather than silently inventing a profile.
+
+**Consequence for the dashboard:** the cold-start experience cannot be demonstrated
+by picking an existing learner. Phase 5B must expose a "new learner" path
+explicitly, or the diversified fallback — the route chosen on measured evidence in
+EXP-029 — will never be visible to a reviewer.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were
