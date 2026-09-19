@@ -99,21 +99,21 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 
 | # | Requirement | Implementation | Status |
 | --- | --- | --- | --- |
-| G1 | Learner profile explorer | `app/` | Not started |
-| G2 | Cluster visualization dashboard | `app/` | Not started |
-| G3 | Personalized course recommendations | `app/` | Not started |
-| G4 | Segment comparison panels | `app/` | Not started |
-| G5 | Select a learner profile | `app/` | Not started |
-| G6 | View assigned segment | `app/` | Not started |
-| G7 | See recommended learning paths | `app/` | Not started |
-| G8 | Filter recommendations by level or category | `app/` | Not started |
+| G1 | Learner profile explorer | `app/pages/2_Learner_Profile.py` | **Verified** |
+| G2 | Cluster visualization dashboard | `app/pages/5_Cluster_Visualization.py` — PCA, with its 30.7% explained variance stated | **Verified** |
+| G3 | Personalized course recommendations | `app/pages/3_Recommendations.py` — with per-item explanations | **Verified** |
+| G4 | Segment comparison panels | `app/pages/6_Segment_Comparison.py` + `4_Segment_Intelligence.py` | **Verified** |
+| G5 | Select a learner profile | pseudonymous `UserID`, filterable by segment and history depth | **Verified** |
+| G6 | View assigned segment | shown on the profile and recommendation pages, with the naming evidence | **Verified** |
+| G7 | See recommended learning paths | ranked top-K with category, level, rating, score and reason | **Verified** |
+| G8 | Filter recommendations by level or category | applied to candidates before scoring, so a filtered list still returns k items | **Verified** |
 
 ## H. Deliverables (official, p.6)
 
 | # | Deliverable | Location | Priority | Status |
 | --- | --- | --- | --- | --- |
 | H1 | Research paper (EDA, insights, recommendations) | `docs/` | P1 | Not started |
-| H2 | Streamlit dashboard (live analytics) | `app/` | P2 | Not started |
+| H2 | Streamlit dashboard (live analytics) | `app/` | P2 | **Implemented** — deployment pending |
 | H3 | Executive summary | `docs/` | P3 | Not started |
 
 ---
@@ -132,16 +132,31 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I8 | Hybrid weights justified, not asserted | 14 | 400-sample simplex search on validation + 6-component ablation + sensitivity spread | **Verified** |
 | I9 | Sparse-history recommendation tiers | 15 | Four tiers implemented and routed on training-window history (L3); per-tier metrics reported | **Verified** |
 | I10 | Explanations consistent with scoring logic | 16 | Scorer returns per-component contributions; tests assert the decomposition sums to the total and that zero-weighted components never appear | **Verified** |
-| I11 | Email never a modelling feature; UI anonymised | 17 | ADR-0006; `PII_COLUMNS`; every persisted artifact asserted PII-free by test | In progress — UI half lands with the app |
+| I11 | Email never a modelling feature; UI anonymised | 17 | ADR-0006; `PII_COLUMNS`; every persisted artifact **and every app file** asserted PII-free by test | **Verified** |
 | I12 | Modular source; app independent of notebooks | 18, 19 | ADR-0001 | **Verified** |
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
-| I14 | App loads artifacts; never retrains on startup | 21 | `edupro.inference.RecommendationService` loads in 0.41 s and never fits the segmentation (D-046) | In progress — the app itself is Phase 5B |
+| I14 | App loads artifacts; never retrains on startup | 21 | `st.cache_resource` around a 0.41 s load; a test asserts no ML call appears anywhere under `app/` | **Verified** |
 | I15 | Artifacts persisted and version-consistent | 22 | `edupro.persistence` — manifest with library versions, workbook checksum and a per-file hash; 11 files; mismatch and half-update both asserted to raise | **Verified** |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **219 tests** across environment, pipeline, segmentation, recommendation and production | In progress — UI workflow tests land with the app |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **245 tests**; every dashboard page is executed by `AppTest` exactly as the server would | **Verified** |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
 | I20 | Reproducible environment | 3, 26 | `requirements*.txt`, `.venv` | **Verified** |
+
+---
+
+## Phase 5B status summary (19 September 2026)
+
+**Every official Streamlit capability (G1–G8) is Verified**, and the engineering
+requirements that were waiting on the application — I11, I14 and I16 — close with
+it. Section **A–G is complete**; only section **H (research paper, executive
+summary) and the deployment itself remain**, which is Phase 6.
+
+Evidence: 245 tests pass, including one that executes each of the seven dashboard
+pages exactly as the server would; a test asserts that no machine-learning call
+appears anywhere under `app/`; and a test asserts the dashboard's representation
+table reproduces `ARCHITECTURE_FREEZE.md` row for row, so the application and the
+research report cannot drift apart silently.
 
 ---
 

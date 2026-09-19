@@ -103,6 +103,7 @@ MODEL_FILES: tuple[tuple[str, str], ...] = (
 )
 TABLE_FILES: tuple[tuple[str, str], ...] = (
     ("learner_features", "learner_features.parquet"),
+    ("learner_projection", "learner_projection.parquet"),
     ("cluster_profiles", "cluster_profiles.parquet"),
     ("segments", "segments.json"),
     ("course_catalogue", "course_catalogue.parquet"),
@@ -145,6 +146,37 @@ SERVING_INTERACTION_COLUMNS: tuple[str, ...] = (
 
 class PipelineError(RuntimeError):
     """Raised when the training pipeline cannot produce a trustworthy artifact set."""
+
+
+def _projection(matrix: np.ndarray, index: pd.Index) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Two-dimensional PCA of the segmentation matrix, for display only.
+
+    Precomputed here rather than in the application because the application must
+    not fit anything at startup (CLAUDE.md §21), and because a stochastic
+    projection recomputed per session would move the points between page loads.
+
+    **This is a picture, not the model.** Clustering happens in the full
+    25-dimensional space; the projection is a lossy view of it, and the explained
+    variance is persisted alongside so the page can say how lossy.
+    """
+    from sklearn.decomposition import PCA
+
+    pca = PCA(n_components=2, random_state=config.RANDOM_SEED)
+    coordinates = pca.fit_transform(matrix)
+    frame = pd.DataFrame(coordinates, columns=["pc1", "pc2"], index=index)
+    info = {
+        "method": "PCA",
+        "n_components": 2,
+        "explained_variance_ratio": [round(float(v), 6) for v in pca.explained_variance_ratio_],
+        "explained_variance_total": round(float(pca.explained_variance_ratio_.sum()), 6),
+        "n_source_dimensions": int(matrix.shape[1]),
+        "note": (
+            "For visualisation only. The segmentation is fitted in the full "
+            "feature space; two components cannot reproduce it, and clusters that "
+            "overlap in this view may be separated in the space the model uses."
+        ),
+    }
+    return frame, info
 
 
 def _level_composition(features: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
@@ -319,6 +351,13 @@ def train(
         label_clusters(features, labels, allowed_features=set(representation.columns)),
         _level_composition(features, labels),
     )
+    projection, projection_info = _projection(representation.matrix, features.index)
+    logger.info(
+        "PCA projection: 2 of %d dimensions, %.1f%% of variance",
+        representation.matrix.shape[1],
+        projection_info["explained_variance_total"] * 100,
+    )
+
     stability: dict[str, Any] = {"assessed": False}
     if with_stability:
         result = assess_stability(representation.matrix, PRODUCTION.n_clusters)
@@ -360,6 +399,7 @@ def train(
         json.dumps(_model_config(), indent=2), encoding="utf-8"
     )
     persisted.to_parquet(paths["learner_features"])
+    projection.to_parquet(paths["learner_projection"])
     profiles.to_parquet(paths["cluster_profiles"])
     paths["segments"].write_text(
         json.dumps(
@@ -373,6 +413,7 @@ def train(
                     for cluster, info in named.items()
                 },
                 "stability": stability,
+                "projection": projection_info,
                 "naming_method": (
                     "Deviation-ranked over the clustering's own columns, with a "
                     "level prefix where a cluster is at least 90% pure on one level."

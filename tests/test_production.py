@@ -158,7 +158,7 @@ def test_recommendation_layer_uses_the_same_course_vectors(raw_data):
 # ---------------------------------------------------------------------------
 def test_every_declared_artifact_is_written(trained):
     paths = artifact_files(trained["models"], trained["tables"])
-    assert len(paths) == 11
+    assert len(paths) == 12
     for name, path in paths.items():
         assert path.exists(), f"{name} was not written"
         assert path.stat().st_size > 0

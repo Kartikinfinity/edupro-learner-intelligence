@@ -149,6 +149,7 @@ class RecommendationService:
         interactions: pd.DataFrame,
         segments: dict[str, Any],
         profiles: pd.DataFrame,
+        projection: pd.DataFrame | None = None,
         problems: list[str] | None = None,
     ) -> None:
         self.manifest = manifest
@@ -159,6 +160,10 @@ class RecommendationService:
         self.interactions = interactions
         self.segments = segments
         self.profiles = profiles
+        #: Precomputed 2D view of the segmentation space. Display only: the
+        #: clustering is fitted in the full feature space, never in these two
+        #: columns. Empty when the artifact set predates the projection.
+        self.projection = projection if projection is not None else pd.DataFrame()
         self.problems = problems or []
 
         self.spec = next(
@@ -229,6 +234,11 @@ class RecommendationService:
         interactions = pd.read_parquet(paths["interactions"])
         profiles = pd.read_parquet(paths["cluster_profiles"])
         segments = json.loads(paths["segments"].read_text(encoding="utf-8"))
+        projection = (
+            pd.read_parquet(paths["learner_projection"])
+            if paths["learner_projection"].exists()
+            else None
+        )
 
         service = cls(
             manifest=manifest,
@@ -239,6 +249,7 @@ class RecommendationService:
             interactions=interactions,
             segments=segments,
             profiles=profiles,
+            projection=projection,
             problems=problems,
         )
         logger.info(

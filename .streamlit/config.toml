@@ -1,0 +1,18 @@
+# Streamlit configuration for the EduPro dashboard.
+#
+# Deliberately minimal. Theme colours are left to Streamlit's light/dark defaults
+# so the dashboard is legible under both; chart colours are chosen in
+# app/lib/shell.py to work against either background.
+
+[server]
+# The dashboard is read-only: it loads a persisted artifact set and never writes.
+enableXsrfProtection = true
+enableCORS = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+# Show errors in the browser rather than only in the server log, so a deployment
+# problem is visible to whoever opens the page.
+showErrorDetails = "full"

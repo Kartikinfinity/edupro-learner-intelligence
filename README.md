@@ -4,19 +4,19 @@ Learner segmentation and personalised course recommendation for the EduPro
 online learning platform — built as a reproducible, explainable research-grade
 system rather than a single notebook.
 
-> **Project status: Phase 5A complete — the production ML system runs.**
+> **Project status: Phase 5B complete — the dashboard runs on the production model.**
 > The ML design is frozen as `edupro-1.0.0`
-> ([`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md)) and is now
-> implemented as reusable modules with a versioned artifact set. Recommendations
-> are generated from the command line; **no notebook is required**:
+> ([`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md)), implemented
+> as reusable modules with a versioned artifact set, and served by a seven-page
+> Streamlit dashboard that contains **no machine learning of its own**:
 >
 > ```bash
-> python scripts/train_production_model.py     # once, writes models/ + artifacts/
-> python scripts/recommend.py --user U00001    # explained top-10
+> streamlit run app/streamlit_app.py
 > ```
 >
-> The **Streamlit dashboard is not built yet** — that is Phase 5B. Sections marked
-> *(Phase N)* below describe planned work, not shipped work.
+> The artifact set is committed, so a fresh clone runs immediately. Remaining work
+> is Phase 6: the research paper, the executive summary and public deployment.
+> Sections marked *(Phase N)* below describe planned work, not shipped work.
 
 > ### ⚠ Headline finding from the Phase 2 audit
 > **Course choice in this dataset is statistically indistinguishable from
@@ -113,7 +113,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **219 passed**. That result confirms the modelling stack is
+A clean run reports **245 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 
@@ -132,11 +132,41 @@ pip install -r requirements.lock.txt
 
 ---
 
+## The dashboard
+
+```bash
+streamlit run app/streamlit_app.py
+```
+
+Seven pages, written for stakeholders, administrators, analysts and reviewers:
+
+| Page | Shows |
+| --- | --- |
+| **Executive Overview** | population, segments, the recommendation design, validated metrics, key insights |
+| **Learner Profile** | one learner's behaviour, preferences, assigned segment and history |
+| **Recommendations** | explained top-K with category and level filters, plus an explicit cold-start mode |
+| **Segment Intelligence** | segment sizes, behaviour, dominant categories and levels, and the evidence behind each name |
+| **Cluster Visualization** | a 2D view of the segmentation space, with how much variance it retains |
+| **Segment Comparison** | segments compared against the population average |
+| **Model Analytics** | every measured number: baselines, significance, coverage, cluster quality, architecture selection |
+
+Three rules the dashboard enforces rather than leaves to the reader:
+
+- **Every figure is labelled** *observed data*, *model output*, or *proxy metric*.
+- **No quality figure renders without its reference.** The random baseline is a
+  required argument, not an optional extra.
+- **Nothing is typed in.** Measured values are read from experiment artifacts, so
+  the dashboard cannot display a number no experiment produced.
+
+Launch, dependency and deployment notes: [`docs/deployment.md`](docs/deployment.md).
+
+---
+
 ## Repository layout
 
 ```
 .
-├── app/                  Streamlit application                     (Phase 5B)
+├── app/                  Streamlit dashboard: 7 pages, no ML of its own
 ├── artifacts/            generated artifacts: source inventory, rendered PDF pages
 ├── data/
 │   ├── raw/              IMMUTABLE authoritative dataset
@@ -190,7 +220,7 @@ carrying an evidence-backed PASS/FAIL.
 | 3B | ML experimentation — recommendation | ✅ **PASS** |
 | 4 | Model selection and architecture freeze | ✅ **PASS** — 🔒 `edupro-1.0.0` |
 | 5A | Production ML implementation | ✅ **PASS** |
-| 5B | Streamlit application | Not started |
+| 5B | Streamlit application | ✅ **PASS** |
 | 6 | Validation, documentation, deployment | Not started |
 
 ### Segmentation — **frozen**

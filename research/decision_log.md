@@ -986,6 +986,96 @@ EXP-029 — will never be visible to a reviewer.
 
 ---
 
+## Phase 5B — Streamlit application (19 September 2026)
+
+### D-050 — A 2D projection is persisted as a display artifact; the freeze is untouched
+**Status:** Settled; explicitly **not** a reopening of the architecture freeze
+
+The cluster-visualisation page needs 2D coordinates. Three options were available
+and two were rejected:
+
+- **Fit a projection in the app.** Rejected: the application must fit nothing
+  (§21), and a stochastic projection refitted per session would move the points
+  between page loads, which looks like instability in the *model* to anyone who
+  did not know the projection was being recomputed.
+- **t-SNE or UMAP.** Rejected: both produce a more separated-looking picture, and
+  on a segmentation whose silhouette is weak that is precisely the wrong property
+  — it would flatter the result. Neither preserves distance, so a viewer's natural
+  reading of the plot would be wrong.
+- **PCA, precomputed by the training pipeline.** Adopted. Deterministic,
+  distance-preserving in the directions it keeps, and it reports how much variance
+  it retained: **30.7% of 25 dimensions**, which the page states before the chart.
+
+**This does not reopen the freeze** (D-044). The projection is written by the
+pipeline and read by one page; no scorer, no clusterer and no metric consumes it.
+It changes no model behaviour, which is the test D-044 sets.
+
+---
+
+### D-051 — Every figure is labelled by what kind of thing it is
+**Status:** Settled
+
+A dashboard mixes three kinds of number that carry very different weight, and a
+stakeholder cannot tell them apart unless the dashboard says so. Each section
+carries a badge:
+
+| Label | Meaning |
+| --- | --- |
+| **Observed data** | Counted from the source workbook |
+| **Model output** | Produced by the segmentation or the recommender |
+| **Proxy metric — not a causal measurement** | Engagement Lift, which the brief names but does not define |
+
+Two rules are enforced in `app/lib/shell.py` rather than left to each page:
+
+**A quality metric never renders without its reference.**
+`metric_against_reference` takes the baseline as a required argument, so the
+comparison is the default rendering and omitting it takes deliberate effort. On a
+60-course catalogue a ranker that has learned nothing still posts a Hit Rate near
+0.35; "Hit Rate 36%" alone reads as success.
+
+**The engagement proxy cannot be read without random's own value.**
+`reporting.engagement_lift_proxy()` returns both numbers in one dict, so a caller
+cannot take the flattering figure and leave the reference behind.
+
+---
+
+### D-052 — The dashboard reproduces the frozen document, and a test enforces it
+**Status:** Settled after the representation table disagreed with the freeze
+
+The Model Analytics page shows each feature representation at "its own best k".
+The first implementation read that as the raw silhouette maximum and produced a
+table that **contradicted `ARCHITECTURE_FREEZE.md`** — `B_proportion` appeared at
+k = 10 with silhouette 0.269 rather than at k = 4 with 0.195.
+
+Both numbers are real; they answer different questions. The unconstrained maximum
+ranks arms by how far they were allowed to fragment, and at k = 10 half of
+`B_proportion`'s clusters fail to reappear under resampling. The frozen table
+applies the pre-registered size constraint, which is the rule the project actually
+committed to.
+
+The dashboard now applies that rule and reproduces all ten rows of the frozen
+table exactly. A test asserts it, so the dashboard and the research report cannot
+drift apart silently — which is the failure mode this catches: a reviewer opening
+both and finding different numbers for the same quantity.
+
+---
+
+### D-053 — Navigation is declared explicitly, and the cold-start route is reachable
+**Status:** Settled
+
+Streamlit's filename-based navigation labelled the entry page "streamlit app".
+Pages are now declared with `st.navigation`, so they carry the names a stakeholder
+should see. Each page also still runs standalone, which is how the tests exercise
+them — `shell.configure` tolerates the repeat `set_page_config` call that implies.
+
+The Recommendations page carries an explicit **"New learner (cold start)"** mode.
+This is not a convenience: on the full history every one of the 3,000 learners has
+at least one enrollment (D-049), so without it the diversified fallback — the route
+selected on measured evidence in EXP-029 — would be unreachable in the application
+and invisible to a reviewer.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were

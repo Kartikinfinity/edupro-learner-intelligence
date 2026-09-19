@@ -1,7 +1,7 @@
 {
   "model_version": "edupro-1.0.0",
-  "artifact_set_version": "50c48678d4e5",
-  "created_at": "2026-09-19T14:19:30+00:00",
+  "artifact_set_version": "247e3eac337f",
+  "created_at": "2026-09-19T14:37:59+00:00",
   "seed": 42,
   "workbook_sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
   "libraries": {
@@ -75,12 +75,13 @@
   },
   "files": {
     "models\\scaler.joblib": "14d3cdfb8b051b662c213ff963fff19f90be12c30c818c271ff059a7c99f70e1",
-    "models\\clusterer.joblib": "82080ff06bf08a4d0f8d3ec0f85c0dd5bbb6ead300ad89767abeb05476eac02d",
+    "models\\clusterer.joblib": "3f5fc8224edd0c070c4a824ac22076ccffff4868b39626a9271653c8b8286f57",
     "models\\feature_schema.json": "8529bccaf031986585e8f0ad89274460aa0aac5dc7b5c3c3ac431990bdf9577f",
     "models\\model_config.json": "0d8eef7454c19fd3009a604054f1da2eab7ce819672636ad9555055d6d749e90",
     "artifacts\\production\\learner_features.parquet": "f95d54b593532b263a5dab30f68df332c4d300bc6406f3bbb1aaa1bb614c1f78",
+    "artifacts\\production\\learner_projection.parquet": "8e1c9cdfa0edaeb27ef53cb661e94b2ce84c9a0299f64461a82cd3dd472972ca",
     "artifacts\\production\\cluster_profiles.parquet": "29c673ffee349b7c7a7a415cbfbf442e7cbf62f3ebd69d23c3da2a8de24f2358",
-    "artifacts\\production\\segments.json": "45176c05a3f7d00dcb436b569ebd2409a2bd9e220a694fd6e80b260a5f8f59f1",
+    "artifacts\\production\\segments.json": "1b2b7110f2e78682d41e0dba8261676d12cc1b979809f1e2b34b37dff125b62f",
     "artifacts\\production\\course_catalogue.parquet": "bccd9a9583d04b60464ac8a22b21b5f673522f911ac1c25b83dc7e0b46439fe6",
     "artifacts\\production\\course_vectors.npy": "b47f98f7b32fae3eb6bc7660762d469677125a6f584a55921ca12038f9ab3c61",
     "artifacts\\production\\interactions.parquet": "bae3b58a6e4ebcd6c4c2d17799eaa7444a517c71d6877a38aa5f3deed9b2c6cc",

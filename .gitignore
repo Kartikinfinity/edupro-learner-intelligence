@@ -93,3 +93,7 @@ reports/figures/*
 # Rendered pages of the official PDF: regenerable from the tracked source via
 # scripts/render_official_pdf.py, so the raster copies are not tracked.
 artifacts/official_pdf_pages/
+
+# Local tool configuration (the launch config is Windows-specific; the
+# authoritative launch instructions are in docs/deployment.md).
+.claude/

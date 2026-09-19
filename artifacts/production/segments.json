@@ -117,5 +117,16 @@
     "subsample_ari_std": 0.0865,
     "all_clusters_reliable": true
   },
+  "projection": {
+    "method": "PCA",
+    "n_components": 2,
+    "explained_variance_ratio": [
+      0.19082,
+      0.116451
+    ],
+    "explained_variance_total": 0.307271,
+    "n_source_dimensions": 25,
+    "note": "For visualisation only. The segmentation is fitted in the full feature space; two components cannot reproduce it, and clusters that overlap in this view may be separated in the space the model uses."
+  },
   "naming_method": "Deviation-ranked over the clustering's own columns, with a level prefix where a cluster is at least 90% pure on one level."
 }
