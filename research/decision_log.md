@@ -1158,6 +1158,71 @@ own reasons is reported as such.
 
 ---
 
+## Phase 6B — Research paper (19 September 2026)
+
+### D-058 — The paper's traceability is machine-checked, not asserted
+**Status:** Settled
+
+"Every result is traceable to an artifact" is a claim a paper can make about
+itself and get wrong in a dozen quiet ways: a number copied from an earlier run, a
+figure cited that was never generated, a reference keyed to nothing.
+
+Three instruments make it checkable instead:
+
+1. **`scripts/verify_paper_claims.py`** reads 77 values *out of the artifacts*,
+   formats each the way the paper prints it, and requires that string to appear in
+   the text. The checks read the artifact first and the paper second, so a wrong
+   number cannot make its own check pass.
+2. **`tests/test_paper.py`** verifies every cited figure file exists, every cited
+   reference is listed with an identifier, and all 25 required sections are present.
+3. **The Markdown is the source of truth**; the HTML submission copy is generated
+   from it by `scripts/build_paper.py`. A separately edited "final" copy is how a
+   paper and its data drift apart.
+
+---
+
+### D-059 — Unsupported claims are prevented by pattern, not by care
+**Status:** Settled
+
+The brief forbids claims like "engagement increased by X%" when no engagement
+measure exists. **A numeric check cannot catch this**, because the violation is a
+sentence rather than a number — and the sentence is easy to write by accident when
+the artifact says "impact proxy 1.084".
+
+Nine forbidden claim shapes are therefore tested for directly: causal engagement
+and retention claims, percentage attributions, and assertions of statistical
+significance that the confidence intervals do not support. Two pairing rules are
+also enforced: the impact proxy may not appear on a line without random's own
+value (1.046), and the deployed method's NDCG may not be quoted in prose without
+the random reference.
+
+**The patterns were verified able to fail** against six synthetic violating
+sentences, all caught, with a correctly-phrased sentence not flagged. The Phase 6A
+rule applies to documentation checks too: a probe that cannot fail proves nothing.
+
+---
+
+### D-060 — A mixed-provenance table found while rebuilding it from the artifact
+**Status:** Corrected in `ARCHITECTURE_FREEZE.md`
+
+Assembling the paper's results table from the artifacts revealed that the Gini
+column of the Phase 4 recommendation decision matrix carried **validation**-window
+values while every other column in the same table came from the **test** window.
+
+No decision changes — Gini was never a selection criterion and the ordering is
+materially the same — but a table whose columns come from different evaluation
+windows is wrong whether or not it changed an outcome. It is corrected to
+test-window values with the correction recorded in place.
+
+**This is the third document-level inconsistency the late phases have caught**,
+after the stale prediction table (Phase 4) and the representation table (Phase 5B).
+All three were found by **rebuilding a table from its artifact rather than copying
+it forward**, which is the practice worth generalising: any table that appears in
+two documents should be generated from the artifact in both, or generated once and
+referenced.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were

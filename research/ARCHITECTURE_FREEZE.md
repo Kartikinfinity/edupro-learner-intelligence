@@ -131,21 +131,28 @@ Test window, 791 learners, leakage-free. From
 
 | Method | NDCG@10 | Δ vs random | 95% CI | Coverage | Gini | Complexity | Verdict |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| hybrid | 0.1206 | +0.0162 | [−0.0033, +0.0355] | 0.92 | — | **6 signals** | Rejected — parsimony |
-| content_based | 0.1191 | +0.0147 | [−0.0040, +0.0340] | 1.00 | 0.530 | low | **Retained — minimal tier** |
-| preference_match | 0.1165 | +0.0121 | [−0.0068, +0.0305] | 1.00 | 0.483 | low | Not retained |
-| **cluster_popularity** ✅ | **0.1138** | +0.0093 | [−0.0092, +0.0271] | 0.75 | 0.606 | medium | **SELECTED — personalised tiers** |
-| tiered | 0.1117 | +0.0072 | [−0.0126, +0.0245] | **1.00** | 0.608 | medium | **Architecture** |
-| user_user_profile | 0.1105 | +0.0061 | [−0.0113, +0.0251] | 1.00 | 0.233 | medium | Not retained |
-| **random** *(floor)* | **0.1102** | — | — | 1.00 | 0.055 | none | Reference |
-| teacher_affinity | 0.1076 | +0.0032 | [−0.0150, +0.0209] | 1.00 | 0.666 | low | **Rejected — §11** |
+| hybrid | 0.1206 | +0.0162 | [−0.0033, +0.0355] | 0.92 | 0.631 | **6 signals** | Rejected — parsimony |
+| content_based | 0.1191 | +0.0147 | [−0.0040, +0.0340] | 1.00 | 0.498 | low | **Retained — minimal tier** |
+| preference_match | 0.1165 | +0.0121 | [−0.0068, +0.0305] | 1.00 | 0.465 | low | Not retained |
+| **cluster_popularity** ✅ | **0.1138** | +0.0093 | [−0.0092, +0.0271] | 0.75 | 0.573 | medium | **SELECTED — personalised tiers** |
+| tiered | 0.1117 | +0.0072 | [−0.0126, +0.0245] | **1.00** | 0.551 | medium | **Architecture** |
+| user_user_profile | 0.1105 | +0.0061 | [−0.0113, +0.0251] | 1.00 | 0.267 | medium | Not retained |
+| **random** *(floor)* | **0.1102** | — | — | 1.00 | 0.049 | none | Reference |
+| teacher_affinity | 0.1076 | +0.0032 | [−0.0150, +0.0209] | 1.00 | 0.626 | low | **Rejected — §11** |
 | global_popularity | 0.1072 | +0.0028 | [−0.0155, +0.0205] | **0.32** | 0.807 | trivial | Rejected — below random |
-| item_item_cf | 0.1047 | +0.0002 | [−0.0179, +0.0174] | 1.00 | 0.468 | medium | Not retained |
+| item_item_cf | 0.1047 | +0.0002 | [−0.0179, +0.0174] | 1.00 | 0.478 | medium | Not retained |
 | rating | 0.1034 | −0.0010 | [−0.0193, +0.0163] | 0.30 | 0.811 | trivial | Component only |
-| user_user_history | 0.0947 | −0.0098 | [−0.0269, +0.0067] | 1.00 | 0.142 | medium | Not retained |
+| user_user_history | 0.0947 | −0.0098 | [−0.0269, +0.0067] | 1.00 | 0.193 | medium | Not retained |
 
 **Zero of eleven methods are significantly better than random.** Random ranks 7th
 of 12. Five methods score below it.
+
+> **Correction (Phase 6B).** The Gini column originally carried **validation**-window
+> values while every other column in this table came from the **test** window — a
+> mixed-provenance row. The values above are now all test-window at K=10. No
+> decision changes: Gini was never a selection criterion and the ordering is
+> materially the same. Recorded rather than silently amended.
+
 
 ### The assembled architecture (Phase 4, validation window)
 

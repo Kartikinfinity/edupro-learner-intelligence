@@ -20,3 +20,9 @@ ipykernel==7.3.0
 # so it must be rendered to images to be read. Used by scripts/ tooling only.
 pypdf==6.19.0
 pymupdf==1.28.2
+
+# --- rendering the research paper to a submission-ready HTML document -------
+# Reached transitively via jupyterlab, but declared explicitly so that
+# scripts/build_paper.py is reproducible rather than depending on an
+# incidental transitive install.
+mistune==3.3.4

@@ -112,7 +112,7 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 
 | # | Deliverable | Location | Priority | Status |
 | --- | --- | --- | --- | --- |
-| H1 | Research paper (EDA, insights, recommendations) | `docs/` | P1 | Not started |
+| H1 | Research paper (EDA, insights, recommendations) | `docs/research_paper.md` + `.html` | P1 | **Verified** — 25 sections; 77 numeric claims machine-checked against artifacts |
 | H2 | Streamlit dashboard (live analytics) | `app/` | P2 | **Implemented** — deployment pending |
 | H3 | Executive summary | `docs/` | P3 | Not started |
 
@@ -137,11 +137,21 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | `st.cache_resource` around a 0.41 s load; a test asserts no ML call appears anywhere under `app/` | **Verified** |
 | I15 | Artifacts persisted and version-consistent | 22 | `edupro.persistence` — manifest with library versions, workbook checksum and a per-file hash; 11 files; mismatch and half-update both asserted to raise | **Verified** |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **257 tests**; every dashboard page executed by `AppTest`, plus 12 regression tests holding the Phase 6A defects | **Verified** |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **304 tests**; dashboard pages executed by `AppTest`, 12 regression tests, 47 paper-integrity tests | **Verified** |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
 | I20 | Reproducible environment | 3, 26 | `requirements*.txt`, `.venv` | **Verified** |
+
+---
+
+## Phase 6B status summary (19 September 2026)
+
+**H1 (research paper) is Verified.** All 25 required sections are present and every
+numeric claim is machine-checked against the experiment artifacts — 77 of 77 match.
+Nine forbidden causal-claim patterns are tested for and verified able to fail.
+
+Remaining scope: **H3 (executive summary)** and public deployment of **H2**.
 
 ---
 

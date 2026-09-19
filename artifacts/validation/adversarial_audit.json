@@ -1,10 +1,10 @@
 {
   "provenance": {
     "workbook_sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
-    "artifact_set": "530e28eb1793",
+    "artifact_set": "b658773c9db8",
     "model_version": "edupro-1.0.0",
     "mode": "exhaustive",
-    "elapsed_seconds": 149.0
+    "elapsed_seconds": 134.9
   },
   "summary": {
     "n_probes": 59,
@@ -232,7 +232,7 @@
       "check": "CHECK 4 - CLUSTERING: does the served model match the trained one?",
       "probe": "artifact set loads",
       "severity": "pass",
-      "detail": "set 530e28eb1793, 12 files, 0 problem(s)",
+      "detail": "set b658773c9db8, 12 files, 0 problem(s)",
       "evidence": {}
     },
     {
@@ -379,7 +379,7 @@
       "check": "CHECK 5 - RECOMMENDATIONS: every history profile, including hostile ones",
       "probe": "no learner is shown a course they took",
       "severity": "pass",
-      "detail": "all 3,000 learners checked in 49s: 0 empty lists, 0 already-enrolled courses",
+      "detail": "all 3,000 learners checked in 42s: 0 empty lists, 0 already-enrolled courses",
       "evidence": {}
     },
     {
@@ -414,7 +414,7 @@
       "check": "CHECK 6 - EXPLAINABILITY: does every sentence match the scoring logic?",
       "probe": "explanation scan",
       "severity": "pass",
-      "detail": "30,000 explanations checked over 3,000 learners in 43s (exhaustive)",
+      "detail": "30,000 explanations checked over 3,000 learners in 42s (exhaustive)",
       "evidence": {}
     },
     {
