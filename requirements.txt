@@ -1,0 +1,34 @@
+# ===========================================================================
+# EduPro - runtime dependencies (pipeline + Streamlit application)
+# ===========================================================================
+# Pinned to the exact versions validated in this project's environment on
+# Python 3.13.9 (see research/PHASE_0_COMPLETE.md for the validation evidence).
+#
+# Direct dependencies only. Transitive dependencies are resolved by pip; the
+# fully-frozen environment is recorded separately in requirements.lock.txt.
+#
+# Python: >=3.11, <3.14  (see ADR-0002 - Streamlit Community Cloud supports
+# up to 3.13, so the project deliberately does not target 3.14.)
+# ===========================================================================
+
+# --- data handling ---------------------------------------------------------
+pandas==3.0.6
+numpy==2.5.3
+pyarrow==25.0.1
+openpyxl==3.1.5
+
+# --- modelling -------------------------------------------------------------
+scikit-learn==1.9.1
+scipy==1.18.1
+joblib==1.6.0
+
+# --- visualisation ---------------------------------------------------------
+matplotlib==3.11.2
+seaborn==0.13.2
+plotly==7.1.0
+
+# --- application -----------------------------------------------------------
+streamlit==1.64.0
+
+# --- configuration ---------------------------------------------------------
+PyYAML==6.0.3

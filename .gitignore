@@ -1,0 +1,86 @@
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# ---------------------------------------------------------------------------
+# Virtual environments
+# ---------------------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+
+# ---------------------------------------------------------------------------
+# Testing / coverage / caches
+# ---------------------------------------------------------------------------
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# IDE / OS
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------------
+# Streamlit local secrets (never commit credentials)
+# ---------------------------------------------------------------------------
+.streamlit/secrets.toml
+
+# ---------------------------------------------------------------------------
+# Project source-material duplicates left in the workspace root.
+# The canonical, version-controlled copies are:
+#     data/raw/EduPro Online Platform.xlsx
+#     references/official/project offical detail.pdf
+# These root-level originals are the user's own untouched files; they are
+# ignored so the repository holds exactly one authoritative copy of each.
+# ---------------------------------------------------------------------------
+/EduPro Online Platform.xlsx
+/project offical detail.pdf
+/claude.md.txt
+
+# ---------------------------------------------------------------------------
+# Derived data and generated outputs.
+# data/raw/ is deliberately NOT ignored - the raw dataset is the authoritative
+# input and must be version-controlled for reproducibility (CLAUDE.md s8).
+# ---------------------------------------------------------------------------
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Large or regenerable binary artifacts are tracked selectively; keep the
+# directories present so the pipeline can always write into them.
+models/*
+!models/.gitkeep
+reports/figures/*
+!reports/figures/.gitkeep
+
+# Rendered pages of the official PDF: regenerable from the tracked source via
+# scripts/render_official_pdf.py, so the raster copies are not tracked.
+artifacts/official_pdf_pages/

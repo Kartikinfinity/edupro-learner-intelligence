@@ -1,0 +1,11 @@
+# Normalise line endings in the repository; check out native on each platform.
+* text=auto
+
+# Explicitly binary - never touched by EOL normalisation.
+*.xlsx  binary
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.joblib binary
+*.pkl   binary
+*.parquet binary

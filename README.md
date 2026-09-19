@@ -1,0 +1,269 @@
+# Student Segmentation and Personalized Course Recommendation System for EduPro
+
+Learner segmentation and personalised course recommendation for the EduPro
+online learning platform — built as a reproducible, explainable research-grade
+system rather than a single notebook.
+
+> **Project status: Phase 0 of 6 complete — project initialization.**
+> No model has been trained and no data finding has been produced yet. The
+> repository currently contains the validated environment, the authoritative
+> source materials, the package skeleton and the research governance documents.
+> Sections marked *(Phase N)* below describe planned work, not shipped work.
+
+---
+
+## What this project does
+
+EduPro's learners are not homogeneous: some sample beginner courses across many
+domains, some specialise deeply, others pursue career-oriented certifications.
+One-size-fits-all recommendations serve none of them well.
+
+This system:
+
+1. **Segments learners** into interpretable behavioural groups from their
+   enrollment history, using K-Means with hierarchical clustering as an
+   independent validation.
+2. **Recommends courses** personalised to each learner's segment, content
+   preferences and history — with an explicit fallback path for learners whose
+   history is too thin to personalise honestly.
+3. **Explains every recommendation** in plain language, derived from the actual
+   scoring contributions rather than written to sound plausible.
+
+---
+
+## Dataset
+
+`data/raw/EduPro Online Platform.xlsx` — 4 sheets, no missing values anywhere.
+
+| Sheet | Rows | Columns | Role |
+| --- | --- | --- | --- |
+| `Users` | 3,000 | 5 | Learner demographics |
+| `Courses` | 60 | 8 | Course catalogue |
+| `Transactions` | 10,000 | 7 | Enrollment interactions |
+| `Teachers` | 60 | 7 | Instructor attributes — *opt-in experiment only* |
+
+The interaction matrix is **5.56% dense**: 10,000 enrollments across 3,000
+learners and 60 courses, all distinct `(UserID, CourseID)` pairs, giving a mean
+of **3.333 courses per learner**. Sparse learner histories are therefore an
+inherent property of this problem, not an edge case — and there are no repeat
+enrollments, so the interaction signal is purely implicit/binary.
+
+Full structural inventory: [`PROJECT_MANIFEST.md`](PROJECT_MANIFEST.md) §3.
+
+---
+
+## Quickstart
+
+Requires **Python 3.11–3.13** (3.13 recommended; see ADR-0002 for why not 3.14).
+
+```bash
+python -m venv .venv
+```
+
+Activate it — Windows PowerShell:
+
+```bash
+.venv\Scripts\Activate.ps1
+```
+
+macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Install the runtime dependencies and the package itself:
+
+```bash
+pip install -r requirements.txt && pip install -e .
+```
+
+Verify the environment and the integrity of the source materials:
+
+```bash
+pytest -q
+```
+
+A clean run reports **31 passed**. That result confirms the modelling stack is
+functional, the seed is deterministic, the repository layout is intact, and both
+source materials match their recorded checksums.
+
+For exploration and research tooling, add the dev extras:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+To reproduce the exact environment behind any reported number, use the full
+freeze instead:
+
+```bash
+pip install -r requirements.lock.txt
+```
+
+---
+
+## Repository layout
+
+```
+.
+├── app/                  Streamlit application                      (Phase 5)
+├── artifacts/            generated artifacts: source inventory, rendered PDF pages
+├── data/
+│   ├── raw/              IMMUTABLE authoritative dataset
+│   ├── interim/          intermediate outputs
+│   └── processed/        modelling-ready datasets
+├── docs/                 technical docs, requirements traceability, deliverables
+├── experiments/          experiment configs and results               (Phase 3)
+├── models/               persisted model artifacts                    (Phase 4+)
+├── notebooks/            exploration only — never the sole implementation
+├── references/official/  authoritative PDF + verbatim transcript
+├── reports/figures/      generated figures
+├── research/             decision log, experiment log, ADRs, phase reports
+├── scripts/              reproducible entry points
+├── src/edupro/           production package
+└── tests/                test suite
+```
+
+### The `edupro` package
+
+One subpackage per pipeline stage, so each is independently testable and the
+boundaries that matter (especially leakage) are visible in the structure itself:
+
+| Module | Responsibility |
+| --- | --- |
+| `edupro.config` | Paths, sheet names, seed, PII column list, source checksums |
+| `edupro.data` | Workbook ingestion and schema validation |
+| `edupro.features` | Learner-level aggregation and feature engineering |
+| `edupro.segmentation` | Scaling, encoding, clustering, selection, profiling |
+| `edupro.recommendation` | Candidate generation, scoring, ranking, sparse-history tiers |
+| `edupro.evaluation` | Segmentation and recommendation metrics |
+| `edupro.explainability` | Human-readable justifications |
+
+The Streamlit app and every notebook are **consumers** of this package. Neither
+defines modelling logic, and the app loads persisted artifacts rather than
+training on startup.
+
+---
+
+## Methodology
+
+A six-phase gated sequence; each phase must pass its acceptance criteria before
+the next begins, and each ends with a `research/PHASE_N_COMPLETE.md` report
+carrying an evidence-backed PASS/FAIL.
+
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 0 | Project initialization | ✅ **PASS** |
+| 1 | Research and methodology investigation | Not started |
+| 2 | Dataset audit and EDA | Not started |
+| 3 | ML experimentation | Not started |
+| 4 | Model selection and architecture freeze | Not started |
+| 5 | Production implementation | Not started |
+| 6 | Validation, documentation, deployment | Not started |
+
+### Segmentation *(Phase 3)*
+
+K-Means as the primary method, with cluster count selected by elbow and
+silhouette analysis, and hierarchical clustering as an independent structural
+validation. Two feature variants are compared on evidence — behaviour +
+demographics vs behaviour only — because demographic features must not dominate
+learner segmentation without justification.
+
+### Recommendation *(Phase 3)*
+
+Five baselines are evaluated before any hybrid is proposed: global popularity,
+content-based, similar-learner, cluster-popularity, and hybrid. Hybrid weights
+are set by ablation, not by assertion. Evaluation uses a leakage-controlled
+temporal hold-out, and learners with insufficient history are evaluated
+separately rather than being scored as if personalisation had applied to them.
+
+---
+
+## Reproducibility
+
+- **Single seed.** `edupro.config.RANDOM_SEED = 42` governs every stochastic
+  operation; determinism is asserted by test.
+- **Immutable inputs.** `data/raw/` is verified by SHA-256 on every test run, so
+  an accidental write becomes a loud failure rather than a silent invalidation of
+  every downstream result.
+- **Pinned environment.** Direct dependencies pinned exactly in
+  `requirements.txt`; the complete resolved environment frozen in
+  `requirements.lock.txt`.
+- **No hidden steps.** Reported results come from scripts in `scripts/` and code
+  in `src/`, never from a notebook that has to be run by hand.
+
+---
+
+## Scientific integrity
+
+This project reports what it finds, including what does not work.
+
+- Failed and underperforming experiments are recorded in
+  `research/experiment_log.md`, not discarded — the record of what lost is what
+  makes the winner defensible.
+- The data is observational, so no causal claim is made. The engagement metric
+  the official brief requires is a **proxy** and is labelled as one everywhere it
+  appears.
+- No metric, citation, dataset statistic or result in this repository is
+  fabricated. Every number traces to a script that regenerates it.
+
+---
+
+## Privacy
+
+`UserName`, `Email` and `TeacherName` are dropped at ingestion, not merely
+excluded by convention downstream — so PII is never present to leak into a
+feature matrix, a persisted artifact or a figure. Learners are identified in the
+dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
+
+---
+
+## Documentation
+
+| Document | Contents |
+| --- | --- |
+| [`PROJECT_MANIFEST.md`](PROJECT_MANIFEST.md) | Source materials, dataset inventory, environment |
+| [`docs/REQUIREMENTS_TRACEABILITY.md`](docs/REQUIREMENTS_TRACEABILITY.md) | Every requirement → implementation → verification |
+| [`research/decision_log.md`](research/decision_log.md) | Decisions with evidence; open questions |
+| [`research/architecture_decision_record.md`](research/architecture_decision_record.md) | Durable architectural decisions (ADRs) |
+| [`research/experiment_log.md`](research/experiment_log.md) | Experiment results, successes and failures |
+| [`references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md`](references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md) | Verbatim transcript of the official brief |
+| `research/PHASE_N_COMPLETE.md` | Per-phase report with PASS/FAIL and evidence |
+
+---
+
+## Deliverables
+
+| # | Deliverable | Status |
+| --- | --- | --- |
+| 1 | Research paper (EDA, insights, recommendations) | Phase 6 |
+| 2 | Streamlit dashboard (live analytics) | Phase 5 |
+| 3 | Executive summary for non-technical stakeholders | Phase 6 |
+
+---
+
+## Scripts
+
+| Script | Purpose |
+| --- | --- |
+| `scripts/inspect_sources.py` | Read-only structural inventory of the workbook → `artifacts/phase0_source_inventory.json` |
+| `scripts/render_official_pdf.py` | Rasterise the image-based official PDF so its requirements can be read and verified |
+
+Both scripts re-verify the source checksum after reading, so even the inspection
+tooling proves it did not mutate its input.
+
+---
+
+## Notes
+
+- **No Docker.** Deployment is a Python environment plus Streamlit, by design.
+- The official documentation PDF is image-based (no text layer), which is why a
+  rendering script and a transcript exist. The PDF remains authoritative on any
+  disagreement.
+
+---
+
+## Acknowledgements
+
+Project brief and dataset provided by **Unified Mentor** (project `id=18743`).

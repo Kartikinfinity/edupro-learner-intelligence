@@ -1,0 +1,219 @@
+{
+  "official_documentation": {
+    "file": "project offical detail.pdf",
+    "sha256": "e794444490c19f85b8bef6534d844a629150971189eaf71448122ed402c4e8cf",
+    "size_bytes": 3217155
+  },
+  "dataset": {
+    "file": "EduPro Online Platform.xlsx",
+    "sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
+    "size_bytes": 525199,
+    "n_sheets": 4,
+    "sheet_names": [
+      "Users",
+      "Teachers",
+      "Courses",
+      "Transactions"
+    ],
+    "sheets": [
+      {
+        "sheet_name": "Users",
+        "n_rows": 3000,
+        "n_columns": 5,
+        "columns": [
+          {
+            "name": "UserID",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 3000
+          },
+          {
+            "name": "UserName",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 3000
+          },
+          {
+            "name": "Age",
+            "pandas_dtype": "int64",
+            "n_missing": 0,
+            "n_unique": 21
+          },
+          {
+            "name": "Gender",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 2
+          },
+          {
+            "name": "Email",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 3000
+          }
+        ],
+        "openpyxl_max_row": null,
+        "openpyxl_max_column": null
+      },
+      {
+        "sheet_name": "Teachers",
+        "n_rows": 60,
+        "n_columns": 7,
+        "columns": [
+          {
+            "name": "TeacherID",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 60
+          },
+          {
+            "name": "TeacherName",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 60
+          },
+          {
+            "name": "Age",
+            "pandas_dtype": "int64",
+            "n_missing": 0,
+            "n_unique": 21
+          },
+          {
+            "name": "Gender",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 2
+          },
+          {
+            "name": "Expertise",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 12
+          },
+          {
+            "name": "YearsOfExperience",
+            "pandas_dtype": "int64",
+            "n_missing": 0,
+            "n_unique": 16
+          },
+          {
+            "name": "TeacherRating",
+            "pandas_dtype": "float64",
+            "n_missing": 0,
+            "n_unique": 56
+          }
+        ],
+        "openpyxl_max_row": null,
+        "openpyxl_max_column": null
+      },
+      {
+        "sheet_name": "Courses",
+        "n_rows": 60,
+        "n_columns": 8,
+        "columns": [
+          {
+            "name": "CourseID",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 60
+          },
+          {
+            "name": "CourseName",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 58
+          },
+          {
+            "name": "CourseCategory",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 12
+          },
+          {
+            "name": "CourseType",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 2
+          },
+          {
+            "name": "CourseLevel",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 3
+          },
+          {
+            "name": "CoursePrice",
+            "pandas_dtype": "float64",
+            "n_missing": 0,
+            "n_unique": 23
+          },
+          {
+            "name": "CourseDuration",
+            "pandas_dtype": "float64",
+            "n_missing": 0,
+            "n_unique": 60
+          },
+          {
+            "name": "CourseRating",
+            "pandas_dtype": "float64",
+            "n_missing": 0,
+            "n_unique": 56
+          }
+        ],
+        "openpyxl_max_row": null,
+        "openpyxl_max_column": null
+      },
+      {
+        "sheet_name": "Transactions",
+        "n_rows": 10000,
+        "n_columns": 7,
+        "columns": [
+          {
+            "name": "TransactionID",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 10000
+          },
+          {
+            "name": "UserID",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 3000
+          },
+          {
+            "name": "CourseID",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 60
+          },
+          {
+            "name": "TransactionDate",
+            "pandas_dtype": "datetime64[us]",
+            "n_missing": 0,
+            "n_unique": 358
+          },
+          {
+            "name": "Amount",
+            "pandas_dtype": "float64",
+            "n_missing": 0,
+            "n_unique": 23
+          },
+          {
+            "name": "PaymentMethod",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 3
+          },
+          {
+            "name": "TeacherID",
+            "pandas_dtype": "str",
+            "n_missing": 0,
+            "n_unique": 60
+          }
+        ],
+        "openpyxl_max_row": null,
+        "openpyxl_max_column": null
+      }
+    ]
+  }
+}

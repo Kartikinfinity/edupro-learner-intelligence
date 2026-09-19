@@ -1,0 +1,15 @@
+# EduPro - direct dependency declarations (unpinned source of truth).
+# Pinned, fully-resolved versions live in requirements.txt (generated via pip freeze).
+pandas
+numpy
+scipy
+scikit-learn
+matplotlib
+seaborn
+plotly
+streamlit
+openpyxl
+pyarrow
+joblib
+pyyaml
+pytest
