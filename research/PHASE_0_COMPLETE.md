@@ -257,10 +257,15 @@ become a broken figure during the research-paper write-up.
 
 ### Git
 
-Repository initialized on `main`; **34 files** in the initial commit
-`phase-0/project-bootstrap`. Root-level source duplicates, `.venv/` and the
-regenerable rendered PDF pages are correctly excluded. Not pushed — CLAUDE.md
-§24 permits pushing only on explicit instruction.
+Repository initialized on `main`; commit `d31ae3e` `phase-0/project-bootstrap`
+tracks **36 files** (35 created this phase, plus the pre-existing `CLAUDE.md`).
+Working tree clean. Root-level source duplicates, `.venv/`, `*.egg-info/` and
+the regenerable rendered PDF pages are correctly excluded. Not pushed —
+CLAUDE.md §24 permits pushing only on explicit instruction.
+
+The commit is authored `Kartik <kartikshreekumar2006@gmail.com>` from the
+machine's existing global git config, which was used rather than silently
+overridden. See unresolved issue 2.
 
 ---
 
