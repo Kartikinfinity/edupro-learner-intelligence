@@ -53,20 +53,20 @@ and justified individually; none is dropped without a recorded reason.
 
 | # | Requirement | Implementation | Status |
 | --- | --- | --- | --- |
-| C1 | Normalize numerical features | `edupro.segmentation` (persisted scaler) | Not started |
-| C2 | Encode categorical variables | `edupro.segmentation` (persisted encoder) | Not started |
+| C1 | Normalize numerical features | `edupro.segmentation.representations` — StandardScaler, chosen on evidence (D-028) | **Implemented** |
+| C2 | Encode categorical variables | `edupro.segmentation.representations` — 4 encodings compared (EXP-011a) | **Implemented** |
 | C3 | Reduce noise from sparse enrollments | `edupro.features` | Not started |
 
 ## D. Segmentation (official, p.4)
 
 | # | Requirement | Implementation | Verification | Status |
 | --- | --- | --- | --- | --- |
-| D1 | K-Means clustering (primary) | `edupro.segmentation` | EXP-010 | Not started |
-| D2 | Hierarchical clustering (validation) | `edupro.segmentation` | EXP-012 | Not started |
-| D3 | Elbow method for cluster selection | `edupro.segmentation` | EXP-010 | Not started |
-| D4 | Silhouette analysis | `edupro.evaluation` | EXP-010 | Not started |
-| D5 | Cluster profiling | `edupro.segmentation` | Phase 3 | Not started |
-| D6 | Interpretable segment descriptions | `edupro.segmentation` | Phase 3 | Not started |
+| D1 | K-Means clustering (primary) | `edupro.segmentation.clustering` | EXP-010, k=2..10 across 10 representations | **Verified** |
+| D2 | Hierarchical clustering (validation) | `edupro.segmentation.clustering` | EXP-012 — Ward + average linkage; **negative result reported** | **Verified** |
+| D3 | Elbow method for cluster selection | `edupro.segmentation.clustering` | EXP-010 — produced; no knee; not decisive | **Verified** |
+| D4 | Silhouette analysis | `edupro.segmentation.metrics` | EXP-010 — global + per-cluster | **Verified** |
+| D5 | Cluster profiling | `edupro.segmentation.profiling` | `research/cluster_profiles.md` | **Verified** |
+| D6 | Interpretable segment descriptions | `edupro.segmentation.profiling` — evidence-derived naming, model features only | 37 tests | **Verified** |
 
 ## E. Recommendation (official, pp.4–5)
 
@@ -83,8 +83,8 @@ and justified individually; none is dropped without a recorded reason.
 
 | # | Metric | Official purpose | Implementation | Status |
 | --- | --- | --- | --- | --- |
-| F1 | Silhouette Score | Cluster quality | `edupro.evaluation` | Not started |
-| F2 | Intra-Cluster Similarity | Behavioural consistency | `edupro.evaluation` | Not started |
+| F1 | Silhouette Score | Cluster quality | `edupro.segmentation.metrics` | **Verified** |
+| F2 | Intra-Cluster Similarity | Behavioural consistency | `edupro.segmentation.metrics` — behavioural cosine, formula defined in `segmentation_research.md` §5 | **Verified** |
 | F3 | Recommendation Precision | Relevance | `edupro.evaluation` | Not started |
 | F4 | Engagement Lift (Proxy) | Impact estimate | `edupro.evaluation` | Not started |
 
@@ -125,8 +125,8 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I1 | Raw data immutable | 8 | ADR-0003; checksums in `edupro.config` | **Verified** |
 | I2 | `data/raw/` + `data/processed/` maintained | 8 | Repository layout | **Verified** |
 | I3 | Leakage detection for temporal evaluation | 9 | Protocol pre-registered (`recommendation_evaluation_plan.md` §2); controls L1-L6 specified as tests | In progress |
-| I4 | Variant A vs Variant B segmentation | 10 | EXP-011 specified; dominance diagnostic + pre-registered decision rule | In progress |
-| I5 | Teachers sheet as explicit experiment | 11 | D-007; EXP-014 | In progress |
+| I4 | Variant A vs Variant B segmentation | 10 | EXP-011 run: ARI 1.000, demographic share 0.0004, Variant B by the pre-registered rule (D-029) | **Verified** |
+| I5 | Teachers sheet as explicit experiment | 11 | EXP-005 refuted the bijection; EXP-014 run and **rejected on evidence** (D-030) | **Verified** for segmentation |
 | I6 | Temporal hold-out; sparse users handled separately | 12 | Dual protocol pre-registered (D-011); tiered evaluation specified | In progress |
 | I7 | Five recommendation baselines | 13 | EXP-019–024 specified with equal tuning budget; 3 further baselines added (D-017) | In progress |
 | I8 | Hybrid weights justified, not asserted | 14 | EXP-024 search + ablation specified; hand-chosen weights named as a failure condition | In progress |
@@ -137,7 +137,7 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | ADR-0001; `app/` | Not started |
 | I15 | Artifacts persisted and version-consistent | 22 | `models/`, `artifacts/` | Not started |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — 67 tests: environment, loading, schema, validation, joins, features, splits | In progress |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **104 tests**: environment, loading, schema, validation, joins, features, splits, representations, clustering, metrics, stability, profiling | In progress |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |

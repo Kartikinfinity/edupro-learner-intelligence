@@ -538,6 +538,116 @@ data, so the feature would encode noise. Recorded here rather than silently omit
 
 ---
 
+## Phase 3A — Segmentation experiments (19 September 2026)
+
+### D-027 — Segmentation configuration frozen for Phase 3B
+**Status:** Settled; reversible if EXP-023 contradicts it
+
+Variant B (behaviour only) · 12-dim category share vector · ordinal level one-hot ·
+StandardScaler · no block weighting · no demographics · no teacher block ·
+K-Means · **k = 4**.
+
+**Evidence:** silhouette 0.1946; every cluster bootstrap Jaccard >=0.981;
+subsample ARI 0.987; seed ARI 1.000; smallest cluster 19.7%; full-history
+sensitivity ARI 0.847. Ten representations and nine k values were compared, and
+every losing arm is reported.
+
+**Reversal:** if Phase 3B's EXP-023 shows cluster-popularity recommendation does
+not beat global popularity, the segmentation has no demonstrated *recommendation*
+value. It would retain standalone analytical value for the brief's learner-analysis
+requirement, and that distinction must be drawn carefully rather than blurred.
+
+---
+
+### D-028 — StandardScaler, because RobustScaler is degenerate here
+**Status:** Settled — answers the D5 choice deferred in Phase 1
+
+**Evidence:** `avg_courses_per_category` and `diversity_ratio` have an
+**interquartile range of exactly zero** — 54% of learners have a single course, so
+their 25th, 50th and 75th percentiles all equal 1.0. RobustScaler leaves those
+columns unscaled while compressing the others, manufacturing a separable axis. Its
+silhouette of **0.716** is three times any other arm, and the k=2 split it produces
+(2,198/452) is a rediscovery of the Phase 2 activity bimodality through a scaling
+bug.
+
+**Why this is recorded prominently:** the highest-scoring arm in the entire
+experiment was an artefact. Accepting it would have been a textbook case of
+optimising for the number instead of the structure (§6).
+
+---
+
+### D-029 — Variant B: demographics are invisible, not merely secondary
+**Status:** Settled — answers Q-5 and CLAUDE.md §10
+
+**Evidence:** **ARI between Variant A and Variant B = 1.000** — the partitions are
+identical. The demographic block explains **0.04%** of between-cluster variance,
+against a pre-registered "secondary" band of <20%. Variant A's silhouette is
+*lower* (0.1729 vs 0.1946), the cost of two uninformative dimensions.
+
+**Decision:** Variant B. The pre-registered tie rule prefers the simpler, more
+privacy-respecting, more actionable model — and this is not even a tie.
+
+Age and gender are retained as **evaluation strata** for Phase 3B (EXP-027) [R30].
+Auditing with a protected attribute is not the same as modelling with it.
+
+---
+
+### D-030 — Teacher features rejected for segmentation, scope stated
+**Status:** Settled — answers CLAUDE.md §11 for segmentation
+
+**Evidence:** +0.0009 silhouette (0.1946 → 0.1955), ARI 0.990, mean bootstrap
+Jaccard slightly *worse* (0.999 → 0.989). The teacher block takes 16.1% of
+between-cluster variance and `teacher_loyalty` becomes the top single feature — but
+it correlates **+0.963** with `total_courses` (Phase 2) and is zero by construction
+for the 54% of learners with one course. Its eta-squared reflects that correlation,
+not new information.
+
+**Scope:** this rejects teacher features for *grouping learners*. Phase 2
+established instructor loyalty as the only genuine behavioural signal in the
+dataset (0.688 distinct teachers per interaction vs a 0.944 null), and it remains a
+live candidate for the Phase 3B **recommender**, where predicting the next course
+is a different problem.
+
+---
+
+### D-031 — The segmentation is a course-level split, and is described as one
+**Status:** Settled as a finding
+
+**Evidence:** three of four clusters are **100% one course level**. The level
+ablation (EXP-011g) removes `preferred_level` and produces an almost entirely
+different partition (**ARI 0.253**), with mean bootstrap Jaccard falling from 0.999
+to 0.656 and one cluster becoming unstable.
+
+**What follows:** the partition is stable, balanced and interpretable — but it is
+*course depth plus activity volume*, not a set of motivational personas. For the
+~80% of learners in clusters 0, 2 and 3 (1.25-1.51 courses each), "preferred level"
+is the level of a single enrollment, and Phase 2 found level choice statistically
+indistinguishable from chance.
+
+**Consequence for the deliverables:** segment descriptions in the dashboard,
+research paper and executive summary must say this plainly. `research/cluster_profiles.md`
+carries the wording, and the limitation travels with the profiles wherever they go.
+
+---
+
+### D-032 — Two Phase 1 predictions recorded as wrong
+**Status:** Settled — recorded rather than quietly dropped
+
+1. **One-hot dominance.** Phase 1 identified one-hot encoding of
+   `preferred_category` as the project's largest methodological risk. Measured at
+   the common selected k=4, the category block takes **5.0%** (proportion) and
+   **3.7%** (one-hot) of between-cluster variance. Neither dominates; one-hot is
+   marginally lower. The mechanism *is* real at k>=9 (46-58%), so the reasoning was
+   sound — it simply does not apply at the k the stability constraint selects.
+
+2. **The gap statistic as a falsification instrument.** Added in Phase 1 (D-017)
+   precisely because it is the only criterion that can report "no structure". On
+   this data it rises monotonically to k=20 and returns no verdict. **The project
+   therefore has no instrument capable of falsifying cluster structure** — a real
+   limitation, and the more important of the two corrections.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were
@@ -551,7 +661,7 @@ questions P-1…P-5 are in `production_research.md` §7.
 | Q-2 | `Courses.CourseName` has 58 distinct values across 60 unique `CourseID`s — two names repeat. Are these genuinely distinct courses, or duplicates? Affects content-based similarity and the de-duplication of recommendations. | Phase 0 inventory | **ANSWERED** — 2 repeated names, distinct courses; no de-duplication |
 | Q-3 | Should `CoursePrice` and `CourseDuration` be used at all? They are in the workbook but absent from the official field list. Using them needs justification; ignoring them may discard signal. | Phase 0 transcript | **ANSWERED** — price enters via `free_ratio`; duration kept as a content attribute only |
 | Q-4 | Where do the sparse-history tier boundaries fall? The mean is 3.333 courses per learner, but the mean is not the distribution. | CLAUDE.md §15 | **ANSWERED (D-021)** — 1 / 2–4 / ≥9, handed over by the empty band |
-| Q-5 | Variant A (behaviour + demographics) or Variant B (behaviour only)? Must be decided on cluster quality, stability, behavioural consistency, interpretability and feature dominance — not assumed. | CLAUDE.md §10 | **Evidence gathered** — demographics independent of choice (all p > 0.2), so Variant A cannot help recommendation. Cluster quality still decided by EXP-011 |
+| Q-5 | Variant A (behaviour + demographics) or Variant B (behaviour only)? Must be decided on cluster quality, stability, behavioural consistency, interpretability and feature dominance — not assumed. | CLAUDE.md §10 | **ANSWERED (D-029)** — ARI 1.000 between variants; demographic share 0.0004. Variant B |
 | Q-6 | Is a temporal hold-out even viable? It requires enough per-learner history; at a mean of 3.333 interactions, a leave-one-out scheme may leave very little to train on, and one-interaction learners must not be evaluated as if personalised (§12). | CLAUDE.md §9, §12 | **ANSWERED (D-022)** — viable; Protocol A primary, 791 evaluable |
 | Q-7 | How is "Engagement Lift (Proxy)" defined so that it is honest? The official document requires the metric but defines no formula. Whatever is used must be labelled a proxy and must not be presented as measured causal impact (§6). | Official doc, p.5 | **Answered by D-014** (definition fixed); magnitude in Phase 3 |
 | Q-8 | **Is the dataset synthetic?** Zero missing values across 27 columns; 21 distinct ages in *both* Users and Teachers; 23 distinct values in *both* Amount and CoursePrice. If generated, learned cluster structure may be a generator artefact rather than real learner behaviour — a material threat to validity. | Phase 1 review of Phase 0 cardinalities | **ANSWERED (D-025)** — almost certainly synthetic |

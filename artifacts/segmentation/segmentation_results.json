@@ -1,0 +1,4711 @@
+{
+  "provenance": {
+    "workbook_sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
+    "seed": 42,
+    "window": "fit (all interactions before the pre-registered test cut)",
+    "test_cut": "2025-10-18",
+    "n_learners_fit_window": 2650,
+    "n_learners_full": 3000,
+    "n_interactions_fit_window": 7992,
+    "k_range": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ]
+  },
+  "EXP-011a_representations": [
+    {
+      "name": "B_proportion",
+      "variant": "B",
+      "description": "Variant B (behaviour only), category as a 12-dim share vector (E-B)",
+      "n_learners": 2650,
+      "n_features": 25,
+      "category_encoding": "proportion",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 12,
+        "level": 3
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "cat_share_artificial_intelligence",
+        "cat_share_business",
+        "cat_share_cybersecurity",
+        "cat_share_data_science",
+        "cat_share_design",
+        "cat_share_digital_marketing",
+        "cat_share_finance",
+        "cat_share_machine_learning",
+        "cat_share_marketing",
+        "cat_share_programming",
+        "cat_share_project_management",
+        "cat_share_web_development",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced"
+      ],
+      "best_k": 6,
+      "best_silhouette": 0.208907,
+      "min_cluster_share_at_best_k": 0.0619,
+      "intra_cluster_similarity": 0.496995,
+      "seed_stability_ari": 0.798106,
+      "block_explained_share": {
+        "engagement": 0.2651,
+        "behavioural": 0.3458,
+        "category": 0.1735,
+        "level": 0.2156
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "cat_share_programming",
+      "top_five_eta_squared": {
+        "cat_share_programming": 0.8376181566060095,
+        "diversity_ratio": 0.8264253321693781,
+        "total_courses": 0.8227266873306377,
+        "diversity_score": 0.7635223342462569,
+        "learning_depth_index": 0.732695405731631
+      }
+    },
+    {
+      "name": "B_one_hot",
+      "variant": "B",
+      "description": "Variant B, category one-hot on the modal category (E-A, the control arm)",
+      "n_learners": 2650,
+      "n_features": 25,
+      "category_encoding": "one_hot",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 12,
+        "level": 3
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "prefcat_Artificial Intelligence",
+        "prefcat_Business",
+        "prefcat_Cybersecurity",
+        "prefcat_Data Science",
+        "prefcat_Design",
+        "prefcat_Digital Marketing",
+        "prefcat_Finance",
+        "prefcat_Machine Learning",
+        "prefcat_Marketing",
+        "prefcat_Programming",
+        "prefcat_Project Management",
+        "prefcat_Web Development",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced"
+      ],
+      "best_k": 2,
+      "best_silhouette": 0.211516,
+      "min_cluster_share_at_best_k": 0.2004,
+      "intra_cluster_similarity": 0.285303,
+      "seed_stability_ari": 1.0,
+      "block_explained_share": {
+        "engagement": 0.6059,
+        "behavioural": 0.3892,
+        "category": 0.0025,
+        "level": 0.0024
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "diversity_ratio",
+      "top_five_eta_squared": {
+        "diversity_ratio": 0.8424214887995052,
+        "total_courses": 0.8123836299747498,
+        "diversity_score": 0.7531810106803851,
+        "avg_courses_per_category": 0.7122886389914791,
+        "activity_span_days": 0.6260285228360991
+      }
+    },
+    {
+      "name": "B_facets",
+      "variant": "B",
+      "description": "Variant B, category as breadth/concentration facets only (E-C)",
+      "n_learners": 2650,
+      "n_features": 15,
+      "category_encoding": "facets",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 2,
+        "level": 3
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "category_entropy",
+        "top_category_share",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced"
+      ],
+      "best_k": 2,
+      "best_silhouette": 0.393321,
+      "min_cluster_share_at_best_k": 0.2045,
+      "intra_cluster_similarity": 0.287137,
+      "seed_stability_ari": 1.0,
+      "block_explained_share": {
+        "engagement": 0.4787,
+        "behavioural": 0.3034,
+        "category": 0.2157,
+        "level": 0.0022
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "diversity_ratio",
+      "top_five_eta_squared": {
+        "diversity_ratio": 0.8210400093380646,
+        "total_courses": 0.8059717323244768,
+        "diversity_score": 0.7540527007334576,
+        "avg_courses_per_category": 0.6942100582481067,
+        "category_entropy": 0.6690043910684845
+      }
+    },
+    {
+      "name": "B_no_category",
+      "variant": "B",
+      "description": "Variant B with no category representation at all (lower bound)",
+      "n_learners": 2650,
+      "n_features": 13,
+      "category_encoding": "none",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "level": 3
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced"
+      ],
+      "best_k": 10,
+      "best_silhouette": 0.434895,
+      "min_cluster_share_at_best_k": 0.0596,
+      "intra_cluster_similarity": 0.710908,
+      "seed_stability_ari": 0.874017,
+      "block_explained_share": {
+        "engagement": 0.3183,
+        "behavioural": 0.4067,
+        "level": 0.275
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "preflevel_Beginner",
+      "top_five_eta_squared": {
+        "preflevel_Beginner": 1.0000000000000004,
+        "learning_depth_index": 0.9330640357797813,
+        "preflevel_Advanced": 0.9035912747012061,
+        "enrollment_frequency": 0.8701167553986273,
+        "preflevel_Intermediate": 0.8683703544588863
+      }
+    },
+    {
+      "name": "A_proportion",
+      "variant": "A",
+      "description": "Variant A (behaviour + demographics), category share vector",
+      "n_learners": 2650,
+      "n_features": 27,
+      "category_encoding": "proportion",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 12,
+        "level": 3,
+        "demographic": 2
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "cat_share_artificial_intelligence",
+        "cat_share_business",
+        "cat_share_cybersecurity",
+        "cat_share_data_science",
+        "cat_share_design",
+        "cat_share_digital_marketing",
+        "cat_share_finance",
+        "cat_share_machine_learning",
+        "cat_share_marketing",
+        "cat_share_programming",
+        "cat_share_project_management",
+        "cat_share_web_development",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced",
+        "age",
+        "gender_female"
+      ],
+      "best_k": 9,
+      "best_silhouette": 0.218849,
+      "min_cluster_share_at_best_k": 0.0509,
+      "intra_cluster_similarity": 0.397772,
+      "seed_stability_ari": 0.555138,
+      "block_explained_share": {
+        "engagement": 0.2172,
+        "behavioural": 0.2123,
+        "category": 0.4627,
+        "level": 0.107,
+        "demographic": 0.0008
+      },
+      "demographic_share": 0.0008,
+      "top_feature_eta_squared": "total_courses",
+      "top_five_eta_squared": {
+        "total_courses": 0.8532275136782914,
+        "cat_share_data_science": 0.8327442620633667,
+        "cat_share_programming": 0.828481113487042,
+        "cat_share_web_development": 0.8277002034325007,
+        "cat_share_digital_marketing": 0.8186655110326955
+      }
+    },
+    {
+      "name": "B_proportion_weighted",
+      "variant": "B",
+      "description": "Variant B, share vector, blocks weighted by 1/sqrt(columns) (EXP-011b)",
+      "n_learners": 2650,
+      "n_features": 25,
+      "category_encoding": "proportion",
+      "block_weighting": true,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 12,
+        "level": 3
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "cat_share_artificial_intelligence",
+        "cat_share_business",
+        "cat_share_cybersecurity",
+        "cat_share_data_science",
+        "cat_share_design",
+        "cat_share_digital_marketing",
+        "cat_share_finance",
+        "cat_share_machine_learning",
+        "cat_share_marketing",
+        "cat_share_programming",
+        "cat_share_project_management",
+        "cat_share_web_development",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced"
+      ],
+      "best_k": 4,
+      "best_silhouette": 0.292188,
+      "min_cluster_share_at_best_k": 0.1962,
+      "intra_cluster_similarity": 0.420262,
+      "seed_stability_ari": 1.0,
+      "block_explained_share": {
+        "engagement": 0.3203,
+        "behavioural": 0.3186,
+        "category": 0.0496,
+        "level": 0.3116
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "preflevel_Intermediate",
+      "top_five_eta_squared": {
+        "preflevel_Intermediate": 0.8510376054623846,
+        "learning_depth_index": 0.8495292033523392,
+        "diversity_ratio": 0.8352921650521568,
+        "total_courses": 0.8180033754020628,
+        "preflevel_Advanced": 0.8011235673890192
+      }
+    },
+    {
+      "name": "B_decorrelated",
+      "variant": "B",
+      "description": "Variant B, share vector, volume-redundant features dropped (EXP-011e)",
+      "n_learners": 2650,
+      "n_features": 23,
+      "category_encoding": "proportion",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 3,
+        "behavioural": 5,
+        "category": 12,
+        "level": 3
+      },
+      "columns": [
+        "total_courses",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "cat_share_artificial_intelligence",
+        "cat_share_business",
+        "cat_share_cybersecurity",
+        "cat_share_data_science",
+        "cat_share_design",
+        "cat_share_digital_marketing",
+        "cat_share_finance",
+        "cat_share_machine_learning",
+        "cat_share_marketing",
+        "cat_share_programming",
+        "cat_share_project_management",
+        "cat_share_web_development",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced"
+      ],
+      "best_k": 10,
+      "best_silhouette": 0.26655,
+      "min_cluster_share_at_best_k": 0.0502,
+      "intra_cluster_similarity": 0.385877,
+      "seed_stability_ari": 0.580902,
+      "block_explained_share": {
+        "engagement": 0.189,
+        "behavioural": 0.1312,
+        "category": 0.5832,
+        "level": 0.0966
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "total_courses",
+      "top_five_eta_squared": {
+        "total_courses": 0.85613518140384,
+        "cat_share_data_science": 0.843848309882204,
+        "cat_share_business": 0.8408353111618182,
+        "cat_share_finance": 0.8364421283446297,
+        "cat_share_cybersecurity": 0.8217360847425543
+      }
+    },
+    {
+      "name": "B_robust_scaled",
+      "variant": "B",
+      "description": "Variant B, share vector, RobustScaler instead of StandardScaler",
+      "n_learners": 2650,
+      "n_features": 25,
+      "category_encoding": "proportion",
+      "block_weighting": false,
+      "scaler": "robust",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 12,
+        "level": 3
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "cat_share_artificial_intelligence",
+        "cat_share_business",
+        "cat_share_cybersecurity",
+        "cat_share_data_science",
+        "cat_share_design",
+        "cat_share_digital_marketing",
+        "cat_share_finance",
+        "cat_share_machine_learning",
+        "cat_share_marketing",
+        "cat_share_programming",
+        "cat_share_project_management",
+        "cat_share_web_development",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced"
+      ],
+      "best_k": 2,
+      "best_silhouette": 0.715913,
+      "min_cluster_share_at_best_k": 0.1706,
+      "intra_cluster_similarity": 0.239114,
+      "seed_stability_ari": 1.0,
+      "block_explained_share": {
+        "engagement": 0.6038,
+        "behavioural": 0.3941,
+        "category": 0.0005,
+        "level": 0.0017
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "total_courses",
+      "top_five_eta_squared": {
+        "total_courses": 0.9260431649986748,
+        "diversity_score": 0.8916229774238701,
+        "activity_span_days": 0.6192687142637997,
+        "diversity_ratio": 0.5978206740756734,
+        "avg_courses_per_category": 0.46435744478258356
+      }
+    },
+    {
+      "name": "B_teacher",
+      "variant": "B",
+      "description": "Variant B + teacher-derived block (EXP-014 arm)",
+      "n_learners": 2650,
+      "n_features": 28,
+      "category_encoding": "proportion",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 12,
+        "level": 3,
+        "teacher": 3
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "cat_share_artificial_intelligence",
+        "cat_share_business",
+        "cat_share_cybersecurity",
+        "cat_share_data_science",
+        "cat_share_design",
+        "cat_share_digital_marketing",
+        "cat_share_finance",
+        "cat_share_machine_learning",
+        "cat_share_marketing",
+        "cat_share_programming",
+        "cat_share_project_management",
+        "cat_share_web_development",
+        "preflevel_Beginner",
+        "preflevel_Intermediate",
+        "preflevel_Advanced",
+        "n_teachers",
+        "teacher_loyalty",
+        "avg_teacher_rating"
+      ],
+      "best_k": 2,
+      "best_silhouette": 0.221247,
+      "min_cluster_share_at_best_k": 0.2008,
+      "intra_cluster_similarity": 0.287873,
+      "seed_stability_ari": 1.0,
+      "block_explained_share": {
+        "engagement": 0.4459,
+        "behavioural": 0.2863,
+        "category": 0.0006,
+        "level": 0.0018,
+        "teacher": 0.2654
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "teacher_loyalty",
+      "top_five_eta_squared": {
+        "teacher_loyalty": 0.8833092321396542,
+        "diversity_ratio": 0.8404411808931314,
+        "total_courses": 0.8126347053794533,
+        "diversity_score": 0.7544445890477445,
+        "avg_courses_per_category": 0.710614238656054
+      }
+    },
+    {
+      "name": "B_no_level",
+      "variant": "B",
+      "description": "Variant B, share vector, preferred_level one-hot removed. Added after the first run showed the k=4 partition was almost purely a level split: this arm tests whether any structure survives without it.",
+      "n_learners": 2650,
+      "n_features": 22,
+      "category_encoding": "proportion",
+      "block_weighting": false,
+      "scaler": "standard",
+      "blocks": {
+        "engagement": 4,
+        "behavioural": 6,
+        "category": 12
+      },
+      "columns": [
+        "total_courses",
+        "avg_courses_per_category",
+        "enrollment_frequency",
+        "avg_course_rating",
+        "avg_spend",
+        "diversity_score",
+        "learning_depth_index",
+        "free_ratio",
+        "diversity_ratio",
+        "activity_span_days",
+        "cat_share_artificial_intelligence",
+        "cat_share_business",
+        "cat_share_cybersecurity",
+        "cat_share_data_science",
+        "cat_share_design",
+        "cat_share_digital_marketing",
+        "cat_share_finance",
+        "cat_share_machine_learning",
+        "cat_share_marketing",
+        "cat_share_programming",
+        "cat_share_project_management",
+        "cat_share_web_development"
+      ],
+      "best_k": 9,
+      "best_silhouette": 0.302748,
+      "min_cluster_share_at_best_k": 0.0558,
+      "intra_cluster_similarity": 0.357611,
+      "seed_stability_ari": 0.536526,
+      "block_explained_share": {
+        "engagement": 0.229,
+        "behavioural": 0.1991,
+        "category": 0.5719
+      },
+      "demographic_share": 0.0,
+      "top_feature_eta_squared": "total_courses",
+      "top_five_eta_squared": {
+        "total_courses": 0.8482229854277278,
+        "cat_share_programming": 0.841543316126563,
+        "cat_share_web_development": 0.8320360806679198,
+        "cat_share_marketing": 0.8291909030064601,
+        "cat_share_finance": 0.8275787954970165
+      }
+    }
+  ],
+  "scaler_diagnostic": {
+    "features_with_zero_iqr": [
+      "avg_courses_per_category",
+      "diversity_ratio"
+    ],
+    "per_feature": {
+      "total_courses": {
+        "q25": 1.0,
+        "q75": 2.0,
+        "iqr": 1.0,
+        "degenerate": false
+      },
+      "avg_courses_per_category": {
+        "q25": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0,
+        "degenerate": true
+      },
+      "enrollment_frequency": {
+        "q25": 0.0417,
+        "q75": 1.0,
+        "iqr": 0.958333,
+        "degenerate": false
+      },
+      "avg_course_rating": {
+        "q25": 2.5367,
+        "q75": 3.85,
+        "iqr": 1.313333,
+        "degenerate": false
+      },
+      "avg_spend": {
+        "q25": 0.0,
+        "q75": 130.5845,
+        "iqr": 130.584545,
+        "degenerate": false
+      },
+      "diversity_score": {
+        "q25": 1.0,
+        "q75": 2.0,
+        "iqr": 1.0,
+        "degenerate": false
+      },
+      "learning_depth_index": {
+        "q25": 0.5,
+        "q75": 1.5,
+        "iqr": 1.0,
+        "degenerate": false
+      },
+      "free_ratio": {
+        "q25": 0.4444,
+        "q75": 1.0,
+        "iqr": 0.555556,
+        "degenerate": false
+      },
+      "diversity_ratio": {
+        "q25": 1.0,
+        "q75": 1.0,
+        "iqr": 0.0,
+        "degenerate": true
+      },
+      "activity_span_days": {
+        "q25": 0.0,
+        "q75": 147.75,
+        "iqr": 147.75,
+        "degenerate": false
+      }
+    },
+    "conclusion": "Two mandated features have IQR exactly 0, because 54% of learners have a single course so their 25th, 50th and 75th percentiles coincide. RobustScaler leaves those columns unscaled while compressing the others, producing an artificially separable axis and an inflated silhouette. StandardScaler is therefore the correct choice here - settling the deferred D5 decision on evidence."
+  },
+  "sweeps": {
+    "B_proportion": [
+      {
+        "k": 2,
+        "inertia": 55391.397,
+        "silhouette": 0.17713,
+        "calinski_harabasz": 519.0983,
+        "davies_bouldin": 1.55428,
+        "sizes": {
+          "0": 2119,
+          "1": 531
+        },
+        "min_cluster_share": 0.200377,
+        "per_cluster_silhouette": {
+          "0": 0.113612,
+          "1": 0.430607
+        },
+        "intra_cluster_similarity": 0.27163,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 49369.277,
+        "silhouette": 0.173304,
+        "calinski_harabasz": 452.5413,
+        "davies_bouldin": 2.213792,
+        "sizes": {
+          "0": 880,
+          "1": 1243,
+          "2": 527
+        },
+        "min_cluster_share": 0.198868,
+        "per_cluster_silhouette": {
+          "0": 0.176818,
+          "1": 0.070954,
+          "2": 0.408843
+        },
+        "intra_cluster_similarity": 0.374297,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 4,
+        "inertia": 45448.3265,
+        "silhouette": 0.1946,
+        "calinski_harabasz": 403.6909,
+        "davies_bouldin": 2.145305,
+        "sizes": {
+          "0": 715,
+          "1": 522,
+          "2": 881,
+          "3": 532
+        },
+        "min_cluster_share": 0.196981,
+        "per_cluster_silhouette": {
+          "0": 0.129065,
+          "1": 0.397791,
+          "2": 0.162351,
+          "3": 0.136712
+        },
+        "intra_cluster_similarity": 0.416343,
+        "seed_stability_ari": 0.999587
+      },
+      {
+        "k": 5,
+        "inertia": 43230.9267,
+        "silhouette": 0.201856,
+        "calinski_harabasz": 352.0943,
+        "davies_bouldin": 1.997502,
+        "sizes": {
+          "0": 508,
+          "1": 143,
+          "2": 785,
+          "3": 522,
+          "4": 692
+        },
+        "min_cluster_share": 0.053962,
+        "per_cluster_silhouette": {
+          "0": 0.138409,
+          "1": 0.46578,
+          "2": 0.135322,
+          "3": 0.391874,
+          "4": 0.126033
+        },
+        "intra_cluster_similarity": 0.422638,
+        "seed_stability_ari": 0.863458
+      },
+      {
+        "k": 6,
+        "inertia": 40925.0848,
+        "silhouette": 0.208907,
+        "calinski_harabasz": 327.2275,
+        "davies_bouldin": 1.947381,
+        "sizes": {
+          "0": 164,
+          "1": 519,
+          "2": 396,
+          "3": 822,
+          "4": 276,
+          "5": 473
+        },
+        "min_cluster_share": 0.061887,
+        "per_cluster_silhouette": {
+          "0": 0.369093,
+          "1": 0.388174,
+          "2": 0.17502,
+          "3": 0.152615,
+          "4": 0.141968,
+          "5": 0.12192
+        },
+        "intra_cluster_similarity": 0.496995,
+        "seed_stability_ari": 0.798106
+      },
+      {
+        "k": 7,
+        "inertia": 39662.4832,
+        "silhouette": 0.230524,
+        "calinski_harabasz": 295.2866,
+        "davies_bouldin": 1.868971,
+        "sizes": {
+          "0": 148,
+          "1": 814,
+          "2": 424,
+          "3": 123,
+          "4": 164,
+          "5": 460,
+          "6": 517
+        },
+        "min_cluster_share": 0.046415,
+        "per_cluster_silhouette": {
+          "0": 0.496312,
+          "1": 0.148276,
+          "2": 0.124201,
+          "3": 0.475346,
+          "4": 0.377226,
+          "5": 0.086562,
+          "6": 0.394438
+        },
+        "intra_cluster_similarity": 0.403851,
+        "seed_stability_ari": 0.676684
+      },
+      {
+        "k": 8,
+        "inertia": 37076.87,
+        "silhouette": 0.234872,
+        "calinski_harabasz": 296.9715,
+        "davies_bouldin": 1.716846,
+        "sizes": {
+          "0": 129,
+          "1": 144,
+          "2": 515,
+          "3": 472,
+          "4": 317,
+          "5": 315,
+          "6": 628,
+          "7": 130
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.46957,
+          "1": 0.445937,
+          "2": 0.380691,
+          "3": 0.1373,
+          "4": 0.110998,
+          "5": 0.162846,
+          "6": 0.140722,
+          "7": 0.476173
+        },
+        "intra_cluster_similarity": 0.499859,
+        "seed_stability_ari": 0.63927
+      },
+      {
+        "k": 9,
+        "inertia": 35415.6263,
+        "silhouette": 0.261333,
+        "calinski_harabasz": 287.4211,
+        "davies_bouldin": 1.786341,
+        "sizes": {
+          "0": 149,
+          "1": 124,
+          "2": 513,
+          "3": 663,
+          "4": 142,
+          "5": 504,
+          "6": 142,
+          "7": 246,
+          "8": 167
+        },
+        "min_cluster_share": 0.046792,
+        "per_cluster_silhouette": {
+          "0": 0.500352,
+          "1": 0.476119,
+          "2": 0.393473,
+          "3": 0.134672,
+          "4": 0.466439,
+          "5": 0.059138,
+          "6": 0.46302,
+          "7": 0.175484,
+          "8": 0.376308
+        },
+        "intra_cluster_similarity": 0.434954,
+        "seed_stability_ari": 0.617007
+      },
+      {
+        "k": 10,
+        "inertia": 33312.3673,
+        "silhouette": 0.268467,
+        "calinski_harabasz": 290.0336,
+        "davies_bouldin": 1.636364,
+        "sizes": {
+          "0": 116,
+          "1": 447,
+          "2": 249,
+          "3": 590,
+          "4": 509,
+          "5": 193,
+          "6": 134,
+          "7": 143,
+          "8": 132,
+          "9": 137
+        },
+        "min_cluster_share": 0.043774,
+        "per_cluster_silhouette": {
+          "0": 0.579299,
+          "1": 0.122344,
+          "2": 0.234546,
+          "3": 0.059316,
+          "4": 0.381335,
+          "5": 0.249999,
+          "6": 0.394987,
+          "7": 0.46381,
+          "8": 0.461514,
+          "9": 0.537454
+        },
+        "intra_cluster_similarity": 0.46303,
+        "seed_stability_ari": 0.557135
+      }
+    ],
+    "B_one_hot": [
+      {
+        "k": 2,
+        "inertia": 55373.6282,
+        "silhouette": 0.211516,
+        "calinski_harabasz": 520.1146,
+        "davies_bouldin": 1.763172,
+        "sizes": {
+          "0": 531,
+          "1": 2119
+        },
+        "min_cluster_share": 0.200377,
+        "per_cluster_silhouette": {
+          "0": 0.240045,
+          "1": 0.204367
+        },
+        "intra_cluster_similarity": 0.285303,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 49524.4459,
+        "silhouette": 0.150745,
+        "calinski_harabasz": 446.9766,
+        "davies_bouldin": 2.218717,
+        "sizes": {
+          "0": 881,
+          "1": 526,
+          "2": 1243
+        },
+        "min_cluster_share": 0.198491,
+        "per_cluster_silhouette": {
+          "0": 0.184744,
+          "1": 0.213786,
+          "2": 0.099971
+        },
+        "intra_cluster_similarity": 0.373912,
+        "seed_stability_ari": 0.999221
+      },
+      {
+        "k": 4,
+        "inertia": 45716.0031,
+        "silhouette": 0.166811,
+        "calinski_harabasz": 396.1629,
+        "davies_bouldin": 2.101129,
+        "sizes": {
+          "0": 881,
+          "1": 531,
+          "2": 522,
+          "3": 716
+        },
+        "min_cluster_share": 0.196981,
+        "per_cluster_silhouette": {
+          "0": 0.161938,
+          "1": 0.176131,
+          "2": 0.198559,
+          "3": 0.142751
+        },
+        "intra_cluster_similarity": 0.408737,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 5,
+        "inertia": 43637.7123,
+        "silhouette": 0.163459,
+        "calinski_harabasz": 342.648,
+        "davies_bouldin": 2.058777,
+        "sizes": {
+          "0": 353,
+          "1": 470,
+          "2": 520,
+          "3": 755,
+          "4": 552
+        },
+        "min_cluster_share": 0.133208,
+        "per_cluster_silhouette": {
+          "0": 0.142923,
+          "1": 0.15958,
+          "2": 0.190466,
+          "3": 0.160935,
+          "4": 0.157908
+        },
+        "intra_cluster_similarity": 0.522056,
+        "seed_stability_ari": 0.760813
+      },
+      {
+        "k": 6,
+        "inertia": 41506.3844,
+        "silhouette": 0.17967,
+        "calinski_harabasz": 315.2388,
+        "davies_bouldin": 1.862422,
+        "sizes": {
+          "0": 129,
+          "1": 804,
+          "2": 353,
+          "3": 516,
+          "4": 520,
+          "5": 328
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.532071,
+          "1": 0.139182,
+          "2": 0.22262,
+          "3": 0.183898,
+          "4": 0.138797,
+          "5": 0.152243
+        },
+        "intra_cluster_similarity": 0.514229,
+        "seed_stability_ari": 0.822561
+      },
+      {
+        "k": 7,
+        "inertia": 39337.5711,
+        "silhouette": 0.198101,
+        "calinski_harabasz": 301.3639,
+        "davies_bouldin": 1.769937,
+        "sizes": {
+          "0": 676,
+          "1": 368,
+          "2": 339,
+          "3": 129,
+          "4": 509,
+          "5": 493,
+          "6": 136
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.175698,
+          "1": 0.207554,
+          "2": 0.129649,
+          "3": 0.526976,
+          "4": 0.147662,
+          "5": 0.181097,
+          "6": 0.392973
+        },
+        "intra_cluster_similarity": 0.50245,
+        "seed_stability_ari": 0.63414
+      },
+      {
+        "k": 8,
+        "inertia": 38407.7991,
+        "silhouette": 0.183714,
+        "calinski_harabasz": 273.6018,
+        "davies_bouldin": 1.899188,
+        "sizes": {
+          "0": 482,
+          "1": 139,
+          "2": 527,
+          "3": 395,
+          "4": 413,
+          "5": 222,
+          "6": 136,
+          "7": 336
+        },
+        "min_cluster_share": 0.051321,
+        "per_cluster_silhouette": {
+          "0": 0.161713,
+          "1": 0.446576,
+          "2": 0.12294,
+          "3": 0.144687,
+          "4": 0.179851,
+          "5": 0.150386,
+          "6": 0.395637,
+          "7": 0.188721
+        },
+        "intra_cluster_similarity": 0.486224,
+        "seed_stability_ari": 0.578559
+      },
+      {
+        "k": 9,
+        "inertia": 36530.5467,
+        "silhouette": 0.217533,
+        "calinski_harabasz": 268.5734,
+        "davies_bouldin": 1.774096,
+        "sizes": {
+          "0": 592,
+          "1": 218,
+          "2": 480,
+          "3": 129,
+          "4": 136,
+          "5": 141,
+          "6": 350,
+          "7": 237,
+          "8": 367
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.09492,
+          "1": 0.168091,
+          "2": 0.163169,
+          "3": 0.539138,
+          "4": 0.396743,
+          "5": 0.358379,
+          "6": 0.172282,
+          "7": 0.331048,
+          "8": 0.252072
+        },
+        "intra_cluster_similarity": 0.46437,
+        "seed_stability_ari": 0.548167
+      },
+      {
+        "k": 10,
+        "inertia": 34035.4477,
+        "silhouette": 0.255784,
+        "calinski_harabasz": 277.64,
+        "davies_bouldin": 1.644717,
+        "sizes": {
+          "0": 129,
+          "1": 239,
+          "2": 474,
+          "3": 164,
+          "4": 372,
+          "5": 446,
+          "6": 139,
+          "7": 242,
+          "8": 197,
+          "9": 248
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.551562,
+          "1": 0.341488,
+          "2": 0.125967,
+          "3": 0.410179,
+          "4": 0.162743,
+          "5": 0.150523,
+          "6": 0.45832,
+          "7": 0.332109,
+          "8": 0.195607,
+          "9": 0.354023
+        },
+        "intra_cluster_similarity": 0.39539,
+        "seed_stability_ari": 0.600698
+      }
+    ],
+    "B_facets": [
+      {
+        "k": 2,
+        "inertia": 25977.7526,
+        "silhouette": 0.393321,
+        "calinski_harabasz": 1403.8517,
+        "davies_bouldin": 1.048627,
+        "sizes": {
+          "0": 2108,
+          "1": 542
+        },
+        "min_cluster_share": 0.204528,
+        "per_cluster_silhouette": {
+          "0": 0.383367,
+          "1": 0.432035
+        },
+        "intra_cluster_similarity": 0.287137,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 20599.3049,
+        "silhouette": 0.302856,
+        "calinski_harabasz": 1230.4272,
+        "davies_bouldin": 1.391951,
+        "sizes": {
+          "0": 881,
+          "1": 1236,
+          "2": 533
+        },
+        "min_cluster_share": 0.201132,
+        "per_cluster_silhouette": {
+          "0": 0.354838,
+          "1": 0.218676,
+          "2": 0.412143
+        },
+        "intra_cluster_similarity": 0.384762,
+        "seed_stability_ari": 0.999308
+      },
+      {
+        "k": 4,
+        "inertia": 16992.1288,
+        "silhouette": 0.356925,
+        "calinski_harabasz": 1181.2789,
+        "davies_bouldin": 1.194024,
+        "sizes": {
+          "0": 881,
+          "1": 522,
+          "2": 716,
+          "3": 531
+        },
+        "min_cluster_share": 0.196981,
+        "per_cluster_silhouette": {
+          "0": 0.322864,
+          "1": 0.406393,
+          "2": 0.319367,
+          "3": 0.415452
+        },
+        "intra_cluster_similarity": 0.420395,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 5,
+        "inertia": 14617.6546,
+        "silhouette": 0.358522,
+        "calinski_harabasz": 1136.8967,
+        "davies_bouldin": 1.157992,
+        "sizes": {
+          "0": 546,
+          "1": 496,
+          "2": 625,
+          "3": 466,
+          "4": 517
+        },
+        "min_cluster_share": 0.175849,
+        "per_cluster_silhouette": {
+          "0": 0.451687,
+          "1": 0.340488,
+          "2": 0.318924,
+          "3": 0.468217,
+          "4": 0.226427
+        },
+        "intra_cluster_similarity": 0.533973,
+        "seed_stability_ari": 0.930099
+      },
+      {
+        "k": 6,
+        "inertia": 12725.1282,
+        "silhouette": 0.380195,
+        "calinski_harabasz": 1123.034,
+        "davies_bouldin": 1.052733,
+        "sizes": {
+          "0": 520,
+          "1": 487,
+          "2": 497,
+          "3": 285,
+          "4": 486,
+          "5": 375
+        },
+        "min_cluster_share": 0.107547,
+        "per_cluster_silhouette": {
+          "0": 0.443459,
+          "1": 0.354149,
+          "2": 0.389516,
+          "3": 0.252026,
+          "4": 0.230251,
+          "5": 0.605675
+        },
+        "intra_cluster_similarity": 0.627693,
+        "seed_stability_ari": 0.853104
+      },
+      {
+        "k": 7,
+        "inertia": 11362.8731,
+        "silhouette": 0.390768,
+        "calinski_harabasz": 1100.4725,
+        "davies_bouldin": 1.070539,
+        "sizes": {
+          "0": 283,
+          "1": 436,
+          "2": 488,
+          "3": 518,
+          "4": 473,
+          "5": 80,
+          "6": 372
+        },
+        "min_cluster_share": 0.030189,
+        "per_cluster_silhouette": {
+          "0": 0.256068,
+          "1": 0.405929,
+          "2": 0.404353,
+          "3": 0.44697,
+          "4": 0.240923,
+          "5": 0.195002,
+          "6": 0.612021
+        },
+        "intra_cluster_similarity": 0.649923,
+        "seed_stability_ari": 0.882825
+      },
+      {
+        "k": 8,
+        "inertia": 10121.9384,
+        "silhouette": 0.42034,
+        "calinski_harabasz": 1104.7762,
+        "davies_bouldin": 1.037467,
+        "sizes": {
+          "0": 196,
+          "1": 516,
+          "2": 366,
+          "3": 72,
+          "4": 280,
+          "5": 406,
+          "6": 435,
+          "7": 379
+        },
+        "min_cluster_share": 0.02717,
+        "per_cluster_silhouette": {
+          "0": 0.37621,
+          "1": 0.447521,
+          "2": 0.591527,
+          "3": 0.201528,
+          "4": 0.245863,
+          "5": 0.29466,
+          "6": 0.390922,
+          "7": 0.579712
+        },
+        "intra_cluster_similarity": 0.676628,
+        "seed_stability_ari": 0.896906
+      },
+      {
+        "k": 9,
+        "inertia": 9370.2355,
+        "silhouette": 0.41,
+        "calinski_harabasz": 1070.3167,
+        "davies_bouldin": 1.081952,
+        "sizes": {
+          "0": 516,
+          "1": 192,
+          "2": 194,
+          "3": 366,
+          "4": 379,
+          "5": 280,
+          "6": 403,
+          "7": 252,
+          "8": 68
+        },
+        "min_cluster_share": 0.02566,
+        "per_cluster_silhouette": {
+          "0": 0.447198,
+          "1": 0.45209,
+          "2": 0.381225,
+          "3": 0.590004,
+          "4": 0.579654,
+          "5": 0.245823,
+          "6": 0.293148,
+          "7": 0.231753,
+          "8": 0.205664
+        },
+        "intra_cluster_similarity": 0.677542,
+        "seed_stability_ari": 0.879327
+      },
+      {
+        "k": 10,
+        "inertia": 8149.5901,
+        "silhouette": 0.473314,
+        "calinski_harabasz": 1137.4135,
+        "davies_bouldin": 0.957382,
+        "sizes": {
+          "0": 136,
+          "1": 396,
+          "2": 343,
+          "3": 436,
+          "4": 226,
+          "5": 342,
+          "6": 320,
+          "7": 196,
+          "8": 183,
+          "9": 72
+        },
+        "min_cluster_share": 0.02717,
+        "per_cluster_silhouette": {
+          "0": 0.440521,
+          "1": 0.277952,
+          "2": 0.637818,
+          "3": 0.388668,
+          "4": 0.374987,
+          "5": 0.644334,
+          "6": 0.688668,
+          "7": 0.368846,
+          "8": 0.459581,
+          "9": 0.197081
+        },
+        "intra_cluster_similarity": 0.743871,
+        "seed_stability_ari": 0.887447
+      }
+    ],
+    "B_no_category": [
+      {
+        "k": 2,
+        "inertia": 23600.7004,
+        "silhouette": 0.372644,
+        "calinski_harabasz": 1217.2921,
+        "davies_bouldin": 1.115236,
+        "sizes": {
+          "0": 2119,
+          "1": 531
+        },
+        "min_cluster_share": 0.200377,
+        "per_cluster_silhouette": {
+          "0": 0.360983,
+          "1": 0.419179
+        },
+        "intra_cluster_similarity": 0.27163,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 18271.393,
+        "silhouette": 0.310783,
+        "calinski_harabasz": 1171.9077,
+        "davies_bouldin": 1.352239,
+        "sizes": {
+          "0": 879,
+          "1": 1243,
+          "2": 528
+        },
+        "min_cluster_share": 0.199245,
+        "per_cluster_silhouette": {
+          "0": 0.390476,
+          "1": 0.222145,
+          "2": 0.386783
+        },
+        "intra_cluster_similarity": 0.375828,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 4,
+        "inertia": 14676.8307,
+        "silhouette": 0.371972,
+        "calinski_harabasz": 1188.263,
+        "davies_bouldin": 1.137888,
+        "sizes": {
+          "0": 526,
+          "1": 532,
+          "2": 713,
+          "3": 879
+        },
+        "min_cluster_share": 0.198491,
+        "per_cluster_silhouette": {
+          "0": 0.365471,
+          "1": 0.429165,
+          "2": 0.35041,
+          "3": 0.358736
+        },
+        "intra_cluster_similarity": 0.415548,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 5,
+        "inertia": 12800.2222,
+        "silhouette": 0.380686,
+        "calinski_harabasz": 1118.4115,
+        "davies_bouldin": 1.030725,
+        "sizes": {
+          "0": 438,
+          "1": 849,
+          "2": 287,
+          "3": 525,
+          "4": 551
+        },
+        "min_cluster_share": 0.108302,
+        "per_cluster_silhouette": {
+          "0": 0.517364,
+          "1": 0.339636,
+          "2": 0.25126,
+          "3": 0.352762,
+          "4": 0.42931
+        },
+        "intra_cluster_similarity": 0.507738,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 6,
+        "inertia": 11466.8243,
+        "silhouette": 0.372634,
+        "calinski_harabasz": 1059.884,
+        "davies_bouldin": 1.102478,
+        "sizes": {
+          "0": 344,
+          "1": 510,
+          "2": 551,
+          "3": 438,
+          "4": 521,
+          "5": 286
+        },
+        "min_cluster_share": 0.107925,
+        "per_cluster_silhouette": {
+          "0": 0.357927,
+          "1": 0.313034,
+          "2": 0.409876,
+          "3": 0.499189,
+          "4": 0.363205,
+          "5": 0.248218
+        },
+        "intra_cluster_similarity": 0.580206,
+        "seed_stability_ari": 0.913856
+      },
+      {
+        "k": 7,
+        "inertia": 10357.324,
+        "silhouette": 0.405086,
+        "calinski_harabasz": 1024.6685,
+        "davies_bouldin": 0.984144,
+        "sizes": {
+          "0": 235,
+          "1": 551,
+          "2": 510,
+          "3": 322,
+          "4": 438,
+          "5": 337,
+          "6": 257
+        },
+        "min_cluster_share": 0.088679,
+        "per_cluster_silhouette": {
+          "0": 0.357414,
+          "1": 0.405158,
+          "2": 0.311509,
+          "3": 0.673292,
+          "4": 0.476323,
+          "5": 0.309759,
+          "6": 0.301771
+        },
+        "intra_cluster_similarity": 0.627297,
+        "seed_stability_ari": 0.864931
+      },
+      {
+        "k": 8,
+        "inertia": 9440.745,
+        "silhouette": 0.395934,
+        "calinski_harabasz": 999.8371,
+        "davies_bouldin": 1.146946,
+        "sizes": {
+          "0": 292,
+          "1": 550,
+          "2": 235,
+          "3": 438,
+          "4": 322,
+          "5": 234,
+          "6": 322,
+          "7": 257
+        },
+        "min_cluster_share": 0.088302,
+        "per_cluster_silhouette": {
+          "0": 0.198728,
+          "1": 0.404686,
+          "2": 0.356821,
+          "3": 0.475189,
+          "4": 0.668299,
+          "5": 0.329374,
+          "6": 0.331972,
+          "7": 0.301449
+        },
+        "intra_cluster_similarity": 0.636425,
+        "seed_stability_ari": 0.88399
+      },
+      {
+        "k": 9,
+        "inertia": 8474.0988,
+        "silhouette": 0.429907,
+        "calinski_harabasz": 1011.9418,
+        "davies_bouldin": 1.065406,
+        "sizes": {
+          "0": 322,
+          "1": 419,
+          "2": 526,
+          "3": 335,
+          "4": 372,
+          "5": 188,
+          "6": 95,
+          "7": 158,
+          "8": 235
+        },
+        "min_cluster_share": 0.035849,
+        "per_cluster_silhouette": {
+          "0": 0.673209,
+          "1": 0.347279,
+          "2": 0.406393,
+          "3": 0.311894,
+          "4": 0.584591,
+          "5": 0.463156,
+          "6": 0.134075,
+          "7": 0.363935,
+          "8": 0.357208
+        },
+        "intra_cluster_similarity": 0.676975,
+        "seed_stability_ari": 0.883123
+      },
+      {
+        "k": 10,
+        "inertia": 7736.9244,
+        "silhouette": 0.434895,
+        "calinski_harabasz": 1012.7843,
+        "davies_bouldin": 1.077204,
+        "sizes": {
+          "0": 310,
+          "1": 235,
+          "2": 344,
+          "3": 331,
+          "4": 373,
+          "5": 186,
+          "6": 158,
+          "7": 204,
+          "8": 322,
+          "9": 187
+        },
+        "min_cluster_share": 0.059623,
+        "per_cluster_silhouette": {
+          "0": 0.204817,
+          "1": 0.357149,
+          "2": 0.576357,
+          "3": 0.31472,
+          "4": 0.5765,
+          "5": 0.458103,
+          "6": 0.363886,
+          "7": 0.335711,
+          "8": 0.671255,
+          "9": 0.322168
+        },
+        "intra_cluster_similarity": 0.710908,
+        "seed_stability_ari": 0.874017
+      }
+    ],
+    "A_proportion": [
+      {
+        "k": 2,
+        "inertia": 60691.1567,
+        "silhouette": 0.161694,
+        "calinski_harabasz": 473.7794,
+        "davies_bouldin": 1.661054,
+        "sizes": {
+          "0": 2119,
+          "1": 531
+        },
+        "min_cluster_share": 0.200377,
+        "per_cluster_silhouette": {
+          "0": 0.104695,
+          "1": 0.389153
+        },
+        "intra_cluster_similarity": 0.27163,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 54663.6538,
+        "silhouette": 0.155131,
+        "calinski_harabasz": 408.8472,
+        "davies_bouldin": 2.332791,
+        "sizes": {
+          "0": 526,
+          "1": 1243,
+          "2": 881
+        },
+        "min_cluster_share": 0.198491,
+        "per_cluster_silhouette": {
+          "0": 0.36798,
+          "1": 0.062491,
+          "2": 0.158757
+        },
+        "intra_cluster_similarity": 0.372853,
+        "seed_stability_ari": 0.998969
+      },
+      {
+        "k": 4,
+        "inertia": 50740.7107,
+        "silhouette": 0.172857,
+        "calinski_harabasz": 361.7173,
+        "davies_bouldin": 2.265774,
+        "sizes": {
+          "0": 881,
+          "1": 522,
+          "2": 715,
+          "3": 532
+        },
+        "min_cluster_share": 0.196981,
+        "per_cluster_silhouette": {
+          "0": 0.145276,
+          "1": 0.355813,
+          "2": 0.114096,
+          "3": 0.117989
+        },
+        "intra_cluster_similarity": 0.414551,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 5,
+        "inertia": 48093.1815,
+        "silhouette": 0.172746,
+        "calinski_harabasz": 322.516,
+        "davies_bouldin": 2.134862,
+        "sizes": {
+          "0": 338,
+          "1": 552,
+          "2": 821,
+          "3": 522,
+          "4": 417
+        },
+        "min_cluster_share": 0.127547,
+        "per_cluster_silhouette": {
+          "0": 0.086591,
+          "1": 0.132526,
+          "2": 0.141143,
+          "3": 0.343627,
+          "4": 0.144135
+        },
+        "intra_cluster_similarity": 0.516323,
+        "seed_stability_ari": 0.830515
+      },
+      {
+        "k": 6,
+        "inertia": 46629.0897,
+        "silhouette": 0.184578,
+        "calinski_harabasz": 282.6171,
+        "davies_bouldin": 2.021736,
+        "sizes": {
+          "0": 446,
+          "1": 518,
+          "2": 143,
+          "3": 762,
+          "4": 147,
+          "5": 634
+        },
+        "min_cluster_share": 0.053962,
+        "per_cluster_silhouette": {
+          "0": 0.102044,
+          "1": 0.349027,
+          "2": 0.382779,
+          "3": 0.116282,
+          "4": 0.410915,
+          "5": 0.09318
+        },
+        "intra_cluster_similarity": 0.417742,
+        "seed_stability_ari": 0.73705
+      },
+      {
+        "k": 7,
+        "inertia": 44745.3754,
+        "silhouette": 0.185299,
+        "calinski_harabasz": 263.8806,
+        "davies_bouldin": 2.033997,
+        "sizes": {
+          "0": 129,
+          "1": 517,
+          "2": 505,
+          "3": 409,
+          "4": 665,
+          "5": 313,
+          "6": 112
+        },
+        "min_cluster_share": 0.042264,
+        "per_cluster_silhouette": {
+          "0": 0.393367,
+          "1": 0.340682,
+          "2": 0.116128,
+          "3": 0.083463,
+          "4": 0.128648,
+          "5": 0.098752,
+          "6": 0.490392
+        },
+        "intra_cluster_similarity": 0.499584,
+        "seed_stability_ari": 0.701309
+      },
+      {
+        "k": 8,
+        "inertia": 43093.1013,
+        "silhouette": 0.196687,
+        "calinski_harabasz": 249.2382,
+        "davies_bouldin": 1.98987,
+        "sizes": {
+          "0": 514,
+          "1": 446,
+          "2": 141,
+          "3": 379,
+          "4": 148,
+          "5": 129,
+          "6": 259,
+          "7": 634
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.338665,
+          "1": 0.106694,
+          "2": 0.383028,
+          "3": 0.08191,
+          "4": 0.40668,
+          "5": 0.39611,
+          "6": 0.095205,
+          "7": 0.123919
+        },
+        "intra_cluster_similarity": 0.483302,
+        "seed_stability_ari": 0.592344
+      },
+      {
+        "k": 9,
+        "inertia": 41159.6994,
+        "silhouette": 0.218849,
+        "calinski_harabasz": 243.7481,
+        "davies_bouldin": 1.957578,
+        "sizes": {
+          "0": 157,
+          "1": 666,
+          "2": 504,
+          "3": 149,
+          "4": 467,
+          "5": 135,
+          "6": 223,
+          "7": 184,
+          "8": 165
+        },
+        "min_cluster_share": 0.050943,
+        "per_cluster_silhouette": {
+          "0": 0.385046,
+          "1": 0.106601,
+          "2": 0.368866,
+          "3": 0.365145,
+          "4": 0.049139,
+          "5": 0.349495,
+          "6": 0.176016,
+          "7": 0.244398,
+          "8": 0.326268
+        },
+        "intra_cluster_similarity": 0.397772,
+        "seed_stability_ari": 0.555138
+      },
+      {
+        "k": 10,
+        "inertia": 38392.4595,
+        "silhouette": 0.236649,
+        "calinski_harabasz": 253.3365,
+        "davies_bouldin": 1.78079,
+        "sizes": {
+          "0": 164,
+          "1": 159,
+          "2": 461,
+          "3": 500,
+          "4": 147,
+          "5": 610,
+          "6": 169,
+          "7": 140,
+          "8": 130,
+          "9": 170
+        },
+        "min_cluster_share": 0.049057,
+        "per_cluster_silhouette": {
+          "0": 0.273359,
+          "1": 0.289126,
+          "2": 0.085651,
+          "3": 0.369748,
+          "4": 0.369752,
+          "5": 0.084845,
+          "6": 0.332399,
+          "7": 0.315707,
+          "8": 0.406893,
+          "9": 0.309291
+        },
+        "intra_cluster_similarity": 0.40687,
+        "seed_stability_ari": 0.561934
+      }
+    ],
+    "B_proportion_weighted": [
+      {
+        "k": 2,
+        "inertia": 8237.4587,
+        "silhouette": 0.260469,
+        "calinski_harabasz": 759.4587,
+        "davies_bouldin": 1.372944,
+        "sizes": {
+          "0": 2119,
+          "1": 531
+        },
+        "min_cluster_share": 0.200377,
+        "per_cluster_silhouette": {
+          "0": 0.226967,
+          "1": 0.394161
+        },
+        "intra_cluster_similarity": 0.288629,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 6721.156,
+        "silhouette": 0.239278,
+        "calinski_harabasz": 763.8046,
+        "davies_bouldin": 1.635777,
+        "sizes": {
+          "0": 882,
+          "1": 1243,
+          "2": 525
+        },
+        "min_cluster_share": 0.198113,
+        "per_cluster_silhouette": {
+          "0": 0.302972,
+          "1": 0.145037,
+          "2": 0.355398
+        },
+        "intra_cluster_similarity": 0.383279,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 4,
+        "inertia": 5584.0058,
+        "silhouette": 0.292188,
+        "calinski_harabasz": 792.2819,
+        "davies_bouldin": 1.395606,
+        "sizes": {
+          "0": 882,
+          "1": 532,
+          "2": 520,
+          "3": 716
+        },
+        "min_cluster_share": 0.196226,
+        "per_cluster_silhouette": {
+          "0": 0.290933,
+          "1": 0.294017,
+          "2": 0.328577,
+          "3": 0.265947
+        },
+        "intra_cluster_similarity": 0.420262,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 5,
+        "inertia": 5252.7293,
+        "silhouette": 0.237074,
+        "calinski_harabasz": 673.1515,
+        "davies_bouldin": 1.598658,
+        "sizes": {
+          "0": 493,
+          "1": 717,
+          "2": 549,
+          "3": 534,
+          "4": 357
+        },
+        "min_cluster_share": 0.134717,
+        "per_cluster_silhouette": {
+          "0": 0.284214,
+          "1": 0.239309,
+          "2": 0.111127,
+          "3": 0.276331,
+          "4": 0.302451
+        },
+        "intra_cluster_similarity": 0.502576,
+        "seed_stability_ari": 0.997596
+      },
+      {
+        "k": 6,
+        "inertia": 4972.1975,
+        "silhouette": 0.221812,
+        "calinski_harabasz": 598.5245,
+        "davies_bouldin": 1.737072,
+        "sizes": {
+          "0": 534,
+          "1": 495,
+          "2": 491,
+          "3": 549,
+          "4": 357,
+          "5": 224
+        },
+        "min_cluster_share": 0.084528,
+        "per_cluster_silhouette": {
+          "0": 0.252496,
+          "1": 0.279999,
+          "2": 0.205541,
+          "3": 0.111127,
+          "4": 0.302485,
+          "5": 0.198448
+        },
+        "intra_cluster_similarity": 0.560633,
+        "seed_stability_ari": 0.915629
+      },
+      {
+        "k": 7,
+        "inertia": 4665.5402,
+        "silhouette": 0.226809,
+        "calinski_harabasz": 560.3059,
+        "davies_bouldin": 1.701277,
+        "sizes": {
+          "0": 186,
+          "1": 331,
+          "2": 533,
+          "3": 233,
+          "4": 527,
+          "5": 549,
+          "6": 291
+        },
+        "min_cluster_share": 0.070189,
+        "per_cluster_silhouette": {
+          "0": 0.256454,
+          "1": 0.324944,
+          "2": 0.252148,
+          "3": 0.352028,
+          "4": 0.211497,
+          "5": 0.097185,
+          "6": 0.221839
+        },
+        "intra_cluster_similarity": 0.569188,
+        "seed_stability_ari": 0.804103
+      },
+      {
+        "k": 8,
+        "inertia": 4505.9225,
+        "silhouette": 0.230791,
+        "calinski_harabasz": 510.4568,
+        "davies_bouldin": 1.838941,
+        "sizes": {
+          "0": 291,
+          "1": 622,
+          "2": 527,
+          "3": 237,
+          "4": 186,
+          "5": 167,
+          "6": 366,
+          "7": 254
+        },
+        "min_cluster_share": 0.063019,
+        "per_cluster_silhouette": {
+          "0": 0.222598,
+          "1": 0.195452,
+          "2": 0.220271,
+          "3": 0.375251,
+          "4": 0.256454,
+          "5": 0.212897,
+          "6": 0.253191,
+          "7": 0.174447
+        },
+        "intra_cluster_similarity": 0.586964,
+        "seed_stability_ari": 0.864626
+      },
+      {
+        "k": 9,
+        "inertia": 4313.5562,
+        "silhouette": 0.240453,
+        "calinski_harabasz": 481.114,
+        "davies_bouldin": 1.724321,
+        "sizes": {
+          "0": 527,
+          "1": 458,
+          "2": 208,
+          "3": 422,
+          "4": 87,
+          "5": 186,
+          "6": 162,
+          "7": 233,
+          "8": 367
+        },
+        "min_cluster_share": 0.03283,
+        "per_cluster_silhouette": {
+          "0": 0.215816,
+          "1": 0.170546,
+          "2": 0.382324,
+          "3": 0.157276,
+          "4": 0.422425,
+          "5": 0.256454,
+          "6": 0.220102,
+          "7": 0.372651,
+          "8": 0.252118
+        },
+        "intra_cluster_similarity": 0.602835,
+        "seed_stability_ari": 0.74367
+      },
+      {
+        "k": 10,
+        "inertia": 4148.2676,
+        "silhouette": 0.218057,
+        "calinski_harabasz": 456.2165,
+        "davies_bouldin": 1.973822,
+        "sizes": {
+          "0": 233,
+          "1": 227,
+          "2": 208,
+          "3": 315,
+          "4": 319,
+          "5": 187,
+          "6": 330,
+          "7": 220,
+          "8": 323,
+          "9": 288
+        },
+        "min_cluster_share": 0.070566,
+        "per_cluster_silhouette": {
+          "0": 0.351067,
+          "1": 0.189487,
+          "2": 0.211018,
+          "3": 0.203103,
+          "4": 0.129317,
+          "5": 0.23523,
+          "6": 0.290501,
+          "7": 0.126981,
+          "8": 0.224605,
+          "9": 0.220772
+        },
+        "intra_cluster_similarity": 0.680393,
+        "seed_stability_ari": 0.759895
+      }
+    ],
+    "B_decorrelated": [
+      {
+        "k": 2,
+        "inertia": 53970.7571,
+        "silhouette": 0.099086,
+        "calinski_harabasz": 342.4268,
+        "davies_bouldin": 1.872533,
+        "sizes": {
+          "0": 539,
+          "1": 2111
+        },
+        "min_cluster_share": 0.203396,
+        "per_cluster_silhouette": {
+          "0": 0.431097,
+          "1": 0.014314
+        },
+        "intra_cluster_similarity": 0.241673,
+        "seed_stability_ari": 0.601236
+      },
+      {
+        "k": 3,
+        "inertia": 47950.6699,
+        "silhouette": 0.141146,
+        "calinski_harabasz": 358.7982,
+        "davies_bouldin": 2.289764,
+        "sizes": {
+          "0": 883,
+          "1": 527,
+          "2": 1240
+        },
+        "min_cluster_share": 0.198868,
+        "per_cluster_silhouette": {
+          "0": 0.12107,
+          "1": 0.409953,
+          "2": 0.0412
+        },
+        "intra_cluster_similarity": 0.35744,
+        "seed_stability_ari": 0.999655
+      },
+      {
+        "k": 4,
+        "inertia": 44025.753,
+        "silhouette": 0.167742,
+        "calinski_harabasz": 339.0558,
+        "davies_bouldin": 2.190011,
+        "sizes": {
+          "0": 884,
+          "1": 517,
+          "2": 532,
+          "3": 717
+        },
+        "min_cluster_share": 0.195094,
+        "per_cluster_silhouette": {
+          "0": 0.115204,
+          "1": 0.397012,
+          "2": 0.124025,
+          "3": 0.099636
+        },
+        "intra_cluster_similarity": 0.386804,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 5,
+        "inertia": 41979.5756,
+        "silhouette": 0.172444,
+        "calinski_harabasz": 298.8166,
+        "davies_bouldin": 2.079121,
+        "sizes": {
+          "0": 253,
+          "1": 514,
+          "2": 614,
+          "3": 415,
+          "4": 854
+        },
+        "min_cluster_share": 0.095472,
+        "per_cluster_silhouette": {
+          "0": 0.148677,
+          "1": 0.393274,
+          "2": 0.096809,
+          "3": 0.152775,
+          "4": 0.110511
+        },
+        "intra_cluster_similarity": 0.421909,
+        "seed_stability_ari": 0.857885
+      },
+      {
+        "k": 6,
+        "inertia": 39845.5962,
+        "silhouette": 0.177455,
+        "calinski_harabasz": 280.0814,
+        "davies_bouldin": 2.10725,
+        "sizes": {
+          "0": 372,
+          "1": 508,
+          "2": 264,
+          "3": 337,
+          "4": 614,
+          "5": 555
+        },
+        "min_cluster_share": 0.099623,
+        "per_cluster_silhouette": {
+          "0": 0.164331,
+          "1": 0.386147,
+          "2": 0.192549,
+          "3": 0.099714,
+          "4": 0.107078,
+          "5": 0.113116
+        },
+        "intra_cluster_similarity": 0.500027,
+        "seed_stability_ari": 0.726094
+      },
+      {
+        "k": 7,
+        "inertia": 37549.2517,
+        "silhouette": 0.211173,
+        "calinski_harabasz": 274.5202,
+        "davies_bouldin": 1.8093,
+        "sizes": {
+          "0": 146,
+          "1": 124,
+          "2": 761,
+          "3": 565,
+          "4": 420,
+          "5": 502,
+          "6": 132
+        },
+        "min_cluster_share": 0.046792,
+        "per_cluster_silhouette": {
+          "0": 0.449071,
+          "1": 0.422047,
+          "2": 0.094088,
+          "3": 0.08865,
+          "4": 0.134422,
+          "5": 0.401405,
+          "6": 0.470159
+        },
+        "intra_cluster_similarity": 0.401233,
+        "seed_stability_ari": 0.671756
+      },
+      {
+        "k": 8,
+        "inertia": 36700.6087,
+        "silhouette": 0.209792,
+        "calinski_harabasz": 249.3804,
+        "davies_bouldin": 1.948987,
+        "sizes": {
+          "0": 494,
+          "1": 551,
+          "2": 431,
+          "3": 261,
+          "4": 127,
+          "5": 143,
+          "6": 480,
+          "7": 163
+        },
+        "min_cluster_share": 0.047925,
+        "per_cluster_silhouette": {
+          "0": 0.39675,
+          "1": 0.050677,
+          "2": 0.129896,
+          "3": 0.19005,
+          "4": 0.447216,
+          "5": 0.454284,
+          "6": 0.086779,
+          "7": 0.386684
+        },
+        "intra_cluster_similarity": 0.420551,
+        "seed_stability_ari": 0.546106
+      },
+      {
+        "k": 9,
+        "inertia": 33888.2893,
+        "silhouette": 0.247188,
+        "calinski_harabasz": 263.6234,
+        "davies_bouldin": 1.757392,
+        "sizes": {
+          "0": 154,
+          "1": 505,
+          "2": 315,
+          "3": 167,
+          "4": 113,
+          "5": 148,
+          "6": 501,
+          "7": 610,
+          "8": 137
+        },
+        "min_cluster_share": 0.042642,
+        "per_cluster_silhouette": {
+          "0": 0.484561,
+          "1": 0.393826,
+          "2": 0.123771,
+          "3": 0.374305,
+          "4": 0.608883,
+          "5": 0.443351,
+          "6": 0.055891,
+          "7": 0.072474,
+          "8": 0.535879
+        },
+        "intra_cluster_similarity": 0.428024,
+        "seed_stability_ari": 0.572318
+      },
+      {
+        "k": 10,
+        "inertia": 32077.6637,
+        "silhouette": 0.26655,
+        "calinski_harabasz": 264.0223,
+        "davies_bouldin": 1.618581,
+        "sizes": {
+          "0": 505,
+          "1": 133,
+          "2": 225,
+          "3": 151,
+          "4": 148,
+          "5": 274,
+          "6": 591,
+          "7": 134,
+          "8": 146,
+          "9": 343
+        },
+        "min_cluster_share": 0.050189,
+        "per_cluster_silhouette": {
+          "0": 0.384837,
+          "1": 0.462175,
+          "2": 0.158738,
+          "3": 0.489408,
+          "4": 0.440591,
+          "5": 0.13229,
+          "6": 0.11364,
+          "7": 0.468917,
+          "8": 0.447473,
+          "9": 0.12871
+        },
+        "intra_cluster_similarity": 0.385877,
+        "seed_stability_ari": 0.580902
+      }
+    ],
+    "B_robust_scaled": [
+      {
+        "k": 2,
+        "inertia": 15347.8158,
+        "silhouette": 0.715913,
+        "calinski_harabasz": 8283.1858,
+        "davies_bouldin": 0.403052,
+        "sizes": {
+          "0": 2198,
+          "1": 452
+        },
+        "min_cluster_share": 0.170566,
+        "per_cluster_silhouette": {
+          "0": 0.715295,
+          "1": 0.718919
+        },
+        "intra_cluster_similarity": 0.239114,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 12584.8272,
+        "silhouette": 0.333486,
+        "calinski_harabasz": 5339.5422,
+        "davies_bouldin": 1.190769,
+        "sizes": {
+          "0": 452,
+          "1": 1658,
+          "2": 540
+        },
+        "min_cluster_share": 0.170566,
+        "per_cluster_silhouette": {
+          "0": 0.715663,
+          "1": 0.255598,
+          "2": 0.252734
+        },
+        "intra_cluster_similarity": 0.394872,
+        "seed_stability_ari": 0.969263
+      },
+      {
+        "k": 4,
+        "inertia": 10276.3685,
+        "silhouette": 0.340147,
+        "calinski_harabasz": 4555.8195,
+        "davies_bouldin": 1.174425,
+        "sizes": {
+          "0": 1142,
+          "1": 449,
+          "2": 402,
+          "3": 657
+        },
+        "min_cluster_share": 0.151698,
+        "per_cluster_silhouette": {
+          "0": 0.270647,
+          "1": 0.680602,
+          "2": 0.321278,
+          "3": 0.239826
+        },
+        "intra_cluster_similarity": 0.500937,
+        "seed_stability_ari": 0.980808
+      },
+      {
+        "k": 5,
+        "inertia": 9116.7656,
+        "silhouette": 0.331201,
+        "calinski_harabasz": 3934.1231,
+        "davies_bouldin": 1.144987,
+        "sizes": {
+          "0": 449,
+          "1": 433,
+          "2": 423,
+          "3": 641,
+          "4": 704
+        },
+        "min_cluster_share": 0.159623,
+        "per_cluster_silhouette": {
+          "0": 0.679854,
+          "1": 0.331358,
+          "2": 0.261427,
+          "3": 0.191637,
+          "4": 0.277737
+        },
+        "intra_cluster_similarity": 0.649905,
+        "seed_stability_ari": 0.885986
+      },
+      {
+        "k": 6,
+        "inertia": 7983.8741,
+        "silhouette": 0.277966,
+        "calinski_harabasz": 3667.5687,
+        "davies_bouldin": 1.232345,
+        "sizes": {
+          "0": 704,
+          "1": 293,
+          "2": 422,
+          "3": 639,
+          "4": 432,
+          "5": 160
+        },
+        "min_cluster_share": 0.060377,
+        "per_cluster_silhouette": {
+          "0": 0.277529,
+          "1": 0.363278,
+          "2": 0.262139,
+          "3": 0.195976,
+          "4": 0.332442,
+          "5": 0.345765
+        },
+        "intra_cluster_similarity": 0.646536,
+        "seed_stability_ari": 0.980622
+      },
+      {
+        "k": 7,
+        "inertia": 7474.501,
+        "silhouette": 0.266551,
+        "calinski_harabasz": 3293.3734,
+        "davies_bouldin": 1.276983,
+        "sizes": {
+          "0": 221,
+          "1": 226,
+          "2": 625,
+          "3": 649,
+          "4": 226,
+          "5": 317,
+          "6": 386
+        },
+        "min_cluster_share": 0.083396,
+        "per_cluster_silhouette": {
+          "0": 0.268682,
+          "1": 0.302522,
+          "2": 0.179931,
+          "3": 0.249412,
+          "4": 0.379039,
+          "5": 0.259727,
+          "6": 0.353083
+        },
+        "intra_cluster_similarity": 0.706844,
+        "seed_stability_ari": 0.860608
+      },
+      {
+        "k": 8,
+        "inertia": 6896.994,
+        "silhouette": 0.273714,
+        "calinski_harabasz": 3089.7068,
+        "davies_bouldin": 1.29328,
+        "sizes": {
+          "0": 247,
+          "1": 226,
+          "2": 330,
+          "3": 590,
+          "4": 334,
+          "5": 290,
+          "6": 226,
+          "7": 407
+        },
+        "min_cluster_share": 0.085283,
+        "per_cluster_silhouette": {
+          "0": 0.206202,
+          "1": 0.302327,
+          "2": 0.359044,
+          "3": 0.164977,
+          "4": 0.365758,
+          "5": 0.286594,
+          "6": 0.379039,
+          "7": 0.244045
+        },
+        "intra_cluster_similarity": 0.727614,
+        "seed_stability_ari": 0.928034
+      },
+      {
+        "k": 9,
+        "inertia": 6466.6212,
+        "silhouette": 0.273817,
+        "calinski_harabasz": 2904.3109,
+        "davies_bouldin": 1.387617,
+        "sizes": {
+          "0": 322,
+          "1": 224,
+          "2": 250,
+          "3": 368,
+          "4": 183,
+          "5": 458,
+          "6": 290,
+          "7": 226,
+          "8": 329
+        },
+        "min_cluster_share": 0.069057,
+        "per_cluster_silhouette": {
+          "0": 0.385337,
+          "1": 0.300634,
+          "2": 0.198369,
+          "3": 0.279068,
+          "4": 0.218961,
+          "5": 0.12659,
+          "6": 0.286638,
+          "7": 0.373779,
+          "8": 0.353366
+        },
+        "intra_cluster_similarity": 0.738204,
+        "seed_stability_ari": 0.872868
+      },
+      {
+        "k": 10,
+        "inertia": 6192.5792,
+        "silhouette": 0.262318,
+        "calinski_harabasz": 2707.803,
+        "davies_bouldin": 1.456042,
+        "sizes": {
+          "0": 243,
+          "1": 143,
+          "2": 324,
+          "3": 213,
+          "4": 366,
+          "5": 115,
+          "6": 429,
+          "7": 332,
+          "8": 195,
+          "9": 290
+        },
+        "min_cluster_share": 0.043396,
+        "per_cluster_silhouette": {
+          "0": 0.207176,
+          "1": 0.276377,
+          "2": 0.381902,
+          "3": 0.184726,
+          "4": 0.281829,
+          "5": 0.251881,
+          "6": 0.14902,
+          "7": 0.3488,
+          "8": 0.246102,
+          "9": 0.283991
+        },
+        "intra_cluster_similarity": 0.742655,
+        "seed_stability_ari": 0.85609
+      }
+    ],
+    "B_teacher": [
+      {
+        "k": 2,
+        "inertia": 59420.2874,
+        "silhouette": 0.221247,
+        "calinski_harabasz": 658.6417,
+        "davies_bouldin": 1.381469,
+        "sizes": {
+          "0": 532,
+          "1": 2118
+        },
+        "min_cluster_share": 0.200755,
+        "per_cluster_silhouette": {
+          "0": 0.461345,
+          "1": 0.160939
+        },
+        "intra_cluster_similarity": 0.287873,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 53364.2782,
+        "silhouette": 0.178075,
+        "calinski_harabasz": 516.7516,
+        "davies_bouldin": 2.234226,
+        "sizes": {
+          "0": 877,
+          "1": 1243,
+          "2": 530
+        },
+        "min_cluster_share": 0.2,
+        "per_cluster_silhouette": {
+          "0": 0.16615,
+          "1": 0.072989,
+          "2": 0.444264
+        },
+        "intra_cluster_similarity": 0.374931,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 4,
+        "inertia": 49438.6817,
+        "silhouette": 0.195515,
+        "calinski_harabasz": 441.7489,
+        "davies_bouldin": 2.189947,
+        "sizes": {
+          "0": 877,
+          "1": 713,
+          "2": 530,
+          "3": 530
+        },
+        "min_cluster_share": 0.2,
+        "per_cluster_silhouette": {
+          "0": 0.150744,
+          "1": 0.123206,
+          "2": 0.129787,
+          "3": 0.432601
+        },
+        "intra_cluster_similarity": 0.415378,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 5,
+        "inertia": 46488.0057,
+        "silhouette": 0.181153,
+        "calinski_harabasz": 394.1782,
+        "davies_bouldin": 2.105151,
+        "sizes": {
+          "0": 596,
+          "1": 503,
+          "2": 496,
+          "3": 333,
+          "4": 722
+        },
+        "min_cluster_share": 0.12566,
+        "per_cluster_silhouette": {
+          "0": 0.182114,
+          "1": 0.126751,
+          "2": 0.393836,
+          "3": 0.144121,
+          "4": 0.089232
+        },
+        "intra_cluster_similarity": 0.638176,
+        "seed_stability_ari": 0.770497
+      },
+      {
+        "k": 6,
+        "inertia": 44349.2812,
+        "silhouette": 0.185946,
+        "calinski_harabasz": 355.926,
+        "davies_bouldin": 2.100052,
+        "sizes": {
+          "0": 228,
+          "1": 550,
+          "2": 491,
+          "3": 436,
+          "4": 483,
+          "5": 462
+        },
+        "min_cluster_share": 0.086038,
+        "per_cluster_silhouette": {
+          "0": 0.185815,
+          "1": 0.093135,
+          "2": 0.393922,
+          "3": 0.12948,
+          "4": 0.113338,
+          "5": 0.204669
+        },
+        "intra_cluster_similarity": 0.562963,
+        "seed_stability_ari": 0.631222
+      },
+      {
+        "k": 7,
+        "inertia": 42446.3931,
+        "silhouette": 0.203828,
+        "calinski_harabasz": 329.5324,
+        "davies_bouldin": 1.912736,
+        "sizes": {
+          "0": 377,
+          "1": 451,
+          "2": 384,
+          "3": 492,
+          "4": 492,
+          "5": 129,
+          "6": 325
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.093172,
+          "1": 0.104987,
+          "2": 0.138509,
+          "3": 0.392783,
+          "4": 0.174515,
+          "5": 0.490017,
+          "6": 0.191256
+        },
+        "intra_cluster_similarity": 0.603665,
+        "seed_stability_ari": 0.657121
+      },
+      {
+        "k": 8,
+        "inertia": 40737.5042,
+        "silhouette": 0.229944,
+        "calinski_harabasz": 310.0264,
+        "davies_bouldin": 1.84209,
+        "sizes": {
+          "0": 123,
+          "1": 489,
+          "2": 490,
+          "3": 138,
+          "4": 418,
+          "5": 330,
+          "6": 113,
+          "7": 549
+        },
+        "min_cluster_share": 0.042642,
+        "per_cluster_silhouette": {
+          "0": 0.467949,
+          "1": 0.079339,
+          "2": 0.400812,
+          "3": 0.473582,
+          "4": 0.134539,
+          "5": 0.156942,
+          "6": 0.56804,
+          "7": 0.143951
+        },
+        "intra_cluster_similarity": 0.511734,
+        "seed_stability_ari": 0.558558
+      },
+      {
+        "k": 9,
+        "inertia": 38359.6745,
+        "silhouette": 0.259874,
+        "calinski_harabasz": 308.4471,
+        "davies_bouldin": 1.668692,
+        "sizes": {
+          "0": 574,
+          "1": 496,
+          "2": 141,
+          "3": 671,
+          "4": 139,
+          "5": 136,
+          "6": 252,
+          "7": 112,
+          "8": 129
+        },
+        "min_cluster_share": 0.042264,
+        "per_cluster_silhouette": {
+          "0": 0.109551,
+          "1": 0.430706,
+          "2": 0.454798,
+          "3": 0.062941,
+          "4": 0.46846,
+          "5": 0.544233,
+          "6": 0.16326,
+          "7": 0.576878,
+          "8": 0.472178
+        },
+        "intra_cluster_similarity": 0.475829,
+        "seed_stability_ari": 0.596212
+      },
+      {
+        "k": 10,
+        "inertia": 35931.549,
+        "silhouette": 0.276719,
+        "calinski_harabasz": 312.411,
+        "davies_bouldin": 1.663008,
+        "sizes": {
+          "0": 127,
+          "1": 474,
+          "2": 553,
+          "3": 423,
+          "4": 164,
+          "5": 113,
+          "6": 117,
+          "7": 284,
+          "8": 123,
+          "9": 272
+        },
+        "min_cluster_share": 0.042642,
+        "per_cluster_silhouette": {
+          "0": 0.428397,
+          "1": 0.426922,
+          "2": 0.126034,
+          "3": 0.120743,
+          "4": 0.352448,
+          "5": 0.576522,
+          "6": 0.446286,
+          "7": 0.218754,
+          "8": 0.473086,
+          "9": 0.221642
+        },
+        "intra_cluster_similarity": 0.483404,
+        "seed_stability_ari": 0.620114
+      }
+    ],
+    "B_no_level": [
+      {
+        "k": 2,
+        "inertia": 47467.4951,
+        "silhouette": 0.203167,
+        "calinski_harabasz": 604.2972,
+        "davies_bouldin": 1.378248,
+        "sizes": {
+          "0": 531,
+          "1": 2119
+        },
+        "min_cluster_share": 0.200377,
+        "per_cluster_silhouette": {
+          "0": 0.503694,
+          "1": 0.127858
+        },
+        "intra_cluster_similarity": 0.285303,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 43106.7035,
+        "silhouette": 0.186343,
+        "calinski_harabasz": 466.4793,
+        "davies_bouldin": 2.290393,
+        "sizes": {
+          "0": 531,
+          "1": 1432,
+          "2": 687
+        },
+        "min_cluster_share": 0.200377,
+        "per_cluster_silhouette": {
+          "0": 0.49542,
+          "1": 0.113199,
+          "2": 0.099913
+        },
+        "intra_cluster_similarity": 0.455903,
+        "seed_stability_ari": 0.911641
+      },
+      {
+        "k": 4,
+        "inertia": 40850.5391,
+        "silhouette": 0.187723,
+        "calinski_harabasz": 376.7496,
+        "davies_bouldin": 2.105401,
+        "sizes": {
+          "0": 528,
+          "1": 587,
+          "2": 1345,
+          "3": 190
+        },
+        "min_cluster_share": 0.071698,
+        "per_cluster_silhouette": {
+          "0": 0.492231,
+          "1": 0.106364,
+          "2": 0.075486,
+          "3": 0.387385
+        },
+        "intra_cluster_similarity": 0.42724,
+        "seed_stability_ari": 0.627067
+      },
+      {
+        "k": 5,
+        "inertia": 38892.0855,
+        "silhouette": 0.196466,
+        "calinski_harabasz": 329.9767,
+        "davies_bouldin": 2.384116,
+        "sizes": {
+          "0": 421,
+          "1": 530,
+          "2": 664,
+          "3": 681,
+          "4": 354
+        },
+        "min_cluster_share": 0.133585,
+        "per_cluster_silhouette": {
+          "0": 0.124094,
+          "1": 0.476828,
+          "2": 0.113891,
+          "3": 0.09504,
+          "4": 0.212785
+        },
+        "intra_cluster_similarity": 0.393747,
+        "seed_stability_ari": 0.467696
+      },
+      {
+        "k": 6,
+        "inertia": 36305.1749,
+        "silhouette": 0.220529,
+        "calinski_harabasz": 320.3638,
+        "davies_bouldin": 2.149717,
+        "sizes": {
+          "0": 192,
+          "1": 759,
+          "2": 512,
+          "3": 477,
+          "4": 484,
+          "5": 226
+        },
+        "min_cluster_share": 0.072453,
+        "per_cluster_silhouette": {
+          "0": 0.354723,
+          "1": 0.089203,
+          "2": 0.499332,
+          "3": 0.1451,
+          "4": 0.115821,
+          "5": 0.299385
+        },
+        "intra_cluster_similarity": 0.433345,
+        "seed_stability_ari": 0.458721
+      },
+      {
+        "k": 7,
+        "inertia": 33958.5233,
+        "silhouette": 0.252669,
+        "calinski_harabasz": 315.7505,
+        "davies_bouldin": 1.79657,
+        "sizes": {
+          "0": 419,
+          "1": 526,
+          "2": 217,
+          "3": 129,
+          "4": 157,
+          "5": 189,
+          "6": 1013
+        },
+        "min_cluster_share": 0.048679,
+        "per_cluster_silhouette": {
+          "0": 0.122816,
+          "1": 0.482016,
+          "2": 0.359383,
+          "3": 0.606579,
+          "4": 0.588271,
+          "5": 0.413324,
+          "6": 0.037374
+        },
+        "intra_cluster_similarity": 0.386919,
+        "seed_stability_ari": 0.418376
+      },
+      {
+        "k": 8,
+        "inertia": 31888.3845,
+        "silhouette": 0.272371,
+        "calinski_harabasz": 312.6059,
+        "davies_bouldin": 1.840939,
+        "sizes": {
+          "0": 509,
+          "1": 415,
+          "2": 227,
+          "3": 208,
+          "4": 473,
+          "5": 450,
+          "6": 182,
+          "7": 186
+        },
+        "min_cluster_share": 0.068679,
+        "per_cluster_silhouette": {
+          "0": 0.495626,
+          "1": 0.185386,
+          "2": 0.279942,
+          "3": 0.303214,
+          "4": 0.152031,
+          "5": 0.110145,
+          "6": 0.432258,
+          "7": 0.35383
+        },
+        "intra_cluster_similarity": 0.35492,
+        "seed_stability_ari": 0.487857
+      },
+      {
+        "k": 9,
+        "inertia": 29269.2567,
+        "silhouette": 0.302748,
+        "calinski_harabasz": 327.4348,
+        "davies_bouldin": 1.642361,
+        "sizes": {
+          "0": 221,
+          "1": 508,
+          "2": 331,
+          "3": 303,
+          "4": 319,
+          "5": 433,
+          "6": 148,
+          "7": 197,
+          "8": 190
+        },
+        "min_cluster_share": 0.055849,
+        "per_cluster_silhouette": {
+          "0": 0.283152,
+          "1": 0.494398,
+          "2": 0.223485,
+          "3": 0.185148,
+          "4": 0.210907,
+          "5": 0.165968,
+          "6": 0.529237,
+          "7": 0.386387,
+          "8": 0.341527
+        },
+        "intra_cluster_similarity": 0.357611,
+        "seed_stability_ari": 0.536526
+      },
+      {
+        "k": 10,
+        "inertia": 26712.9113,
+        "silhouette": 0.325949,
+        "calinski_harabasz": 346.8565,
+        "davies_bouldin": 1.543619,
+        "sizes": {
+          "0": 771,
+          "1": 188,
+          "2": 150,
+          "3": 286,
+          "4": 519,
+          "5": 159,
+          "6": 166,
+          "7": 125,
+          "8": 150,
+          "9": 136
+        },
+        "min_cluster_share": 0.04717,
+        "per_cluster_silhouette": {
+          "0": 0.045477,
+          "1": 0.314035,
+          "2": 0.51144,
+          "3": 0.256233,
+          "4": 0.47069,
+          "5": 0.387828,
+          "6": 0.450158,
+          "7": 0.529034,
+          "8": 0.613059,
+          "9": 0.594839
+        },
+        "intra_cluster_similarity": 0.393093,
+        "seed_stability_ari": 0.608086
+      }
+    ]
+  },
+  "EXP-010_k_sweep": [
+    {
+      "k": 2,
+      "inertia": 55391.397,
+      "silhouette": 0.17713,
+      "calinski_harabasz": 519.0983,
+      "davies_bouldin": 1.55428,
+      "sizes": {
+        "0": 2119,
+        "1": 531
+      },
+      "min_cluster_share": 0.200377,
+      "per_cluster_silhouette": {
+        "0": 0.113612,
+        "1": 0.430607
+      },
+      "intra_cluster_similarity": 0.27163,
+      "seed_stability_ari": 1.0
+    },
+    {
+      "k": 3,
+      "inertia": 49369.277,
+      "silhouette": 0.173304,
+      "calinski_harabasz": 452.5413,
+      "davies_bouldin": 2.213792,
+      "sizes": {
+        "0": 880,
+        "1": 1243,
+        "2": 527
+      },
+      "min_cluster_share": 0.198868,
+      "per_cluster_silhouette": {
+        "0": 0.176818,
+        "1": 0.070954,
+        "2": 0.408843
+      },
+      "intra_cluster_similarity": 0.374297,
+      "seed_stability_ari": 1.0
+    },
+    {
+      "k": 4,
+      "inertia": 45448.3265,
+      "silhouette": 0.1946,
+      "calinski_harabasz": 403.6909,
+      "davies_bouldin": 2.145305,
+      "sizes": {
+        "0": 715,
+        "1": 522,
+        "2": 881,
+        "3": 532
+      },
+      "min_cluster_share": 0.196981,
+      "per_cluster_silhouette": {
+        "0": 0.129065,
+        "1": 0.397791,
+        "2": 0.162351,
+        "3": 0.136712
+      },
+      "intra_cluster_similarity": 0.416343,
+      "seed_stability_ari": 0.999587
+    },
+    {
+      "k": 5,
+      "inertia": 43230.9267,
+      "silhouette": 0.201856,
+      "calinski_harabasz": 352.0943,
+      "davies_bouldin": 1.997502,
+      "sizes": {
+        "0": 508,
+        "1": 143,
+        "2": 785,
+        "3": 522,
+        "4": 692
+      },
+      "min_cluster_share": 0.053962,
+      "per_cluster_silhouette": {
+        "0": 0.138409,
+        "1": 0.46578,
+        "2": 0.135322,
+        "3": 0.391874,
+        "4": 0.126033
+      },
+      "intra_cluster_similarity": 0.422638,
+      "seed_stability_ari": 0.863458
+    },
+    {
+      "k": 6,
+      "inertia": 40925.0848,
+      "silhouette": 0.208907,
+      "calinski_harabasz": 327.2275,
+      "davies_bouldin": 1.947381,
+      "sizes": {
+        "0": 164,
+        "1": 519,
+        "2": 396,
+        "3": 822,
+        "4": 276,
+        "5": 473
+      },
+      "min_cluster_share": 0.061887,
+      "per_cluster_silhouette": {
+        "0": 0.369093,
+        "1": 0.388174,
+        "2": 0.17502,
+        "3": 0.152615,
+        "4": 0.141968,
+        "5": 0.12192
+      },
+      "intra_cluster_similarity": 0.496995,
+      "seed_stability_ari": 0.798106
+    },
+    {
+      "k": 7,
+      "inertia": 39662.4832,
+      "silhouette": 0.230524,
+      "calinski_harabasz": 295.2866,
+      "davies_bouldin": 1.868971,
+      "sizes": {
+        "0": 148,
+        "1": 814,
+        "2": 424,
+        "3": 123,
+        "4": 164,
+        "5": 460,
+        "6": 517
+      },
+      "min_cluster_share": 0.046415,
+      "per_cluster_silhouette": {
+        "0": 0.496312,
+        "1": 0.148276,
+        "2": 0.124201,
+        "3": 0.475346,
+        "4": 0.377226,
+        "5": 0.086562,
+        "6": 0.394438
+      },
+      "intra_cluster_similarity": 0.403851,
+      "seed_stability_ari": 0.676684
+    },
+    {
+      "k": 8,
+      "inertia": 37076.87,
+      "silhouette": 0.234872,
+      "calinski_harabasz": 296.9715,
+      "davies_bouldin": 1.716846,
+      "sizes": {
+        "0": 129,
+        "1": 144,
+        "2": 515,
+        "3": 472,
+        "4": 317,
+        "5": 315,
+        "6": 628,
+        "7": 130
+      },
+      "min_cluster_share": 0.048679,
+      "per_cluster_silhouette": {
+        "0": 0.46957,
+        "1": 0.445937,
+        "2": 0.380691,
+        "3": 0.1373,
+        "4": 0.110998,
+        "5": 0.162846,
+        "6": 0.140722,
+        "7": 0.476173
+      },
+      "intra_cluster_similarity": 0.499859,
+      "seed_stability_ari": 0.63927
+    },
+    {
+      "k": 9,
+      "inertia": 35415.6263,
+      "silhouette": 0.261333,
+      "calinski_harabasz": 287.4211,
+      "davies_bouldin": 1.786341,
+      "sizes": {
+        "0": 149,
+        "1": 124,
+        "2": 513,
+        "3": 663,
+        "4": 142,
+        "5": 504,
+        "6": 142,
+        "7": 246,
+        "8": 167
+      },
+      "min_cluster_share": 0.046792,
+      "per_cluster_silhouette": {
+        "0": 0.500352,
+        "1": 0.476119,
+        "2": 0.393473,
+        "3": 0.134672,
+        "4": 0.466439,
+        "5": 0.059138,
+        "6": 0.46302,
+        "7": 0.175484,
+        "8": 0.376308
+      },
+      "intra_cluster_similarity": 0.434954,
+      "seed_stability_ari": 0.617007
+    },
+    {
+      "k": 10,
+      "inertia": 33312.3673,
+      "silhouette": 0.268467,
+      "calinski_harabasz": 290.0336,
+      "davies_bouldin": 1.636364,
+      "sizes": {
+        "0": 116,
+        "1": 447,
+        "2": 249,
+        "3": 590,
+        "4": 509,
+        "5": 193,
+        "6": 134,
+        "7": 143,
+        "8": 132,
+        "9": 137
+      },
+      "min_cluster_share": 0.043774,
+      "per_cluster_silhouette": {
+        "0": 0.579299,
+        "1": 0.122344,
+        "2": 0.234546,
+        "3": 0.059316,
+        "4": 0.381335,
+        "5": 0.249999,
+        "6": 0.394987,
+        "7": 0.46381,
+        "8": 0.461514,
+        "9": 0.537454
+      },
+      "intra_cluster_similarity": 0.46303,
+      "seed_stability_ari": 0.557135
+    }
+  ],
+  "EXP-010b_gap_statistic": {
+    "k_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "gap": [
+      0.413085,
+      0.442659,
+      0.526681,
+      0.585783,
+      0.61623,
+      0.656128,
+      0.675841,
+      0.732455,
+      0.768328,
+      0.820604,
+      0.883627,
+      0.951571,
+      1.03169,
+      1.124474,
+      1.154864,
+      1.177627,
+      1.220659,
+      1.253594,
+      1.285658,
+      1.310523
+    ],
+    "std_error": [
+      0.004243,
+      0.004231,
+      0.003996,
+      0.004039,
+      0.003965,
+      0.00383,
+      0.003837,
+      0.003876,
+      0.004119,
+      0.003898,
+      0.003861,
+      0.003945,
+      0.003791,
+      0.003938,
+      0.003933,
+      0.003644,
+      0.003778,
+      0.003775,
+      0.004133,
+      0.003957
+    ],
+    "optimal_k": 20,
+    "indicates_no_structure": false,
+    "monotonically_increasing": true,
+    "informative": false,
+    "note": "k=1 was in the search range on purpose: the gap statistic is the only criterion here that can report the ABSENCE of cluster structure. If the curve rises monotonically to the range ceiling it has found no interior optimum, and the statistic is uninformative on this data rather than endorsing the largest k."
+  },
+  "EXP-010c_gmm": {
+    "sweep": [
+      {
+        "k": 2,
+        "bic": -33473.641,
+        "aic": -37597.1438
+      },
+      {
+        "k": 3,
+        "bic": -62146.6735,
+        "aic": -68334.8688
+      },
+      {
+        "k": 4,
+        "bic": -113079.4738,
+        "aic": -121332.3616
+      },
+      {
+        "k": 5,
+        "bic": -163153.6383,
+        "aic": -173471.2186
+      },
+      {
+        "k": 6,
+        "bic": -181589.5309,
+        "aic": -193971.8038
+      },
+      {
+        "k": 7,
+        "bic": -180762.9205,
+        "aic": -195209.8859
+      },
+      {
+        "k": 8,
+        "bic": -194332.8129,
+        "aic": -210844.4709
+      },
+      {
+        "k": 9,
+        "bic": -196821.0863,
+        "aic": -215397.4368
+      },
+      {
+        "k": 10,
+        "bic": -246857.7673,
+        "aic": -267498.8103
+      }
+    ],
+    "bic_optimal_k": 10
+  },
+  "k_selection": {
+    "rule": "Gap statistic first (if k=1, report no structure). Otherwise the k maximising mean silhouette subject to BOTH constraints: every cluster holds >=5% of learners AND every cluster reaches bootstrap Jaccard >=0.60. Pre-registered in research/segmentation_research.md section 6.2.",
+    "gap_optimal_k": 20,
+    "gap_informative": false,
+    "silhouette_optimal_k_unconstrained": 10,
+    "candidates": [
+      {
+        "k": 2,
+        "silhouette": 0.17713,
+        "min_cluster_share": 0.2004,
+        "mean_bootstrap_jaccard": 0.9825,
+        "n_unstable_clusters": 0,
+        "passes_constraints": true,
+        "failure_reasons": []
+      },
+      {
+        "k": 3,
+        "silhouette": 0.173304,
+        "min_cluster_share": 0.1989,
+        "mean_bootstrap_jaccard": 0.9898,
+        "n_unstable_clusters": 0,
+        "passes_constraints": true,
+        "failure_reasons": []
+      },
+      {
+        "k": 4,
+        "silhouette": 0.1946,
+        "min_cluster_share": 0.197,
+        "mean_bootstrap_jaccard": 0.9985,
+        "n_unstable_clusters": 0,
+        "passes_constraints": true,
+        "failure_reasons": []
+      },
+      {
+        "k": 5,
+        "silhouette": 0.201856,
+        "min_cluster_share": 0.054,
+        "mean_bootstrap_jaccard": 0.7477,
+        "n_unstable_clusters": 1,
+        "passes_constraints": false,
+        "failure_reasons": [
+          "1 cluster(s) below Jaccard 0.60"
+        ]
+      },
+      {
+        "k": 6,
+        "silhouette": 0.208907,
+        "min_cluster_share": 0.0619,
+        "mean_bootstrap_jaccard": 0.7028,
+        "n_unstable_clusters": 2,
+        "passes_constraints": false,
+        "failure_reasons": [
+          "2 cluster(s) below Jaccard 0.60"
+        ]
+      },
+      {
+        "k": 7,
+        "silhouette": 0.230524,
+        "min_cluster_share": 0.0464,
+        "mean_bootstrap_jaccard": 0.5116,
+        "n_unstable_clusters": 5,
+        "passes_constraints": false,
+        "failure_reasons": [
+          "smallest cluster 4.6% < 5%",
+          "5 cluster(s) below Jaccard 0.60"
+        ]
+      },
+      {
+        "k": 8,
+        "silhouette": 0.234872,
+        "min_cluster_share": 0.0487,
+        "mean_bootstrap_jaccard": 0.5494,
+        "n_unstable_clusters": 6,
+        "passes_constraints": false,
+        "failure_reasons": [
+          "smallest cluster 4.9% < 5%",
+          "6 cluster(s) below Jaccard 0.60"
+        ]
+      },
+      {
+        "k": 9,
+        "silhouette": 0.261333,
+        "min_cluster_share": 0.0468,
+        "mean_bootstrap_jaccard": 0.5339,
+        "n_unstable_clusters": 6,
+        "passes_constraints": false,
+        "failure_reasons": [
+          "smallest cluster 4.7% < 5%",
+          "6 cluster(s) below Jaccard 0.60"
+        ]
+      },
+      {
+        "k": 10,
+        "silhouette": 0.268467,
+        "min_cluster_share": 0.0438,
+        "mean_bootstrap_jaccard": 0.6329,
+        "n_unstable_clusters": 5,
+        "passes_constraints": false,
+        "failure_reasons": [
+          "smallest cluster 4.4% < 5%",
+          "5 cluster(s) below Jaccard 0.60"
+        ]
+      }
+    ],
+    "eligible_k": [
+      2,
+      3,
+      4
+    ],
+    "chosen_k": 4,
+    "fallback_used": false
+  },
+  "EXP-012_hierarchical": {
+    "k": 4,
+    "ari_kmeans_vs_ward": 0.34955,
+    "ari_kmeans_vs_average": 0.019219,
+    "ari_ward_vs_average": 0.025578,
+    "ward_sizes": {
+      "0": 747,
+      "1": 374,
+      "2": 1005,
+      "3": 524
+    },
+    "average_sizes": {
+      "0": 21,
+      "1": 110,
+      "2": 113,
+      "3": 2406
+    },
+    "caveat": "Ward minimises within-cluster variance, the same objective family K-Means optimises, so Ward-K-Means agreement is partly a shared inductive bias. Average linkage optimises something different, so agreement across all three is materially stronger evidence."
+  },
+  "EXP-013_stability": {
+    "k": 4,
+    "n_bootstrap": 100,
+    "per_cluster_jaccard": {
+      "0": 0.9833,
+      "1": 0.9962,
+      "2": 0.9961,
+      "3": 0.9813
+    },
+    "mean_jaccard": 0.9892,
+    "n_unstable_below_0.60": 0,
+    "n_reliable_above_0.75": 4,
+    "subsample_ari_mean": 0.9874,
+    "subsample_ari_std": 0.0608,
+    "all_clusters_reliable": true
+  },
+  "EXP-013_stability_by_k": {
+    "2": {
+      "k": 2,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.9859,
+        "1": 0.9791
+      },
+      "mean_jaccard": 0.9825,
+      "n_unstable_below_0.60": 0,
+      "n_reliable_above_0.75": 2,
+      "subsample_ari_mean": 1.0,
+      "subsample_ari_std": 0.0,
+      "all_clusters_reliable": true
+    },
+    "3": {
+      "k": 3,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.9862,
+        "1": 0.9858,
+        "2": 0.9973
+      },
+      "mean_jaccard": 0.9898,
+      "n_unstable_below_0.60": 0,
+      "n_reliable_above_0.75": 3,
+      "subsample_ari_mean": 0.9991,
+      "subsample_ari_std": 0.0013,
+      "all_clusters_reliable": true
+    },
+    "4": {
+      "k": 4,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.9994,
+        "1": 0.9964,
+        "2": 0.9985,
+        "3": 0.9997
+      },
+      "mean_jaccard": 0.9985,
+      "n_unstable_below_0.60": 0,
+      "n_reliable_above_0.75": 4,
+      "subsample_ari_mean": 0.9761,
+      "subsample_ari_std": 0.0845,
+      "all_clusters_reliable": true
+    },
+    "5": {
+      "k": 5,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.8435,
+        "1": 0.1936,
+        "2": 0.8627,
+        "3": 0.9925,
+        "4": 0.8461
+      },
+      "mean_jaccard": 0.7477,
+      "n_unstable_below_0.60": 1,
+      "n_reliable_above_0.75": 4,
+      "subsample_ari_mean": 0.8443,
+      "subsample_ari_std": 0.0735,
+      "all_clusters_reliable": false
+    },
+    "6": {
+      "k": 6,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.3237,
+        "1": 0.9866,
+        "2": 0.807,
+        "3": 0.8631,
+        "4": 0.5406,
+        "5": 0.6958
+      },
+      "mean_jaccard": 0.7028,
+      "n_unstable_below_0.60": 2,
+      "n_reliable_above_0.75": 3,
+      "subsample_ari_mean": 0.7353,
+      "subsample_ari_std": 0.0868,
+      "all_clusters_reliable": false
+    },
+    "7": {
+      "k": 7,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.2695,
+        "1": 0.7286,
+        "2": 0.538,
+        "3": 0.1902,
+        "4": 0.3935,
+        "5": 0.4874,
+        "6": 0.974
+      },
+      "mean_jaccard": 0.5116,
+      "n_unstable_below_0.60": 5,
+      "n_reliable_above_0.75": 1,
+      "subsample_ari_mean": 0.665,
+      "subsample_ari_std": 0.0649,
+      "all_clusters_reliable": false
+    },
+    "8": {
+      "k": 8,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.419,
+        "1": 0.5166,
+        "2": 0.9751,
+        "3": 0.5801,
+        "4": 0.3993,
+        "5": 0.4838,
+        "6": 0.676,
+        "7": 0.345
+      },
+      "mean_jaccard": 0.5494,
+      "n_unstable_below_0.60": 6,
+      "n_reliable_above_0.75": 1,
+      "subsample_ari_mean": 0.6,
+      "subsample_ari_std": 0.0844,
+      "all_clusters_reliable": false
+    },
+    "9": {
+      "k": 9,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.4825,
+        "1": 0.2844,
+        "2": 0.9653,
+        "3": 0.6112,
+        "4": 0.7251,
+        "5": 0.2853,
+        "6": 0.4879,
+        "7": 0.4782,
+        "8": 0.4848
+      },
+      "mean_jaccard": 0.5339,
+      "n_unstable_below_0.60": 6,
+      "n_reliable_above_0.75": 1,
+      "subsample_ari_mean": 0.5932,
+      "subsample_ari_std": 0.1168,
+      "all_clusters_reliable": false
+    },
+    "10": {
+      "k": 10,
+      "n_bootstrap": 60,
+      "per_cluster_jaccard": {
+        "0": 0.654,
+        "1": 0.5327,
+        "2": 0.513,
+        "3": 0.5352,
+        "4": 0.9682,
+        "5": 0.5761,
+        "6": 0.6829,
+        "7": 0.7268,
+        "8": 0.6648,
+        "9": 0.4753
+      },
+      "mean_jaccard": 0.6329,
+      "n_unstable_below_0.60": 5,
+      "n_reliable_above_0.75": 1,
+      "subsample_ari_mean": 0.578,
+      "subsample_ari_std": 0.0928,
+      "all_clusters_reliable": false
+    }
+  },
+  "EXP-011c_dominance": {
+    "representation": "B_proportion",
+    "k": 4,
+    "mean_eta_squared_per_block": {
+      "engagement": 0.6287,
+      "behavioural": 0.4168,
+      "category": 0.0325,
+      "level": 0.8146
+    },
+    "explained_share_per_block": {
+      "engagement": 0.3204,
+      "behavioural": 0.3186,
+      "category": 0.0497,
+      "level": 0.3113
+    },
+    "top_15_features": {
+      "preflevel_Intermediate": 0.8509276469300885,
+      "learning_depth_index": 0.8505732243268392,
+      "diversity_ratio": 0.8301674912878579,
+      "total_courses": 0.8198434149778715,
+      "preflevel_Advanced": 0.800339422980932,
+      "preflevel_Beginner": 0.7924727885651763,
+      "diversity_score": 0.7604215814669897,
+      "avg_courses_per_category": 0.7032055027127945,
+      "activity_span_days": 0.6347287050424962,
+      "enrollment_frequency": 0.3569540552762789,
+      "cat_share_design": 0.08111765295246369,
+      "cat_share_programming": 0.07838782403998126,
+      "avg_course_rating": 0.043230715109028574,
+      "cat_share_marketing": 0.039538141285595865,
+      "cat_share_artificial_intelligence": 0.036540806514582136
+    }
+  },
+  "EXP-011c_dominance_at_common_k": {
+    "B_proportion": {
+      "k": 4,
+      "silhouette": 0.1946,
+      "min_cluster_share": 0.197,
+      "block_explained_share": {
+        "engagement": 0.3204,
+        "behavioural": 0.3186,
+        "category": 0.0497,
+        "level": 0.3113
+      },
+      "top_feature": "preflevel_Intermediate"
+    },
+    "B_one_hot": {
+      "k": 4,
+      "silhouette": 0.166811,
+      "min_cluster_share": 0.197,
+      "block_explained_share": {
+        "engagement": 0.3246,
+        "behavioural": 0.3227,
+        "category": 0.0374,
+        "level": 0.3152
+      },
+      "top_feature": "learning_depth_index"
+    },
+    "B_facets": {
+      "k": 4,
+      "silhouette": 0.356925,
+      "min_cluster_share": 0.197,
+      "block_explained_share": {
+        "engagement": 0.2923,
+        "behavioural": 0.2906,
+        "category": 0.1327,
+        "level": 0.2844
+      },
+      "top_feature": "learning_depth_index"
+    },
+    "B_no_category": {
+      "k": 4,
+      "silhouette": 0.371972,
+      "min_cluster_share": 0.1985,
+      "block_explained_share": {
+        "engagement": 0.3374,
+        "behavioural": 0.3355,
+        "level": 0.327
+      },
+      "top_feature": "preflevel_Intermediate"
+    },
+    "A_proportion": {
+      "k": 4,
+      "silhouette": 0.172857,
+      "min_cluster_share": 0.197,
+      "block_explained_share": {
+        "engagement": 0.3202,
+        "behavioural": 0.3185,
+        "category": 0.0497,
+        "level": 0.3112,
+        "demographic": 0.0004
+      },
+      "top_feature": "preflevel_Intermediate"
+    },
+    "B_proportion_weighted": {
+      "k": 4,
+      "silhouette": 0.292188,
+      "min_cluster_share": 0.1962,
+      "block_explained_share": {
+        "engagement": 0.3203,
+        "behavioural": 0.3186,
+        "category": 0.0496,
+        "level": 0.3116
+      },
+      "top_feature": "preflevel_Intermediate"
+    },
+    "B_decorrelated": {
+      "k": 4,
+      "silhouette": 0.167742,
+      "min_cluster_share": 0.1951,
+      "block_explained_share": {
+        "engagement": 0.2828,
+        "behavioural": 0.2726,
+        "category": 0.0613,
+        "level": 0.3833
+      },
+      "top_feature": "learning_depth_index"
+    },
+    "B_robust_scaled": {
+      "k": 4,
+      "silhouette": 0.340147,
+      "min_cluster_share": 0.1517,
+      "block_explained_share": {
+        "engagement": 0.504,
+        "behavioural": 0.4488,
+        "category": 0.0367,
+        "level": 0.0106
+      },
+      "top_feature": "total_courses"
+    },
+    "B_teacher": {
+      "k": 4,
+      "silhouette": 0.195515,
+      "min_cluster_share": 0.2,
+      "block_explained_share": {
+        "engagement": 0.2696,
+        "behavioural": 0.2677,
+        "category": 0.0414,
+        "level": 0.2605,
+        "teacher": 0.1607
+      },
+      "top_feature": "teacher_loyalty"
+    },
+    "B_no_level": {
+      "k": 4,
+      "silhouette": 0.187723,
+      "min_cluster_share": 0.0717,
+      "block_explained_share": {
+        "engagement": 0.3767,
+        "behavioural": 0.4419,
+        "category": 0.1814
+      },
+      "top_feature": "cat_share_digital_marketing"
+    }
+  },
+  "EXP-011_variants": {
+    "k": 4,
+    "arms": [
+      {
+        "representation": "B_proportion",
+        "variant": "B",
+        "n_features": 25,
+        "silhouette": 0.1946,
+        "intra_cluster_similarity": 0.416343,
+        "min_cluster_share": 0.197,
+        "seed_stability_ari": 0.999587,
+        "mean_bootstrap_jaccard": 0.9985,
+        "n_unstable_clusters": 0,
+        "demographic_share": 0.0,
+        "top_feature": "preflevel_Intermediate"
+      },
+      {
+        "representation": "A_proportion",
+        "variant": "A",
+        "n_features": 27,
+        "silhouette": 0.172857,
+        "intra_cluster_similarity": 0.414551,
+        "min_cluster_share": 0.197,
+        "seed_stability_ari": 1.0,
+        "mean_bootstrap_jaccard": 0.9909,
+        "n_unstable_clusters": 0,
+        "demographic_share": 0.0004,
+        "top_feature": "preflevel_Intermediate"
+      }
+    ],
+    "ari_between_variants": 1.0,
+    "decision_rule": "Reject Variant A if the demographic block explains more than 40% of between-cluster variance. Otherwise prefer Variant B on ties, since it is simpler, more privacy-respecting and more actionable. The downstream recommendation check (EXP-023) can still overturn this in Phase 3B."
+  },
+  "EXP-014_teacher": {
+    "k": 4,
+    "arms": [
+      {
+        "representation": "B_proportion",
+        "n_features": 25,
+        "silhouette": 0.1946,
+        "intra_cluster_similarity": 0.416343,
+        "min_cluster_share": 0.197,
+        "mean_bootstrap_jaccard": 0.9985,
+        "teacher_block_share": 0.0,
+        "top_feature": "preflevel_Intermediate"
+      },
+      {
+        "representation": "B_teacher",
+        "n_features": 28,
+        "silhouette": 0.195515,
+        "intra_cluster_similarity": 0.415378,
+        "min_cluster_share": 0.2,
+        "mean_bootstrap_jaccard": 0.9891,
+        "teacher_block_share": 0.1607,
+        "top_feature": "teacher_loyalty"
+      }
+    ],
+    "ari_core_vs_teacher": 0.990438,
+    "decision_rule": "Retain teacher features only on defensible evidence of improvement (CLAUDE.md \u00a711). Teacher Age and Gender are excluded before experimentation (D-016)."
+  },
+  "EXP-011g_level_ablation": {
+    "k": 4,
+    "arms": [
+      {
+        "representation": "B_proportion",
+        "n_features": 25,
+        "silhouette": 0.1946,
+        "intra_cluster_similarity": 0.416343,
+        "min_cluster_share": 0.197,
+        "mean_bootstrap_jaccard": 0.9985,
+        "n_unstable_clusters": 0,
+        "block_explained_share": {
+          "engagement": 0.3204,
+          "behavioural": 0.3186,
+          "category": 0.0497,
+          "level": 0.3113
+        },
+        "top_feature": "preflevel_Intermediate"
+      },
+      {
+        "representation": "B_no_level",
+        "n_features": 22,
+        "silhouette": 0.187723,
+        "intra_cluster_similarity": 0.42724,
+        "min_cluster_share": 0.0717,
+        "mean_bootstrap_jaccard": 0.6558,
+        "n_unstable_clusters": 1,
+        "block_explained_share": {
+          "engagement": 0.3767,
+          "behavioural": 0.4419,
+          "category": 0.1814
+        },
+        "top_feature": "cat_share_digital_marketing"
+      }
+    ],
+    "ari_with_vs_without_level": 0.253277,
+    "no_level_profiles": {
+      "0": {
+        "n_learners": 528,
+        "share": 0.1992,
+        "age_mean": 24.83,
+        "age_median": 25.0,
+        "pct_female": 50.95,
+        "total_courses_mean": 9.5947,
+        "diversity_score_mean": 6.8087,
+        "avg_courses_per_category_mean": 1.4593,
+        "enrollment_frequency_mean": 0.0436,
+        "activity_span_days_mean": 225.7538,
+        "avg_course_rating_mean": 3.119,
+        "avg_spend_mean": 94.2244,
+        "diversity_ratio_mean": 0.705,
+        "learning_depth_index_mean": 0.9828,
+        "free_ratio_mean": 0.6245,
+        "category_entropy_mean": 2.5066,
+        "top_category_share_mean": 0.3014,
+        "recency_days_mean": 31.5966,
+        "n_teachers_mean": 2.0379,
+        "teacher_loyalty_mean": 0.7263,
+        "avg_teacher_rating_mean": 4.6346,
+        "top_categories": "Artificial Intelligence 17%, Business 12%, Data Science 12%",
+        "level_mix": "Advanced 45%, Beginner 39%, Intermediate 16%",
+        "category_profile": "data science 9%, web development 9%, finance 9%"
+      },
+      "1": {
+        "n_learners": 587,
+        "share": 0.2215,
+        "age_mean": 24.64,
+        "age_median": 25.0,
+        "pct_female": 49.74,
+        "total_courses_mean": 1.3288,
+        "diversity_score_mean": 1.3288,
+        "avg_courses_per_category_mean": 1.0,
+        "enrollment_frequency_mean": 0.7557,
+        "activity_span_days_mean": 27.9387,
+        "avg_course_rating_mean": 2.936,
+        "avg_spend_mean": 270.4334,
+        "diversity_ratio_mean": 1.0,
+        "learning_depth_index_mean": 0.9692,
+        "free_ratio_mean": 0.097,
+        "category_entropy_mean": 0.2995,
+        "top_category_share_mean": 0.8586,
+        "recency_days_mean": 126.7172,
+        "n_teachers_mean": 1.3169,
+        "teacher_loyalty_mean": 0.0051,
+        "avg_teacher_rating_mean": 2.5941,
+        "top_categories": "Artificial Intelligence 26%, Business 19%, Project Management 14%",
+        "level_mix": "Advanced 38%, Beginner 37%, Intermediate 25%",
+        "category_profile": "artificial intelligence 19%, project management 17%, business 16%"
+      },
+      "2": {
+        "n_learners": 1345,
+        "share": 0.5075,
+        "age_mean": 25.17,
+        "age_median": 25.0,
+        "pct_female": 51.08,
+        "total_courses_mean": 1.4007,
+        "diversity_score_mean": 1.4007,
+        "avg_courses_per_category_mean": 1.0,
+        "enrollment_frequency_mean": 0.7295,
+        "activity_span_days_mean": 31.2342,
+        "avg_course_rating_mean": 3.1663,
+        "avg_spend_mean": 10.3841,
+        "diversity_ratio_mean": 1.0,
+        "learning_depth_index_mean": 1.0437,
+        "free_ratio_mean": 0.9032,
+        "category_entropy_mean": 0.3489,
+        "top_category_share_mean": 0.8399,
+        "recency_days_mean": 126.3569,
+        "n_teachers_mean": 1.3888,
+        "teacher_loyalty_mean": 0.0044,
+        "avg_teacher_rating_mean": 2.7575,
+        "top_categories": "Cybersecurity 14%, Design 13%, Machine Learning 12%",
+        "level_mix": "Advanced 43%, Beginner 31%, Intermediate 26%",
+        "category_profile": "machine learning 13%, design 12%, cybersecurity 11%"
+      },
+      "3": {
+        "n_learners": 190,
+        "share": 0.0717,
+        "age_mean": 24.63,
+        "age_median": 24.5,
+        "pct_female": 50.53,
+        "total_courses_mean": 1.3789,
+        "diversity_score_mean": 1.3632,
+        "avg_courses_per_category_mean": 1.0132,
+        "enrollment_frequency_mean": 0.6581,
+        "activity_span_days_mean": 37.2684,
+        "avg_course_rating_mean": 3.5271,
+        "avg_spend_mean": 68.448,
+        "diversity_ratio_mean": 0.993,
+        "learning_depth_index_mean": 0.9307,
+        "free_ratio_mean": 0.6509,
+        "category_entropy_mean": 0.3584,
+        "top_category_share_mean": 0.8228,
+        "recency_days_mean": 135.4211,
+        "n_teachers_mean": 1.3684,
+        "teacher_loyalty_mean": 0.0053,
+        "avg_teacher_rating_mean": 2.8109,
+        "top_categories": "Digital Marketing 81%, Artificial Intelligence 6%, Data Science 5%",
+        "level_mix": "Beginner 43%, Advanced 39%, Intermediate 18%",
+        "category_profile": "digital marketing 82%, artificial intelligence 3%, data science 2%"
+      }
+    },
+    "question": "The reference partition splits learners almost perfectly by course level. Does any structure remain once preferred_level is removed?"
+  },
+  "EXP-011f_volume_dominance": {
+    "eta_squared_total_courses": 0.819843,
+    "ari_clusters_vs_light_heavy_cohort": 0.177044,
+    "note": "ARI against the light/heavy cohort split measures how much of the segmentation is simply the Phase 2 activity-volume bimodality."
+  },
+  "cluster_profiles": {
+    "0": {
+      "n_learners": 715,
+      "share": 0.2698,
+      "age_mean": 25.22,
+      "age_median": 26.0,
+      "pct_female": 49.09,
+      "total_courses_mean": 1.3427,
+      "diversity_score_mean": 1.3399,
+      "avg_courses_per_category_mean": 1.0014,
+      "enrollment_frequency_mean": 0.7448,
+      "activity_span_days_mean": 29.0769,
+      "avg_course_rating_mean": 3.2617,
+      "avg_spend_mean": 102.7013,
+      "diversity_ratio_mean": 0.9991,
+      "learning_depth_index_mean": 0.09,
+      "free_ratio_mean": 0.6742,
+      "category_entropy_mean": 0.3084,
+      "top_category_share_mean": 0.8545,
+      "recency_days_mean": 128.4503,
+      "n_teachers_mean": 1.3357,
+      "teacher_loyalty_mean": 0.003,
+      "avg_teacher_rating_mean": 2.7262,
+      "top_categories": "Artificial Intelligence 17%, Programming 15%, Data Science 13%",
+      "level_mix": "Beginner 100%",
+      "category_profile": "programming 17%, artificial intelligence 13%, data science 11%"
+    },
+    "1": {
+      "n_learners": 522,
+      "share": 0.197,
+      "age_mean": 24.85,
+      "age_median": 25.0,
+      "pct_female": 51.15,
+      "total_courses_mean": 9.6513,
+      "diversity_score_mean": 6.841,
+      "avg_courses_per_category_mean": 1.463,
+      "enrollment_frequency_mean": 0.0435,
+      "activity_span_days_mean": 226.9751,
+      "avg_course_rating_mean": 3.1223,
+      "avg_spend_mean": 93.7721,
+      "diversity_ratio_mean": 0.7033,
+      "learning_depth_index_mean": 0.9762,
+      "free_ratio_mean": 0.6266,
+      "category_entropy_mean": 2.5134,
+      "top_category_share_mean": 0.3008,
+      "recency_days_mean": 31.5115,
+      "n_teachers_mean": 2.0326,
+      "teacher_loyalty_mean": 0.7301,
+      "avg_teacher_rating_mean": 4.6387,
+      "top_categories": "Artificial Intelligence 17%, Business 12%, Data Science 12%",
+      "level_mix": "Advanced 44%, Beginner 39%, Intermediate 16%",
+      "category_profile": "data science 10%, web development 9%, artificial intelligence 9%"
+    },
+    "2": {
+      "n_learners": 881,
+      "share": 0.3325,
+      "age_mean": 24.61,
+      "age_median": 24.0,
+      "pct_female": 50.28,
+      "total_courses_mean": 1.5062,
+      "diversity_score_mean": 1.5017,
+      "avg_courses_per_category_mean": 1.0021,
+      "enrollment_frequency_mean": 0.6366,
+      "activity_span_days_mean": 40.5131,
+      "avg_course_rating_mean": 2.8744,
+      "avg_spend_mean": 77.9612,
+      "diversity_ratio_mean": 0.9986,
+      "learning_depth_index_mean": 1.7719,
+      "free_ratio_mean": 0.6093,
+      "category_entropy_mean": 0.4491,
+      "top_category_share_mean": 0.7905,
+      "recency_days_mean": 121.9285,
+      "n_teachers_mean": 1.479,
+      "teacher_loyalty_mean": 0.009,
+      "avg_teacher_rating_mean": 2.7699,
+      "top_categories": "Design 20%, Business 19%, Machine Learning 9%",
+      "level_mix": "Advanced 100%",
+      "category_profile": "design 18%, business 15%, web development 13%"
+    },
+    "3": {
+      "n_learners": 532,
+      "share": 0.2008,
+      "age_mean": 25.22,
+      "age_median": 26.0,
+      "pct_female": 53.2,
+      "total_courses_mean": 1.2538,
+      "diversity_score_mean": 1.2519,
+      "avg_courses_per_category_mean": 1.0009,
+      "enrollment_frequency_mean": 0.8586,
+      "activity_span_days_mean": 18.282,
+      "avg_course_rating_mean": 3.3924,
+      "avg_spend_mean": 83.4629,
+      "diversity_ratio_mean": 0.9994,
+      "learning_depth_index_mean": 1.003,
+      "free_ratio_mean": 0.7129,
+      "category_entropy_mean": 0.2038,
+      "top_category_share_mean": 0.9111,
+      "recency_days_mean": 133.5263,
+      "n_teachers_mean": 1.2368,
+      "teacher_loyalty_mean": 0.0042,
+      "avg_teacher_rating_mean": 2.6349,
+      "top_categories": "Cybersecurity 19%, Data Science 13%, Artificial Intelligence 12%",
+      "level_mix": "Intermediate 100%",
+      "category_profile": "cybersecurity 17%, data science 13%, machine learning 12%"
+    }
+  },
+  "centroid_deviations": {
+    "0": {
+      "total_courses": -0.4607,
+      "diversity_score": -0.4495,
+      "avg_courses_per_category": -0.416,
+      "activity_span_days": -0.4132,
+      "enrollment_frequency": 0.3185,
+      "avg_course_rating": 0.1347,
+      "category_entropy": -0.4322,
+      "top_category_share": 0.3652,
+      "avg_spend": 0.1095,
+      "total_spend": -0.3425,
+      "diversity_ratio": 0.4521,
+      "learning_depth_index": -1.3023,
+      "free_ratio": 0.0587,
+      "recency_days": 0.2406,
+      "first_interaction_days": -0.2392,
+      "n_teachers": -0.2448,
+      "teacher_loyalty": -0.4738,
+      "avg_teacher_rating": -0.3214,
+      "age": 0.0459
+    },
+    "1": {
+      "total_courses": 1.8271,
+      "diversity_score": 1.7587,
+      "avg_courses_per_category": 1.6928,
+      "activity_span_days": 1.5999,
+      "enrollment_frequency": -1.1581,
+      "avg_course_rating": -0.0097,
+      "category_entropy": 1.6392,
+      "top_category_share": -1.3341,
+      "avg_spend": 0.0389,
+      "total_spend": 1.5003,
+      "diversity_ratio": -1.8393,
+      "learning_depth_index": -0.0437,
+      "free_ratio": -0.0617,
+      "recency_days": -0.9116,
+      "first_interaction_days": 0.9461,
+      "n_teachers": 0.7887,
+      "teacher_loyalty": 1.8948,
+      "avg_teacher_rating": 1.3268,
+      "age": -0.0158
+    },
+    "2": {
+      "total_courses": -0.4157,
+      "diversity_score": -0.3845,
+      "avg_courses_per_category": -0.4129,
+      "activity_span_days": -0.2968,
+      "enrollment_frequency": 0.0906,
+      "avg_course_rating": -0.2667,
+      "category_entropy": -0.3001,
+      "top_category_share": 0.1686,
+      "avg_spend": -0.0861,
+      "total_spend": -0.3712,
+      "diversity_ratio": 0.4484,
+      "learning_depth_index": 1.0862,
+      "free_ratio": -0.1054,
+      "recency_days": 0.1631,
+      "first_interaction_days": -0.1815,
+      "n_teachers": -0.0323,
+      "teacher_loyalty": -0.4544,
+      "avg_teacher_rating": -0.2837,
+      "age": -0.0554
+    },
+    "3": {
+      "total_courses": -0.4852,
+      "diversity_score": -0.4848,
+      "avg_courses_per_category": -0.4181,
+      "activity_span_days": -0.523,
+      "enrollment_frequency": 0.5581,
+      "avg_course_rating": 0.2701,
+      "category_entropy": -0.5305,
+      "top_category_share": 0.5389,
+      "avg_spend": -0.0426,
+      "total_spend": -0.397,
+      "diversity_ratio": 0.4545,
+      "learning_depth_index": -0.0057,
+      "free_ratio": 0.1563,
+      "recency_days": 0.301,
+      "first_interaction_days": -0.3063,
+      "n_teachers": -0.3914,
+      "teacher_loyalty": -0.4701,
+      "avg_teacher_rating": -0.4001,
+      "age": 0.0455
+    }
+  },
+  "derived_labels": {
+    "0": {
+      "label": "Beginner-level Single-course learners",
+      "evidence": [
+        {
+          "feature": "learning_depth_index",
+          "deviation": -1.302,
+          "phrase": "Beginner-leaning"
+        },
+        {
+          "feature": "total_courses",
+          "deviation": -0.461,
+          "phrase": "Single-course"
+        },
+        {
+          "feature": "preferred_level",
+          "deviation": null,
+          "phrase": "100% prefer Beginner"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 1.0,
+      "dominant_level": "Beginner"
+    },
+    "1": {
+      "label": "Category-repeating High-volume learners",
+      "evidence": [
+        {
+          "feature": "diversity_ratio",
+          "deviation": -1.839,
+          "phrase": "Category-repeating"
+        },
+        {
+          "feature": "total_courses",
+          "deviation": 1.827,
+          "phrase": "High-volume"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 0.4444,
+      "dominant_level": "Advanced"
+    },
+    "2": {
+      "label": "Advanced-level Non-repeating learners",
+      "evidence": [
+        {
+          "feature": "learning_depth_index",
+          "deviation": 1.086,
+          "phrase": "Advanced-leaning"
+        },
+        {
+          "feature": "diversity_ratio",
+          "deviation": 0.448,
+          "phrase": "Non-repeating"
+        },
+        {
+          "feature": "preferred_level",
+          "deviation": null,
+          "phrase": "100% prefer Advanced"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 1.0,
+      "dominant_level": "Advanced"
+    },
+    "3": {
+      "label": "Intermediate-level Single-session Single-course learners",
+      "evidence": [
+        {
+          "feature": "activity_span_days",
+          "deviation": -0.523,
+          "phrase": "Single-session"
+        },
+        {
+          "feature": "total_courses",
+          "deviation": -0.485,
+          "phrase": "Single-course"
+        },
+        {
+          "feature": "preferred_level",
+          "deviation": null,
+          "phrase": "100% prefer Intermediate"
+        }
+      ],
+      "is_neutral": false,
+      "note": "",
+      "level_purity": 1.0,
+      "dominant_level": "Intermediate"
+    }
+  },
+  "category_preference_matrix": {
+    "0": {
+      "Artificial Intelligence": 0.1322,
+      "Business": 0.045,
+      "Cybersecurity": 0.0666,
+      "Data Science": 0.1127,
+      "Design": 0.0509,
+      "Digital Marketing": 0.0966,
+      "Finance": 0.0958,
+      "Machine Learning": 0.0438,
+      "Marketing": 0.0072,
+      "Programming": 0.1696,
+      "Project Management": 0.0953,
+      "Web Development": 0.0843
+    },
+    "1": {
+      "Artificial Intelligence": 0.0868,
+      "Business": 0.0799,
+      "Cybersecurity": 0.078,
+      "Data Science": 0.0956,
+      "Design": 0.0679,
+      "Digital Marketing": 0.0835,
+      "Finance": 0.0856,
+      "Machine Learning": 0.0808,
+      "Marketing": 0.0805,
+      "Programming": 0.0812,
+      "Project Management": 0.0864,
+      "Web Development": 0.0937
+    },
+    "2": {
+      "Artificial Intelligence": 0.0246,
+      "Business": 0.1476,
+      "Cybersecurity": 0.0576,
+      "Data Science": 0.0533,
+      "Design": 0.1787,
+      "Digital Marketing": 0.076,
+      "Finance": 0.0559,
+      "Machine Learning": 0.099,
+      "Marketing": 0.1133,
+      "Programming": 0.0165,
+      "Project Management": 0.0519,
+      "Web Development": 0.1257
+    },
+    "3": {
+      "Artificial Intelligence": 0.0889,
+      "Business": 0.0518,
+      "Cybersecurity": 0.173,
+      "Data Science": 0.1281,
+      "Design": 0.0052,
+      "Digital Marketing": 0.0628,
+      "Finance": 0.1101,
+      "Machine Learning": 0.1237,
+      "Marketing": 0.1005,
+      "Programming": 0.0432,
+      "Project Management": 0.1094,
+      "Web Development": 0.0031
+    }
+  },
+  "cluster_level_composition": {
+    "0": {
+      "Advanced": 0.0,
+      "Beginner": 1.0,
+      "Intermediate": 0.0
+    },
+    "1": {
+      "Advanced": 0.4444,
+      "Beginner": 0.3946,
+      "Intermediate": 0.1609
+    },
+    "2": {
+      "Advanced": 1.0,
+      "Beginner": 0.0,
+      "Intermediate": 0.0
+    },
+    "3": {
+      "Advanced": 0.0,
+      "Beginner": 0.0,
+      "Intermediate": 1.0
+    }
+  },
+  "level_purity": {
+    "0": 1.0,
+    "1": 0.4444,
+    "2": 1.0,
+    "3": 1.0
+  },
+  "sensitivity_full_history": {
+    "n_learners": 3000,
+    "best_k": 8,
+    "best_silhouette": 0.233504,
+    "silhouette_at_chosen_k": 0.196351,
+    "ari_fit_window_vs_full": 0.846509,
+    "sweep": [
+      {
+        "k": 2,
+        "inertia": 62703.9511,
+        "silhouette": 0.181448,
+        "calinski_harabasz": 587.8984,
+        "davies_bouldin": 1.538362,
+        "sizes": {
+          "0": 591,
+          "1": 2409
+        },
+        "min_cluster_share": 0.197,
+        "per_cluster_silhouette": {
+          "0": 0.433132,
+          "1": 0.119702
+        },
+        "intra_cluster_similarity": 0.269132,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 3,
+        "inertia": 55893.7965,
+        "silhouette": 0.174476,
+        "calinski_harabasz": 512.233,
+        "davies_bouldin": 2.202742,
+        "sizes": {
+          "0": 1027,
+          "1": 562,
+          "2": 1411
+        },
+        "min_cluster_share": 0.187333,
+        "per_cluster_silhouette": {
+          "0": 0.176192,
+          "1": 0.429506,
+          "2": 0.071648
+        },
+        "intra_cluster_similarity": 0.362238,
+        "seed_stability_ari": 1.0
+      },
+      {
+        "k": 4,
+        "inertia": 51400.1068,
+        "silhouette": 0.196351,
+        "calinski_harabasz": 458.5287,
+        "davies_bouldin": 2.120771,
+        "sizes": {
+          "0": 841,
+          "1": 1030,
+          "2": 607,
+          "3": 522
+        },
+        "min_cluster_share": 0.174,
+        "per_cluster_silhouette": {
+          "0": 0.127607,
+          "1": 0.162891,
+          "2": 0.130798,
+          "3": 0.449357
+        },
+        "intra_cluster_similarity": 0.384957,
+        "seed_stability_ari": 0.999744
+      },
+      {
+        "k": 5,
+        "inertia": 48383.2788,
+        "silhouette": 0.198008,
+        "calinski_harabasz": 411.9041,
+        "davies_bouldin": 1.991344,
+        "sizes": {
+          "0": 962,
+          "1": 523,
+          "2": 375,
+          "3": 476,
+          "4": 664
+        },
+        "min_cluster_share": 0.125,
+        "per_cluster_silhouette": {
+          "0": 0.156234,
+          "1": 0.438027,
+          "2": 0.102295,
+          "3": 0.161592,
+          "4": 0.149639
+        },
+        "intra_cluster_similarity": 0.482926,
+        "seed_stability_ari": 0.951771
+      },
+      {
+        "k": 6,
+        "inertia": 46786.9098,
+        "silhouette": 0.195618,
+        "calinski_harabasz": 361.0839,
+        "davies_bouldin": 1.997669,
+        "sizes": {
+          "0": 233,
+          "1": 646,
+          "2": 751,
+          "3": 510,
+          "4": 389,
+          "5": 471
+        },
+        "min_cluster_share": 0.077667,
+        "per_cluster_silhouette": {
+          "0": 0.200344,
+          "1": 0.131177,
+          "2": 0.151977,
+          "3": 0.451545,
+          "4": 0.097053,
+          "5": 0.155538
+        },
+        "intra_cluster_similarity": 0.474804,
+        "seed_stability_ari": 0.810799
+      },
+      {
+        "k": 7,
+        "inertia": 44963.3692,
+        "silhouette": 0.200937,
+        "calinski_harabasz": 333.2329,
+        "davies_bouldin": 1.974777,
+        "sizes": {
+          "0": 133,
+          "1": 267,
+          "2": 512,
+          "3": 349,
+          "4": 497,
+          "5": 671,
+          "6": 571
+        },
+        "min_cluster_share": 0.044333,
+        "per_cluster_silhouette": {
+          "0": 0.46669,
+          "1": 0.189467,
+          "2": 0.103067,
+          "3": 0.102416,
+          "4": 0.457738,
+          "5": 0.135257,
+          "6": 0.146038
+        },
+        "intra_cluster_similarity": 0.468998,
+        "seed_stability_ari": 0.636408
+      },
+      {
+        "k": 8,
+        "inertia": 42178.9133,
+        "silhouette": 0.233504,
+        "calinski_harabasz": 332.5991,
+        "davies_bouldin": 1.808205,
+        "sizes": {
+          "0": 614,
+          "1": 155,
+          "2": 505,
+          "3": 418,
+          "4": 792,
+          "5": 173,
+          "6": 155,
+          "7": 188
+        },
+        "min_cluster_share": 0.051667,
+        "per_cluster_silhouette": {
+          "0": 0.090541,
+          "1": 0.429025,
+          "2": 0.461793,
+          "3": 0.129543,
+          "4": 0.105918,
+          "5": 0.41297,
+          "6": 0.450144,
+          "7": 0.350869
+        },
+        "intra_cluster_similarity": 0.394952,
+        "seed_stability_ari": 0.611835
+      },
+      {
+        "k": 9,
+        "inertia": 40131.3502,
+        "silhouette": 0.250064,
+        "calinski_harabasz": 324.8462,
+        "davies_bouldin": 1.650424,
+        "sizes": {
+          "0": 881,
+          "1": 127,
+          "2": 612,
+          "3": 156,
+          "4": 490,
+          "5": 134,
+          "6": 126,
+          "7": 126,
+          "8": 348
+        },
+        "min_cluster_share": 0.042,
+        "per_cluster_silhouette": {
+          "0": 0.110107,
+          "1": 0.490177,
+          "2": 0.086375,
+          "3": 0.440335,
+          "4": 0.475916,
+          "5": 0.463278,
+          "6": 0.422803,
+          "7": 0.577368,
+          "8": 0.138165
+        },
+        "intra_cluster_similarity": 0.405549,
+        "seed_stability_ari": 0.554086
+      },
+      {
+        "k": 10,
+        "inertia": 37629.0305,
+        "silhouette": 0.270527,
+        "calinski_harabasz": 329.9438,
+        "davies_bouldin": 1.648293,
+        "sizes": {
+          "0": 583,
+          "1": 209,
+          "2": 157,
+          "3": 168,
+          "4": 489,
+          "5": 170,
+          "6": 739,
+          "7": 131,
+          "8": 191,
+          "9": 163
+        },
+        "min_cluster_share": 0.043667,
+        "per_cluster_silhouette": {
+          "0": 0.087199,
+          "1": 0.347453,
+          "2": 0.367816,
+          "3": 0.424346,
+          "4": 0.487968,
+          "5": 0.387733,
+          "6": 0.086795,
+          "7": 0.46499,
+          "8": 0.282664,
+          "9": 0.463283
+        },
+        "intra_cluster_similarity": 0.393796,
+        "seed_stability_ari": 0.60399
+      }
+    ]
+  }
+}

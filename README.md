@@ -4,7 +4,7 @@ Learner segmentation and personalised course recommendation for the EduPro
 online learning platform — built as a reproducible, explainable research-grade
 system rather than a single notebook.
 
-> **Project status: Phase 2 of 6 complete — dataset audit and EDA.**
+> **Project status: Phase 3A complete — learner segmentation experiments.**
 > No model has been trained yet. The repository contains the validated
 > environment, the authoritative source materials, a research corpus with 40
 > verified references and 28 pre-registered experiments, and a tested data
@@ -97,7 +97,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **67 passed**. That result confirms the modelling stack is
+A clean run reports **104 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 
@@ -170,7 +170,8 @@ carrying an evidence-backed PASS/FAIL.
 | 0 | Project initialization | ✅ **PASS** |
 | 1 | Research and methodology investigation | ✅ **PASS** |
 | 2 | Dataset audit and EDA | ✅ **PASS** |
-| 3 | ML experimentation | Not started |
+| 3A | ML experimentation — segmentation | ✅ **PASS** |
+| 3B | ML experimentation — recommendation | Not started |
 | 4 | Model selection and architecture freeze | Not started |
 | 5 | Production implementation | Not started |
 | 6 | Validation, documentation, deployment | Not started |
@@ -248,6 +249,9 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | [`research/production_research.md`](research/production_research.md) | Artifacts, deployment, testing strategy |
 | [`research/experiment_plan.md`](research/experiment_plan.md) | 8 research questions, 28 experiments |
 | [`research/dataset_audit.md`](research/dataset_audit.md) | **Full forensic data-quality report and EDA findings** |
+| [`research/segmentation_results.md`](research/segmentation_results.md) | All segmentation experiments, including the negative results |
+| [`research/segmentation_feature_decision.md`](research/segmentation_feature_decision.md) | The chosen representation and its reversal conditions |
+| [`research/cluster_profiles.md`](research/cluster_profiles.md) | The four segments, with limitations |
 | [`references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md`](references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md) | Verbatim transcript of the official brief |
 | `research/PHASE_N_COMPLETE.md` | Per-phase report with PASS/FAIL and evidence |
 
@@ -272,6 +276,8 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | `scripts/analytical_baselines.py` | Random-ranker and Precision@K ceiling reference values implied by the 60-course catalogue |
 | `scripts/run_data_audit.py` | EXP-001…006 plus permutation signal detection → `artifacts/phase2_audit.json` |
 | `scripts/generate_eda_figures.py` | The ten EDA figures → `artifacts/eda/` |
+| `scripts/run_segmentation_experiments.py` | EXP-010…014 → `artifacts/segmentation/segmentation_results.json` |
+| `scripts/generate_segmentation_figures.py` | The ten segmentation figures → `artifacts/segmentation/` |
 
 Both scripts re-verify the source checksum after reading, so even the inspection
 tooling proves it did not mutate its input.

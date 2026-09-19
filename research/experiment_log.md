@@ -63,6 +63,17 @@ completes — never in advance.
 | EXP-004 | 2 | Temporal coverage and split viability | **Hypothesis confirmed** — Protocol A viable (791 ≥ 300) | 19 Sep 2026 |
 | EXP-005 | 2 | Is `TeacherID` an alias for `CourseID`? | **Hypothesis REFUTED** — 887 pairs, not a bijection. EXP-014 proceeds | 19 Sep 2026 |
 | EXP-006 | 2 | Feature distributions; synthetic-data assessment | **Hypothesis confirmed and extended** — near-uniform throughout; **no course-choice signal** | 19 Sep 2026 |
+| EXP-010 | 3A | Cluster-count sweep: elbow, silhouette, CH, DB | **k=4** by the pre-registered rule; elbow uninformative | 19 Sep 2026 |
+| EXP-010b | 3A | Gap statistic | **Instrument failed** — monotone to k=20, no verdict | 19 Sep 2026 |
+| EXP-010c | 3A | GMM/BIC cross-check | Selects the range maximum; no interior optimum | 19 Sep 2026 |
+| EXP-011 | 3A | Variant A vs Variant B | **ARI 1.000** — demographics change nothing. Variant B | 19 Sep 2026 |
+| EXP-011a | 3A | Encoding comparison | **Phase 1 dominance prediction refuted at k=4** | 19 Sep 2026 |
+| EXP-011c | 3A | Feature-dominance diagnostic | Level 31.1%, demographics 0.04% | 19 Sep 2026 |
+| EXP-011f | 3A | History-length dominance | eta^2 = 0.820, but ARI vs cohort split only 0.177 | 19 Sep 2026 |
+| EXP-011g | 3A | Level ablation *(added post-hoc)* | **Decisive** — the stable structure *is* the level split | 19 Sep 2026 |
+| EXP-012 | 3A | Hierarchical validation | **Negative** — average linkage agrees at ARI 0.019 | 19 Sep 2026 |
+| EXP-013 | 3A | Cluster stability | All four clusters >=0.98 bootstrap Jaccard | 19 Sep 2026 |
+| EXP-014 | 3A | Core vs core + teacher signals | **Rejected** — +0.0009 silhouette, ARI 0.990 | 19 Sep 2026 |
 
 Phase 0 was project initialization: **environment validation**, not
 experimentation, so it produced no entries. Those checks are recorded in
@@ -206,7 +217,165 @@ V8. Phase 3 expectations revised (below). **Q-8 answered.**
 
 ---
 
-## Pre-registered expectations — status after Phase 2
+## Phase 3A results
+
+Full detail in `research/segmentation_results.md`; machine-readable record in
+`artifacts/segmentation/segmentation_results.json`. Reproduce with
+`python scripts/run_segmentation_experiments.py` (seed 42).
+
+**Window:** the fit window — 2,650 learners, 7,992 interactions before the
+pre-registered 2025-10-18 test cut, so assignments can feed Phase 3B without
+leaking (control L4).
+
+### EXP-010 — Cluster-count selection
+| Field | Value |
+| --- | --- |
+| Hypothesis | A modest k (3-6) optimises silhouette; the elbow is ambiguous. |
+| Method | K-Means (k-means++, n_init=10) for k=2..10; inertia, silhouette, CH, DB, sizes, intra-cluster similarity, 5-seed ARI. |
+
+**Result:** the elbow has no knee. Silhouette rises monotonically from 0.177 (k=2)
+to 0.269 (k=10). Unconstrained, it would select k=10.
+
+Applying both pre-registered constraints — every cluster >=5% of learners **and**
+every cluster bootstrap Jaccard >=0.60 — only k = 2, 3, 4 qualify. **k = 4** has
+the highest silhouette among them (0.1946).
+
+**Interpretation:** the hypothesis about the elbow was right. The silhouette
+hypothesis was right about the range but for the wrong reason: a modest k wins
+because larger k fragments, not because silhouette peaks there.
+
+**Decision:** k = 4.
+
+---
+
+### EXP-010b — Gap statistic — **the instrument failed**
+| Field | Value |
+| --- | --- |
+| Hypothesis | The gap statistic indicates k >= 2, i.e. structure exists. |
+| Method | Tibshirani-Walther-Hastie gap over k=1..20, 50 uniform reference datasets. |
+
+**Result:** the gap rises **monotonically** across the whole range and never turns
+over. No interior optimum.
+
+**Interpretation:** the uniform bounding-box reference is a poor null for discrete,
+bounded, bimodal features. The statistic returns **no verdict** — it does not
+endorse k=20. This is reported as a failed instrument rather than dropped.
+
+**Consequence:** this project has **no criterion capable of falsifying the
+existence of cluster structure.** A genuine limitation, recorded for the research
+paper. GMM/BIC (EXP-010c) also selects the range maximum, consistent with "more
+components always fit better".
+
+---
+
+### EXP-011 — Variant A vs Variant B — **demographics change nothing**
+| Field | Value |
+| --- | --- |
+| Hypothesis | Variant B is no worse and more actionable; demographics risk dominating. |
+
+**Result:** **ARI between the two partitions = 1.000.** They are identical.
+Demographic block share of between-cluster variance = **0.0004**. Silhouette
+0.1946 (B) vs 0.1729 (A).
+
+**Interpretation:** demographics do not merely fail to dominate — they are
+invisible. The slight silhouette drop is the geometric cost of two uninformative
+dimensions. This confirms Phase 2 at the modelling level.
+
+**Decision:** **Variant B** by the pre-registered tie rule. Age and gender retained
+for evaluation stratification in Phase 3B only.
+
+---
+
+### EXP-011a — Encoding comparison — **Phase 1 prediction refuted**
+**Result (at the common selected k=4):** category block share is **5.0%**
+(proportion vector) and **3.7%** (one-hot). Neither dominates; one-hot is
+marginally lower.
+
+**Interpretation:** Phase 1 predicted 12 one-hot columns would swamp the distance
+metric. **Wrong at k=4** — level and volume swamp them instead. The mechanism is
+real at higher k (46.3% for `A_proportion` at k=9; 58.3% for `B_decorrelated` at
+k=10), so the reasoning was sound but does not apply at the selected k.
+
+**Also found:** `B_robust_scaled` posted silhouette **0.716**, three times any other
+arm. Investigated rather than accepted: two mandated features have **IQR exactly
+zero** (54% of learners have one course, so their quartiles coincide), and
+RobustScaler leaves those unscaled while compressing the rest. A scaling
+pathology, not a better representation.
+
+**Decision:** proportion encoding (on interpretability grounds, not dominance) and
+**StandardScaler** — settling the D5 choice deferred in Phase 1.
+
+---
+
+### EXP-011g — Level ablation *(added post-hoc)* — **decisive**
+Added after the first run showed three of four clusters were 100% one course level.
+Recorded as a post-hoc addition, not presented as planned.
+
+| | With level | Without level |
+| --- | --- | --- |
+| Silhouette | 0.1946 | 0.1877 |
+| Mean bootstrap Jaccard | **0.999** | **0.656** |
+| Unstable clusters | **0** | **1** |
+
+**ARI with vs without: 0.253.**
+
+**Interpretation:** removing `preferred_level` produces an almost entirely
+different, unstable partition. **The stable structure in this dataset *is* the
+course-level split.**
+
+---
+
+### EXP-012 — Hierarchical validation — **negative result**
+**Result:** ARI K-Means vs Ward **0.350**; vs average linkage **0.019**. Average
+linkage collapses 91% of learners into one cluster (21 / 110 / 113 / 2,406).
+
+**Interpretation:** Ward shares K-Means's objective family, so 0.350 is already
+weak confirmation — and it is modest even by that standard. Average linkage, which
+optimises something different, agrees essentially not at all. **The structure is
+not algorithm-independent.**
+
+---
+
+### EXP-013 — Cluster stability
+**Result:** per-cluster bootstrap Jaccard at k=4: **0.983 / 0.996 / 0.996 / 0.981**
+(100 resamples). Subsample consensus ARI **0.987**. Seed ARI **1.000**.
+
+Stability collapses beyond k=4: 1 unstable cluster at k=5, 2 at k=6, 5 at k=7, 6 at
+k=8 and k=9.
+
+**Interpretation:** the cliff between k=4 and k=5 is the clearest signal in the
+entire selection.
+
+**Process correction:** the first run selected k=6 because the implementation
+applied the size constraint and measured stability *afterwards*. Two of those six
+clusters scored 0.33 and 0.54. Applying the rule as written, over every candidate
+k, changed the answer to **k=4**. A constraint evaluated after the choice is not a
+constraint.
+
+---
+
+### EXP-014 — Teacher signal — **rejected**
+| | Core | Core + teacher |
+| --- | --- | --- |
+| Silhouette | 0.1946 | 0.1955 (**+0.0009**) |
+| Mean bootstrap Jaccard | **0.999** | 0.989 |
+| Teacher block share | — | 16.1% |
+
+**ARI core vs teacher: 0.990.**
+
+**Interpretation:** `teacher_loyalty` becomes the most explanatory single feature
+yet barely moves the partition, because it correlates **+0.963** with
+`total_courses` (Phase 2) and is zero by construction for single-course learners.
+Its eta-squared reflects that correlation, not new information.
+
+**Decision:** not retained for segmentation. §11 requires defensible evidence of
+improvement; +0.0009 silhouette with a worse stability profile is not that. The
+rejection is scoped to segmentation — instructor loyalty remains a live candidate
+for the Phase 3B recommender.
+
+---
+
+## Pre-registered expectations — status after Phase 3A
 
 Phase 1 recorded seven predictions before any data was examined. Comparing them
 against evidence is itself part of the record.
@@ -216,8 +385,8 @@ against evidence is itself part of the record.
 | P-1 | Popularity hard to beat | Popularity near-uniform, Gini 0.042 | **Revised** — popularity ≈ random; hard to beat *because it is weak*, not strong |
 | P-2 | Item-based CF strongest | Co-occurrence *below* the null | **Revised** — expect ≈ random |
 | P-3 | Hybrid wins by a small margin | — | Unchanged; awaiting EXP-024 |
-| P-4 | Cluster structure weak; gap may say k=1 | Volume dominates; choice is random | **Strengthened** |
-| P-5 | Variant B preferred | Demographics independent of choice | **Strengthened** |
+| P-4 | Cluster structure weak; gap may say k=1 | Silhouette 0.195 at k=4 is weak, as predicted. But the gap statistic **failed** — it could not deliver any verdict, so the k=1 half is untestable with this instrument | **Half-confirmed, half-untestable** |
+| P-5 | Variant B preferred | **CONFIRMED** — ARI 1.000, demographic share 0.0004 | **Confirmed (EXP-011)** |
 | P-6 | Teacher signals add nothing; EXP-005 may cancel | EXP-005 refuted the cancellation; teacher reuse is the only real signal, but 1.10× on next-course | **Half-refuted, now genuinely uncertain** |
 | P-7 | Coverage separates methods more than accuracy | — | Unchanged; awaiting EXP-019–024 |
 
