@@ -1492,7 +1492,11 @@ sign-in** button on a signed-out landing page. No sign-in was attempted.
 ## Phase 6E follow-up — the first deployment (20 September 2026)
 
 ### D-072 — Hashed artifacts must be byte-identical across platforms
-**Status:** Settled by a production failure. The most instructive defect in the project.
+**Status:** Fixed — but **the root cause named here was wrong. See D-075.**
+The line-ending defect below was real and its fix stands; it was not what broke
+the deployment. The manifest's path separators were. Left unedited, because a
+corrected record should show what was believed, on what evidence, and why it
+was not enough.
 
 **What happened.** The first public deployment built and ran, and every page showed
 "Model artifacts not found" — the empty state meant for a repository with no model
@@ -1573,6 +1577,47 @@ misdiagnose their own cause, and both are more expensive than no message at all,
 because a confident wrong explanation is acted upon. This project's own audit
 caught the first instance in the recommender and missed the second in the page
 that reports the audit's subject.
+
+---
+
+### D-075 — The manifest records POSIX paths, and the checks read them verbatim
+**Status:** Fixed. **Supersedes the root-cause claim in D-072.**
+
+`_manifest_key` used `str(Path)`, which emits the *platform* separator, so the
+manifest written on Windows recorded `models\scaler.joblib`. On Linux that is not
+a path: it is a single filename containing a backslash. Every one of the twelve
+artifacts resolved to nothing, `check_integrity` reported them all as **missing**,
+and the deployed app served its empty state on every page.
+
+Manifest keys are now written with `as_posix()`, and `resolve_manifest_key()`
+reads either spelling so an existing set does not become unreadable.
+
+**What this corrects.** D-072 attributed the failed deployment to `.gitattributes`
+line-ending normalisation. That defect was real -- three JSON artifacts genuinely
+hashed differently as CRLF and LF -- and fixing it was right. It was **not** the
+cause of the failure. The files were reported missing before a single hash was
+compared, so the line-ending mismatch was never reached. D-072's diagnosis was
+plausible, was supported by real evidence, and was wrong.
+
+**Why three independent checks all passed while the app failed.** The readiness
+probe 3c, the Finding 4 regression tests and the fresh-clone verification each
+wrote `rel.replace("\\", "/")` before using the key. Individually the
+normalisation is defensible -- git speaks POSIX, so a git lookup needs it.
+Collectively it meant that **no check ever saw the separator the application
+itself would use**. Three checks, one shared assumption, and the assumption was
+the defect.
+
+This is the same error as the one D-072 recorded, one level up. There, the check
+ran on the machine that produced the artifact. Here, the check repaired its input
+before testing it. Both are ways of verifying something other than what ships.
+Probe **3d** and four regression tests now read the key exactly as stored, and
+the fix was confirmed by resolving all twelve keys against `git ls-files` with no
+normalisation at any step.
+
+**What found it.** Not a test -- the empty-state diagnostic from D-073 and D-074.
+The failure had been invisible for two deployments because the page said "not
+found" and showed no detail. The first build that could describe itself named the
+cause in one line.
 
 ---
 

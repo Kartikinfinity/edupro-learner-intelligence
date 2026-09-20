@@ -2,11 +2,11 @@
 
 **Application:** EduPro learner segmentation and course recommendation dashboard
 **Repository:** <https://github.com/Kartikinfinity/edupro-learner-intelligence>
-**Model version:** `edupro-1.0.0` · artifact set `d997e9092047`
+**Model version:** `edupro-1.0.0` · artifact set `6892a4f9ef27`
 **Platform:** Streamlit Community Cloud. **No Docker** (CLAUDE.md §20).
 
 **Live app:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
-**Readiness:** audited by `scripts/deployment_readiness.py` — **24 of 24 checks pass**.
+**Readiness:** audited by `scripts/deployment_readiness.py` — **25 of 25 checks pass**.
 
 > **Deployed.** The app is live at the URL above. Creating it required signing in
 > to <https://share.streamlit.io> with the GitHub account that owns the
@@ -151,47 +151,56 @@ nothing to configure and nothing that can be left misconfigured.
 
 ## 6. Troubleshooting
 
-### 6.1 The failure this deployment actually hit
+### 6.1 The failures this deployment actually hit
 
-**Symptom.** The app built and ran, the navigation rendered — and every page showed
-**"Model artifacts not found"**, the empty state meant for a repository with no
-model in it. The artifacts were committed and present.
+It failed twice, for two different reasons, and the second is the instructive one.
 
-**Cause.** The manifest records a SHA-256 of every artifact and the loader
-re-hashes them at startup. Three artifacts are JSON, and `.gitattributes` applied
-`* text=auto`, so git stored them with LF and checked them out with **CRLF on
-Windows**. The hashes were therefore recorded against CRLF bytes, the Linux runner
-received LF bytes, and `check_integrity` correctly reported the files as changed.
-The integrity check was not wrong — the artifact set genuinely was not
-byte-identical to the one that had been hashed.
+**Symptom (both times).** The app built and ran, navigation rendered — and every
+page showed the artifacts empty state. The artifacts were committed and present.
 
-**Why the readiness audit missed it.** It ran `check_integrity` against the
-Windows working copy, where the hashes match by construction. The audit's own
-docstring claimed to test "failures invisible on the development machine" and then
-missed one of exactly that kind.
+#### The real cause: Windows path separators in the manifest
 
-**Fix, in three parts:**
+`_manifest_key()` built each key with `str(Path)`, which emits the **platform**
+separator, so the manifest written on Windows recorded `models\scaler.joblib`. On
+Linux that is not a path — it is one filename containing a backslash — so all
+twelve artifacts resolved to nothing and `check_integrity` reported every one of
+them **missing**.
 
-1. `.gitattributes` marks `models/*.json` and `artifacts/production/*.json` as
-   `-text`, so git never rewrites their bytes at checkout.
-2. The pipeline writes every JSON artifact with an explicit LF newline (the `LF`
-   constant in `src/edupro/persistence.py`), so the bytes are the same whichever
-   platform produced them.
-3. A new probe (**3c**) and three regression tests compare the manifest against
-   what **git** stores, not against the working copy — which is the only comparison
-   that could have caught this.
+**Fix.** Keys are written with `as_posix()`. `resolve_manifest_key()` reads either
+spelling, so an older artifact set does not become unreadable.
 
-**If you see this symptom again**, the page now tells you which failure it is.
-Two things changed after the first deployment:
+#### The first diagnosis, which was wrong
 
-- The loader's actual error is printed on the empty-state page. The first failure
-  showed nothing, because the diagnostic was written to `st.session_state` from
-  inside a `@st.cache_resource` function, where it does not survive to the
-  rendering session. It is now a module-level value.
-- The heading names the real cause. "Model artifacts failed their integrity
-  check", "came from a different environment" and "not found" are three different
-  problems with three different fixes, and the first deployment showed the wrong
-  one of the three.
+`.gitattributes` applied `* text=auto`, so the three JSON artifacts were stored LF
+and checked out CRLF on Windows; their recorded hashes could not match what a
+Linux runner received. **That defect was real and its fix stands** — but it was not
+the cause. Files are reported missing before any hash is compared, so the
+line-ending mismatch was never reached.
+
+#### Why three checks passed while the app was broken
+
+The readiness probe 3c, the regression tests and a fresh-clone verification all
+passed. Each contained `rel.replace("\\", "/")` — defensible individually, since
+git speaks POSIX, but together it meant no check ever saw the separator the
+application would use. Probe **3d** and four regression tests now read manifest
+keys **verbatim**.
+
+**The general lesson.** A check that runs where the artifact was produced can only
+confirm it was produced. A check that repairs its input can only confirm the repair
+works. Neither tests what ships.
+
+#### What found it
+
+Not a test — the empty-state diagnostic. Two deployments failed invisibly because
+the page said "not found" and showed nothing else. Two changes fixed that:
+
+- The loader's actual error is printed. It had been written to `st.session_state`
+  from inside a `@st.cache_resource` function, where it does not survive to the
+  rendering session.
+- The heading names the real cause. "Failed their integrity check", "came from a
+  different environment" and "not found" are three problems with three fixes.
+
+The first build that could describe itself named the cause in one line.
 
 ### 6.2 Other symptoms
 
@@ -259,7 +268,7 @@ python scripts/recommend.py --describe
 | 10c | Entry point exists | ✅ `app/streamlit_app.py` |
 | 11 | No file over GitHub's limit | ✅ 13 MB total, largest file 3.1 MB |
 
-**24 of 24 pass.**
+**25 of 25 pass.**
 
 Three of these exist because they catch failures invisible on the development
 machine: Linux **case sensitivity** (Windows treats `Models/` and `models/` as the
@@ -273,14 +282,17 @@ git-ignored), and **public error disclosure**.
 | | |
 | --- | --- |
 | Repository pushed | ✅ `main` at `Kartikinfinity/edupro-learner-intelligence` |
-| Readiness audit | ✅ **24 of 24** |
+| Readiness audit | ✅ **25 of 25** |
 | App created on Community Cloud | ✅ Deployed 20 September 2026 |
 | **Public URL** | **<https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>** |
 | First deployment | ❌ Failed — artifacts rejected by their own integrity check (§6.1) |
-| Fix pushed | ✅ Commit `64532da`; artifact bytes are now platform-independent |
-| Fix verified | ✅ A fresh `git clone` of that commit reproduces **12 of 12** recorded hashes, with no CRLF in any JSON artifact |
-| Hosted build carrying the fix | ⏳ **Not yet.** The live page still shows the pre-fix empty state, so Community Cloud has not rebuilt. **Reboot app** from the dashboard (§6.2) |
+| First fix (line endings) | ✅ Real defect, fixed — but not the cause (§6.1) |
+| Second deployment | ❌ Failed — all twelve artifacts reported missing; manifest recorded Windows path separators |
+| Second fix (POSIX keys) | ✅ Pushed; artifact set `6892a4f9ef27` |
+| Fix verified | ✅ All 12 manifest keys matched against `git ls-files` **verbatim**, with no separator repair at any step |
+| Model affected | ✅ No — retraining reproduced identical segments (841 / 1,030 / 607 / 522) and tiers |
+| Hosted build carrying the second fix | ⏳ Pushed; Community Cloud rebuilt within minutes on the previous push. Open the URL to confirm; if it still shows an artifacts page, **Reboot app** (§6.2) |
 
-The URL above is the real one, recorded only after the app existed. The last row is
-the honest state of the hosted build, not a prediction: the pushed code always
-renders the loader's error on a failed load, and the live page does not.
+The URL is real and was recorded only after the app existed. The last row states
+what was pushed, not what was observed — those are kept separate deliberately,
+because the first fix was verified three ways and was still not the cause.

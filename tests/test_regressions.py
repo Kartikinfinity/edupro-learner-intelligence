@@ -267,3 +267,64 @@ def test_an_integrity_failure_is_not_reported_as_a_missing_file():
     assert "not found" not in heading.lower()
     assert "not found" not in cause.lower()
     assert "integrity" in heading.lower()
+
+
+# ---------------------------------------------------------------------------
+# Finding 6 (critical) — the manifest recorded Windows paths, and every check
+# normalised them away before looking
+# ---------------------------------------------------------------------------
+# `_manifest_key` used `str(Path)`, which emits the *platform* separator, so the
+# manifest written on Windows recorded `models\scaler.joblib`. On Linux that is
+# not a path: it is one filename containing a backslash. Every artifact resolved
+# to nothing, `check_integrity` reported all twelve as missing, and the public
+# deployment served the empty state on every page.
+#
+# This is the finding the Phase 6E audit, probe 3c and the Finding 4 tests all
+# missed, and they missed it the same way: each one called `.replace("\\", "/")`
+# on the manifest key before using it. Three independent checks, one shared
+# assumption, and the assumption was the bug. A check that repairs its input
+# cannot fail on the defect it repairs.
+#
+# So these tests read the key exactly as stored.
+
+
+def test_manifest_keys_use_forward_slashes():
+    """Read verbatim: normalising here is what hid the defect for three checks."""
+    from edupro.persistence import load_manifest
+
+    offenders = [key for key in load_manifest().files if "\\" in key]
+    assert not offenders, (
+        "manifest keys contain Windows separators, which resolve to nothing on "
+        f"Linux and report every artifact as missing: {offenders}"
+    )
+
+
+def test_artifacts_resolve_from_the_manifest_key_without_repair():
+    """Exactly what `check_integrity` does, with no separator fix-up."""
+    from edupro.persistence import load_manifest
+
+    missing = [
+        key for key in load_manifest().files if not (config.PROJECT_ROOT / key).exists()
+    ]
+    assert not missing, f"manifest keys do not resolve as written: {missing}"
+
+
+def test_manifest_key_is_posix_even_for_a_windows_path():
+    """The unit that produced the bad key."""
+    from edupro.pipeline import _manifest_key
+
+    key = _manifest_key(config.MODELS_DIR / "scaler.joblib")
+    assert key == "models/scaler.joblib"
+    assert "\\" not in key
+
+
+def test_a_windows_style_key_still_resolves_on_a_posix_checkout(tmp_path):
+    """Old artifact sets must not become unreadable; the loader reads both."""
+    from edupro.persistence import resolve_manifest_key
+
+    target = tmp_path / "models" / "scaler.joblib"
+    target.parent.mkdir(parents=True)
+    target.write_bytes(b"x")
+
+    assert resolve_manifest_key("models" + chr(92) + "scaler.joblib", tmp_path) == target
+    assert resolve_manifest_key("models/scaler.joblib", tmp_path) == target

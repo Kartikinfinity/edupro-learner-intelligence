@@ -51,13 +51,15 @@ _LOAD_ERROR: Exception | None = None
 _FAILURE_GUIDE: dict[type[Exception], tuple[str, str, str]] = {
     ArtifactIntegrityError: (
         "Model artifacts failed their integrity check",
-        "The artifact files are present, but at least one no longer hashes to the "
-        "value `models/manifest.json` recorded for it. The loader refuses a set it "
-        "cannot vouch for, because a half-updated set pairs a fresh model with a "
-        "stale lookup table and answers confidently with the wrong numbers.",
-        "Usually the committed bytes differ from the bytes that were hashed - the "
-        "line-ending case is documented in `docs/deployment_guide.md` §6.1. "
-        "Retraining rewrites the set and the manifest together.",
+        "At least one file listed in `models/manifest.json` is missing, or is "
+        "present but no longer hashes to the value recorded for it. The loader "
+        "refuses a set it cannot vouch for, because a half-updated set pairs a "
+        "fresh model with a stale lookup table and answers confidently with the "
+        "wrong numbers. **The line below says which files and which problem.**",
+        "If they are reported *missing* while the files are plainly there, compare "
+        "the manifest's path separators with this platform's. If they are reported "
+        "*changed*, the committed bytes differ from the bytes that were hashed. "
+        "Both cases are documented in `docs/deployment_guide.md` §6.1.",
     ),
     ArtifactVersionError: (
         "Model artifacts came from a different environment",

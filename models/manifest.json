@@ -1,7 +1,7 @@
 {
   "model_version": "edupro-1.0.0",
-  "artifact_set_version": "d997e9092047",
-  "created_at": "2026-09-20T04:06:05+00:00",
+  "artifact_set_version": "6892a4f9ef27",
+  "created_at": "2026-09-20T08:10:27+00:00",
   "seed": 42,
   "workbook_sha256": "ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0",
   "libraries": {
@@ -74,17 +74,17 @@
     "default_k": 10
   },
   "files": {
-    "models\\scaler.joblib": "14d3cdfb8b051b662c213ff963fff19f90be12c30c818c271ff059a7c99f70e1",
-    "models\\clusterer.joblib": "6b64fa22b1e7630aa8ca4390c9f46059f717116cdf6d8ba5d58e24074a3f7961",
-    "models\\feature_schema.json": "93013f3351763f3e879884305dbf8ec6da942df44c81883fe2dcb6dcca40ff12",
-    "models\\model_config.json": "94cd4988702757e917a3033918e446f37f96e0c3a60432ef281b4f866800d1c1",
-    "artifacts\\production\\learner_features.parquet": "3912bcb938311b0e297f337888728ee74a89c34da342095fa8ee680b5b22f046",
-    "artifacts\\production\\learner_projection.parquet": "8e1c9cdfa0edaeb27ef53cb661e94b2ce84c9a0299f64461a82cd3dd472972ca",
-    "artifacts\\production\\cluster_profiles.parquet": "29c673ffee349b7c7a7a415cbfbf442e7cbf62f3ebd69d23c3da2a8de24f2358",
-    "artifacts\\production\\segments.json": "0d9fb9138d6a4dd845642c3cad982f0eba79a03b742583b7c7c9950ba6916b5a",
-    "artifacts\\production\\course_catalogue.parquet": "bccd9a9583d04b60464ac8a22b21b5f673522f911ac1c25b83dc7e0b46439fe6",
-    "artifacts\\production\\course_vectors.npy": "b47f98f7b32fae3eb6bc7660762d469677125a6f584a55921ca12038f9ab3c61",
-    "artifacts\\production\\interactions.parquet": "bae3b58a6e4ebcd6c4c2d17799eaa7444a517c71d6877a38aa5f3deed9b2c6cc",
-    "artifacts\\production\\popularity.parquet": "b6f55784a16480bb7055d44c32e4eb278d6c86bad2fe864b8c6faf78b8e217b0"
+    "models/scaler.joblib": "14d3cdfb8b051b662c213ff963fff19f90be12c30c818c271ff059a7c99f70e1",
+    "models/clusterer.joblib": "68c41bfbaa75418a724e2ecbbe1ad6a1f88ad60eb631f51cc60ab8f1d1324e0a",
+    "models/feature_schema.json": "93013f3351763f3e879884305dbf8ec6da942df44c81883fe2dcb6dcca40ff12",
+    "models/model_config.json": "94cd4988702757e917a3033918e446f37f96e0c3a60432ef281b4f866800d1c1",
+    "artifacts/production/learner_features.parquet": "3912bcb938311b0e297f337888728ee74a89c34da342095fa8ee680b5b22f046",
+    "artifacts/production/learner_projection.parquet": "8e1c9cdfa0edaeb27ef53cb661e94b2ce84c9a0299f64461a82cd3dd472972ca",
+    "artifacts/production/cluster_profiles.parquet": "29c673ffee349b7c7a7a415cbfbf442e7cbf62f3ebd69d23c3da2a8de24f2358",
+    "artifacts/production/segments.json": "0d9fb9138d6a4dd845642c3cad982f0eba79a03b742583b7c7c9950ba6916b5a",
+    "artifacts/production/course_catalogue.parquet": "bccd9a9583d04b60464ac8a22b21b5f673522f911ac1c25b83dc7e0b46439fe6",
+    "artifacts/production/course_vectors.npy": "b47f98f7b32fae3eb6bc7660762d469677125a6f584a55921ca12038f9ab3c61",
+    "artifacts/production/interactions.parquet": "bae3b58a6e4ebcd6c4c2d17799eaa7444a517c71d6877a38aa5f3deed9b2c6cc",
+    "artifacts/production/popularity.parquet": "b6f55784a16480bb7055d44c32e4eb278d6c86bad2fe864b8c6faf78b8e217b0"
   }
 }

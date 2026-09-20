@@ -218,6 +218,29 @@ def check_artifacts_available(audit: Audit, tracked: set[str]) -> None:
                      f"all {len(manifest.files)} artifacts hash identically from git, so a "
                      "Linux checkout reproduces the manifest exactly")
 
+    # Probe 3c, the Finding 4 tests and the fresh-clone check all passed while
+    # the deployment failed, because each one wrote `rel.replace("\\", "/")`
+    # before using the key. The normalisation was reasonable in isolation -- git
+    # speaks POSIX -- and collectively it meant no check ever saw the separator
+    # the *application* would use. So this one reads the key exactly as stored.
+    windows_keys = [rel for rel in manifest.files if "\\" in rel]
+    unresolved = [rel for rel in manifest.files
+                  if not (config.PROJECT_ROOT / rel).exists()]
+    if windows_keys:
+        audit.record("3d. manifest keys resolve on any platform", "fail",
+                     f"{len(windows_keys)} manifest key(s) use Windows separators. "
+                     "On Linux each is a single filename containing a backslash, so "
+                     "every artifact is reported missing and the app serves its empty "
+                     "state on every page", files=windows_keys)
+    elif unresolved:
+        audit.record("3d. manifest keys resolve on any platform", "fail",
+                     f"{len(unresolved)} manifest key(s) do not resolve as written",
+                     files=unresolved)
+    else:
+        audit.record("3d. manifest keys resolve on any platform", "pass",
+                     f"all {len(manifest.files)} keys are POSIX-relative and resolve "
+                     "verbatim, with no separator repair")
+
 
 def check_no_training_on_startup(audit: Audit) -> None:
     banned = ("KMeans(", "fit_transform", ".fit(", "cosine_similarity", "train(")

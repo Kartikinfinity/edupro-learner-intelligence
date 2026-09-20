@@ -132,11 +132,21 @@ def artifact_files(
 
 
 def _manifest_key(path: Path) -> str:
-    """Project-relative path where possible, absolute otherwise (temp dirs)."""
+    """Project-relative path where possible, absolute otherwise (temp dirs).
+
+    **Always forward slashes.** ``str(Path)`` uses the platform separator, so a
+    manifest written on Windows recorded ``models\\scaler.joblib``. On Linux that
+    is not a path at all — it is a single filename containing a backslash — so
+    every artifact resolved to nothing and the loader reported all twelve as
+    missing. That is what broke the public deployment (decision log D-075).
+
+    The manifest is data that travels between platforms, so it uses the one
+    separator that means the same thing everywhere.
+    """
     try:
-        return str(path.relative_to(config.PROJECT_ROOT))
+        return path.relative_to(config.PROJECT_ROOT).as_posix()
     except ValueError:
-        return str(path)
+        return path.as_posix()
 
 #: Interaction columns persisted for serving. Deliberately minimal: the scorers
 #: need the pair, the dashboard needs the date to show a history in order, and

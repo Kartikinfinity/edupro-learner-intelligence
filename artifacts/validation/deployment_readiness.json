@@ -1,7 +1,7 @@
 {
   "summary": {
-    "n_checks": 24,
-    "n_pass": 24,
+    "n_checks": 25,
+    "n_pass": 25,
     "n_warn": 0,
     "n_fail": 0,
     "deployment_ready": true
@@ -46,13 +46,19 @@
     {
       "check": "3b. artifact set is internally consistent",
       "severity": "pass",
-      "detail": "every file matches its recorded hash (set d997e9092047)",
+      "detail": "every file matches its recorded hash (set 6892a4f9ef27)",
       "evidence": {}
     },
     {
       "check": "3c. committed bytes match the recorded hashes",
       "severity": "pass",
       "detail": "all 12 artifacts hash identically from git, so a Linux checkout reproduces the manifest exactly",
+      "evidence": {}
+    },
+    {
+      "check": "3d. manifest keys resolve on any platform",
+      "severity": "pass",
+      "detail": "all 12 keys are POSIX-relative and resolve verbatim, with no separator repair",
       "evidence": {}
     },
     {

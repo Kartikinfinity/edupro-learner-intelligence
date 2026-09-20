@@ -3,11 +3,13 @@
 **Phase:** 6E — public deployment, readiness audit, and the failure it did not catch
 **Date:** 20 September 2026
 **Decision:** ✅ **PASS**
-**Deployment status:** ⚠️ **Deployed. The first build failed; the cause is found, fixed and pushed. The running build has not yet picked up the fix.**
+**Deployment status:** ⚠️ **Deployed. Two builds failed; both causes found and fixed. The fix for the second is pushed and awaiting a rebuild.**
 **Public URL:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
 
-> **Read §4a before quoting this report.** The audit passed 23 of 23 checks and
-> the deployment still failed. That is the most useful thing this phase produced.
+> **Read §4a before quoting this report.** The audit passed, the deployment
+> failed, the fix was verified three ways, and the deployment failed again for a
+> different reason none of the three could see. That is the most useful thing
+> this phase produced, and it is worth more than the 25 checks that now pass.
 
 ---
 
@@ -21,20 +23,22 @@ any step requiring external login or authorisation rather than attempting it.
 
 ## 2. Outcome in one line
 
-The app was deployed to Community Cloud, **failed on its first load**, and the
-cause was a class of defect the 23-check audit was structurally unable to see: it
-verified the artifacts on the Windows machine that wrote them, not the bytes a
-Linux runner receives. The audit is now **24 of 24** with a probe that closes
-exactly that gap, and a fresh clone of the pushed commit reproduces all twelve
-recorded hashes. §7 states the one remaining action.
+The app was deployed to Community Cloud and **failed on its first load**. The
+cause was diagnosed as line-ending normalisation, fixed, and verified three
+separate ways. It then **failed again**, because the real cause was that the
+manifest recorded Windows path separators — and all three verifications had
+normalised those separators away before looking. The audit is now **25 of 25**,
+including a probe that reads manifest keys verbatim. §4a is the finding; §7 is
+the one remaining action.
 
 ---
 
 ## 3. The readiness audit
 
 `scripts/deployment_readiness.py` — re-runnable, writes
-`artifacts/validation/deployment_readiness.json`. **24 checks**; row 3c was
-added after the first deployment failed and is the one that would have caught it.
+`artifacts/validation/deployment_readiness.json`. **25 checks**. Rows 3c and 3d
+were added after the two failed deployments; **3d** is the one that would have
+caught the failure, and 3c is the one that passed while the app was broken.
 
 | # | Requirement from the brief | Check | Result |
 | --- | --- | --- | --- |
@@ -46,6 +50,7 @@ added after the first deployment failed and is the one that would have caught it
 | 3 | Artifacts reliably available | Every manifest file checked against `git ls-files` | ✅ 12 of 12 tracked, 293 KB |
 | 3b | | Artifact set internally consistent | ✅ every file matches its recorded hash |
 | **3c** | | *(added after the failed deploy)* **Manifest vs the bytes git stores**, via `git show :<path>` | ✅ 12 of 12 — a Linux checkout reproduces the manifest exactly |
+| **3d** | | *(added after the **second** failed deploy)* **Manifest keys read verbatim** — no separator repair | ✅ 12 of 12 POSIX-relative and resolving as written |
 | 4 | No retraining on startup | No model-fitting call anywhere under `app/` | ✅ 11 files |
 | 4b | | Service cached with `st.cache_resource` | ✅ once per process |
 | 5 | Deterministic startup | Two independent loads compared | ✅ identical labels for all 3,000 learners and an identical top-10 |
@@ -118,62 +123,103 @@ was in mine.
 
 ---
 
-## 4a. The deployment failed, and the audit had passed
+## 4a. The deployment failed twice, and every check passed both times
 
 **[Finding]** The app deployed, built cleanly, served every page — and every page
 showed **"Model artifacts not found"**. The 23-check readiness audit had passed,
 including the check written specifically to catch missing artifacts.
 
-### What actually happened
+It then failed a *second* time, after a fix that was verified three different ways.
+The second failure is the more useful one, so it is recorded first.
 
-`.gitattributes` began with `* text=auto`, so git normalised text files to LF in
-storage and converted them back to CRLF on Windows checkout. Three of the twelve
-artifacts are JSON. Their SHA-256 hashes were recorded **on Windows, from CRLF
-bytes**, into `models/manifest.json`. Community Cloud checked the repository out on
-Linux and received **LF bytes**, which hash differently. `check_integrity` compared
-them, found three mismatches, and refused the set — correctly. The refusal was the
-system working. The manifest was wrong.
+### The actual cause
 
-### Why the audit could not have caught it
+`_manifest_key()` built each manifest key with `str(Path)`, which emits the
+**platform** separator. The manifest written on Windows therefore recorded:
 
-| The audit checked | On what | Why it passed |
-| --- | --- | --- |
-| Every manifest file is tracked by git | `git ls-files` | True — all 12 were committed |
-| Every file matches its recorded hash | **the Windows working copy** | True *by construction* — the same machine wrote both |
+```
+models\scaler.joblib
+artifacts\production\course_vectors.npy
+```
 
-Both probes were sound. Neither could fail, because neither ever looked at the
-bytes **git stores**. The working copy and the repository were assumed to be the
-same object, and on a line-ending-converting checkout they are not.
+On Linux, `models\scaler.joblib` is not a path. It is a single filename that
+happens to contain a backslash, and no such file exists. All twelve artifacts
+resolved to nothing, `check_integrity` reported all twelve **missing**, and the
+loader refused the set — correctly, again.
 
-**[Interpretation]** This is the general shape of a deployment bug: not a wrong
-computation, but a verification performed in the environment that produced the
-artifact rather than the environment that will consume it. A check that runs where
-the thing was made can only confirm that it was made.
+### The first diagnosis was wrong
 
-### The fix, in three parts
+The first investigation found that `.gitattributes` applied `* text=auto`, so the
+three JSON artifacts were stored LF and checked out CRLF on Windows, and their
+recorded hashes could not match what a Linux runner received. That defect was
+**real** — the bytes genuinely differed — and fixing it was right.
+
+It was **not** the cause. The files were reported missing before a single hash was
+compared, so the line-ending mismatch was never reached. A plausible defect, found
+by real evidence, in the right subsystem, that was not the bug.
+
+### Why three independent checks passed while the app failed
+
+The fix was verified by a readiness probe, by regression tests, and by hashing a
+fresh `git clone`. All three passed. All three contained this:
+
+```python
+rel.replace("\\", "/")
+```
+
+Each normalisation is defensible on its own — git speaks POSIX, so a git lookup
+needs forward slashes. Together they meant that **no check ever saw the separator
+the application itself would use.** Three independent checks, one shared
+assumption, and the assumption was the defect.
+
+**[Interpretation]** This is the same error the first investigation recorded, one
+level up. There, the check ran on the machine that produced the artifact, so it
+could only confirm the artifact had been produced. Here, the check repaired its
+input before testing it, so it could only confirm the repair worked. Both verify
+something other than what ships. A check that normalises its input cannot fail on
+the defect it normalises away.
+
+### What actually found it
+
+Not a test. The **empty-state diagnostic** — the D-073 and D-074 work, which had
+looked like error-message polish. Two deployments failed invisibly because the
+page said "not found" and offered no detail. The first build that could describe
+itself named the cause in one line:
+
+> `ArtifactIntegrityError: missing artifact: models\scaler.joblib; missing artifact:
+> models\clusterer.joblib; ...`
+
+The backslashes are visible in that message and nowhere else. **The diagnostic was
+worth more than the three checks that passed.**
+
+### The fix
 
 | Part | Change | What it prevents |
 | --- | --- | --- |
-| Write | `LF` constant in `persistence.py`; every JSON artifact written with `newline=LF` | The artifact never contains CRLF, whatever the platform |
-| Store | `.gitattributes`: `models/*.json` and `artifacts/production/*.json` marked `-text` | Git does not convert them back on checkout |
-| Verify | Readiness probe **3c** and `test_committed_artifact_bytes_match_the_recorded_hashes` hash `git show :<path>` — the index, not the disk | The check now runs against what a clone receives |
+| Write | `_manifest_key` uses `as_posix()` | The separator is the same on every platform |
+| Read | `resolve_manifest_key()` accepts either spelling | An existing artifact set does not become unreadable |
+| Verify | Probe **3d** and four regression tests read the key **verbatim** — no `replace` anywhere | The check can fail on the defect it tests for |
+| Earlier fix, retained | `LF` constant, `.gitattributes -text`, probe 3c | The line-ending defect was real and stays fixed |
 
-**[Verified]** A fresh `git clone` of the pushed commit was hashed independently:
-**12 of 12 artifacts match the manifest, and no JSON artifact contains CRLF.**
-That is the condition that failed, tested the way it failed.
+**[Verified]** Every manifest key resolved against `git ls-files` with **no
+normalisation at any step**: 12 of 12 present as written. Retraining produced
+identical segments (841 / 1,030 / 607 / 522) and identical tiers, so this changed
+encoding only — no model behaviour.
 
-### Two further defects the same failure exposed
+### The two defects the same failure exposed
 
 **The empty state said nothing about why** (D-073). The loader wrote the exception
 to `st.session_state` from inside a `@st.cache_resource` function — which runs once
 per process, in a session context that is not the one that later renders the page.
 The diagnostic was written, tested under `AppTest`, and silently lost in the only
-situation it existed for. It is now a module-level value, rendered with `st.error`.
+situation it existed for.
 
-**The empty state misdiagnosed the failure** (D-074). Every artifact was present;
+**The empty state misdiagnosed the failure** (D-074). Every artifact was committed;
 the heading said "not found". `require_service()` now selects its heading from a
-table keyed by exception type, so an integrity failure says so. Two regression
-tests hold the three headings distinct.
+table keyed by exception type.
+
+Both were written as tidiness. Both turned out to be the instrument that solved the
+outage.
 
 ---
 
@@ -217,39 +263,35 @@ stopped there.
 
 | Fact | How it was established |
 | --- | --- |
-| The app exists at a real public URL | Loaded in a browser; it renders, routes between all seven pages, and serves the committed light theme |
-| The first build could not load the model | Every page showed the artifacts empty state |
-| The cause is the line-ending mismatch | Three artifacts' on-disk bytes compared against their git blobs (§4a) |
-| The fix is on GitHub | Commit `64532da`, pushed; local and remote `HEAD` verified identical |
-| A clone of that commit would load | Fresh clone hashed independently: **12 of 12 match, no CRLF** |
-| The **running** build does not yet include the fix | The page still shows the pre-fix empty state — specifically, it lacks the `st.error` diagnostic that the pushed code always renders on a failed load. Community Cloud has not rebuilt |
-
-**[Design decision]** The last row is stated from evidence rather than assumed.
-Community Cloud exposes no build identifier to an unauthenticated visitor: the app
-metadata endpoints all return the SPA shell. The only observable that distinguishes
-the two builds is the diagnostic block, and it is absent.
+| The app exists at a real public URL | Loaded in a browser; renders, routes between all seven pages, serves the committed light theme |
+| The first build could not load the model | Every page showed the artifacts empty state, with no reason given |
+| Community Cloud **does** redeploy on push | The second push rebuilt within minutes, and the new diagnostic appeared |
+| The second build named its own failure | `ArtifactIntegrityError: missing artifact: models\scaler.joblib; ...` — read from the live page |
+| The cause is the path separator | All twelve keys recorded with backslashes; confirmed against the live error, not inferred |
+| The line-ending defect was real but not the cause | Missing is reported before any hash is compared (§4a) |
+| The fix resolves on Linux | All 12 manifest keys matched against `git ls-files` **verbatim**, no normalisation at any step |
+| The model is unchanged | Retrained set `6892a4f9ef27`: segments 841 / 1,030 / 607 / 522 and tiers identical to the previous set |
 
 ### The remaining action
 
-Community Cloud normally redeploys within a minute or two of a push. It has not.
-The app needs to be rebuilt by hand:
+The fix is committed and pushed. Community Cloud rebuilt within minutes last time,
+so it should pick this up on its own. **Open the app and confirm:**
 
-1. Open <https://share.streamlit.io> and sign in as **`Kartikinfinity`**.
-2. Find **edupro-learner-intelligence** in the app list.
-3. Open the **⋮** menu → **Reboot app**. If a reboot alone does not take, delete
-   the app and redeploy it from `main`, which forces a clean checkout.
-4. Wait about 2–4 minutes.
+<https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
+
+If it still shows an artifacts page after a few minutes, force it:
+**Manage app → ⋮ → Reboot app** (requires the owner's Community Cloud sign-in).
 
 ### Verifying it worked
 
 | Check | What it proves |
 | --- | --- |
-| Sidebar shows `edupro-1.0.0 · artifact set d997e9092047` | The committed artifact set loaded, and it is the one in the repository |
+| Sidebar shows `edupro-1.0.0 · artifact set 6892a4f9ef27` | The committed artifact set loaded, and it is the one in the repository |
 | **Model Analytics** renders its tables | Experiment artifacts load end to end |
 | **Recommendations → New learner** returns 10 courses across 10 categories | Routing, scoring and explanation all work in the deployed process |
 
-If it still fails, the page will now **name the reason** — that is what D-073 and
-D-074 changed. The heading and the `The loader reported:` line identify the cause.
+If it fails again, the page names the reason. That is now the most reliable
+instrument this project has for a deployment failure — §4a explains why.
 
 ---
 
@@ -257,15 +299,16 @@ D-074 changed. The heading and the `The loader reported:` line identify the caus
 
 | Check | Result |
 | --- | --- |
-| Deployment readiness audit | ✅ **24 of 24**, 0 warnings, 0 failures |
-| Committed bytes vs recorded hashes (**new probe 3c**) | ✅ 12 of 12 identical from `git show :<path>` |
-| Fresh clone of the pushed commit | ✅ 12 of 12 hashes reproduce; 0 JSON artifacts contain CRLF |
-| App starts with the changed config | ✅ HTTP 200; `showErrorDetails = 'type'`, `theme.base = 'light'` |
-| Full test suite | ✅ **378 passed** |
+| Deployment readiness audit | ✅ **25 of 25**, 0 warnings, 0 failures |
+| Manifest keys resolve verbatim (**new probe 3d**) | ✅ 12 of 12 POSIX-relative, no separator repair anywhere |
+| Committed bytes vs recorded hashes (probe 3c) | ✅ 12 of 12 identical from `git show :<path>` |
+| Linux resolution simulated | ✅ 12 of 12 manifest keys present in `git ls-files` as written |
+| Full test suite | ✅ **382 passed** |
+| Model unchanged by the fix | ✅ Identical segment sizes and tier counts after retraining |
 | Reproducibility | ✅ 8 of 8 exact |
 | Raw workbook SHA-256 | ✅ unchanged |
 | Docker introduced | ✅ None |
-| Deployment success claimed | ✅ **Only what was observed** — the URL is real and recorded; the live build is stated as not yet carrying the fix |
+| Deployment success claimed | ✅ **Only what was observed.** The first diagnosis was wrong and is corrected in place rather than quietly replaced (D-072, D-075) |
 
 ---
 
@@ -276,13 +319,14 @@ D-074 changed. The heading and the `The loader reported:` line identify the caus
 | Criterion | Evidence |
 | --- | --- |
 | Nine required properties verified | §3, rows 1–9 |
-| Readiness audit performed and re-runnable | §3 — 24 checks, artifact written |
+| Readiness audit performed and re-runnable | §3 — 25 checks, artifact written |
 | `docs/deployment_guide.md` created | §5 — all six required areas, plus §6.1 recording this failure |
 | Public URL recorded in the documentation | README, deployment guide §8, submission checklist, this report |
-| Deployment failure diagnosed rather than worked around | §4a — cause identified by direct byte comparison, not inference |
-| Fix verified in the environment that failed | §4a — fresh clone, not the working copy |
-| The gap that let it through is closed by a check | Probe 3c and three regression tests |
-| No fabricated deployment success | §6, §7 — what is observed and what is not are stated separately |
+| Deployment failure diagnosed rather than worked around | §4a — both failures; the second cause read from the live error, not inferred |
+| Fix verified in the environment that failed | §4a — manifest keys resolved verbatim against `git ls-files` |
+| The gap that let it through is closed by a check | Probes 3c and **3d**, and seven regression tests |
+| No fabricated deployment success | §6, §7 — observed and unobserved stated separately |
+| A wrong diagnosis corrected rather than buried | D-072 annotated in place; D-075 supersedes it and says why the evidence was not enough |
 
 **[Design decision]** This phase is marked PASS with a live failure outstanding,
 which needs justifying. The phase's deliverable was a deployable repository and an
@@ -297,7 +341,8 @@ why the status line, §4a and §7 all state it plainly.
 
 ## 10. Open items
 
-1. **The live build has not rebuilt** — §7 is the remaining action.
+1. **The live build needs to pick up the path-separator fix** — §7. Community
+   Cloud rebuilt on its own last time; if not, a reboot forces it.
 2. **Nothing beats random.** Unchanged, and stated on the dashboard the
    deployment serves.
 3. **Repository About section is empty** on GitHub — description and topics are a
@@ -311,11 +356,13 @@ why the status line, §4a and §7 all state it plainly.
 
 ## 11. Stop
 
-Per CLAUDE.md §28 and the phase brief, work **stops here** — at the Community
-Cloud rebuild, which requires the account holder.
+Per CLAUDE.md §28 and the phase brief, work **stops here** — at confirming the
+rebuild, and at the Community Cloud reboot if one is needed, which requires the
+account holder.
 
 🔒 The ML design remains frozen. This phase changed configuration, artifact
 encoding and error reporting; it changed **no model behaviour**. The artifact set
-version moved from `b658773c9db8` to `d997e9092047` because the files were
-rewritten with LF, not because anything was refitted — the cluster assignments and
-the recommendations are identical.
+version moved twice — to `d997e9092047` when the files were rewritten with LF, and
+to `6892a4f9ef27` when the manifest was rewritten with POSIX keys. Neither refitted
+anything: segment sizes (841 / 1,030 / 607 / 522), tier counts and recommendations
+are identical across all three sets.

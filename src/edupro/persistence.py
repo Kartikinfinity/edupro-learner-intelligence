@@ -221,6 +221,25 @@ def check_compatibility(manifest: Manifest, strict: bool = True) -> list[str]:
     return problems
 
 
+def resolve_manifest_key(relative: str, root: Path) -> Path:
+    """Turn a manifest key into a path on *this* platform.
+
+    Keys are written with forward slashes, but a set written before that was
+    fixed carries Windows separators. ``root / "models\\scaler.joblib"`` on Linux
+    yields a single filename containing a backslash, which exists nowhere, so
+    every artifact is reported missing — the public deployment's actual failure
+    (D-075). Splitting on both separators reads either spelling correctly.
+    """
+    normalised = relative.replace("\\", "/")
+    candidate = Path(normalised)
+    if candidate.is_absolute():
+        # A set trained outside the project records absolute keys (temp dirs in
+        # the test suite). Joining those to a root would corrupt them.
+        return candidate
+    parts = [part for part in normalised.split("/") if part]
+    return root.joinpath(*parts) if parts else root
+
+
 def check_integrity(manifest: Manifest, root: Path | None = None) -> list[str]:
     """Verify every file the manifest lists is present and unchanged.
 
@@ -236,7 +255,7 @@ def check_integrity(manifest: Manifest, root: Path | None = None) -> list[str]:
     root = root or config.PROJECT_ROOT
     problems: list[str] = []
     for relative, expected in manifest.files.items():
-        path = root / relative
+        path = resolve_manifest_key(relative, root)
         if not path.exists():
             problems.append(f"missing artifact: {relative}")
             continue
