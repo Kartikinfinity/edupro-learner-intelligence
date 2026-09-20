@@ -502,7 +502,12 @@ artifact availability from a fresh clone, startup cost, determinism, dependency
 compatibility, path safety, Linux filename case sensitivity, and the absence of
 container configuration.
 
-**Status: deployed** at <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>.
+**Status: live and verified** at
+<https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>.
+Confirmed in a browser on 20 September 2026: the sidebar reports artifact set
+`6892a4f9ef27` — the set committed here — the Recommendations page routes a
+learner and returns ranked courses with per-item explanations, and Model Analytics
+loads the experiment artifacts.
 
 It failed twice before it worked, and the second failure is worth reading about.
 Both times every page showed the artifacts empty state although the artifacts were

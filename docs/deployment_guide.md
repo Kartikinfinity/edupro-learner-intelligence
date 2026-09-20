@@ -291,8 +291,11 @@ git-ignored), and **public error disclosure**.
 | Second fix (POSIX keys) | ✅ Pushed; artifact set `6892a4f9ef27` |
 | Fix verified | ✅ All 12 manifest keys matched against `git ls-files` **verbatim**, with no separator repair at any step |
 | Model affected | ✅ No — retraining reproduced identical segments (841 / 1,030 / 607 / 522) and tiers |
-| Hosted build carrying the second fix | ⏳ Pushed; Community Cloud rebuilt within minutes on the previous push. Open the URL to confirm; if it still shows an artifacts page, **Reboot app** (§6.2) |
+| Third failure | ❌ The empty state rendered with **no reason attached** — the reason was module-level state beside the cache (§6.1) |
+| Third fix (`LoadOutcome`) | ✅ The reason now travels inside the cached value |
+| **Live and verified** | ✅ **20 September 2026.** Sidebar reports artifact set `6892a4f9ef27`; Recommendations routes a learner and returns ranked courses with explanations; Model Analytics loads the experiment artifacts |
 
-The URL is real and was recorded only after the app existed. The last row states
-what was pushed, not what was observed — those are kept separate deliberately,
-because the first fix was verified three ways and was still not the cause.
+The URL is real and was recorded only after the app existed, and "verified" means
+opened in a browser and exercised — not inferred from a successful build. That
+distinction is kept deliberately, because the first fix was verified three ways
+and was still not the cause.

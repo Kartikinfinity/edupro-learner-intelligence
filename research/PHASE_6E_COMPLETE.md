@@ -3,13 +3,15 @@
 **Phase:** 6E — public deployment, readiness audit, and the failure it did not catch
 **Date:** 20 September 2026
 **Decision:** ✅ **PASS**
-**Deployment status:** ⚠️ **Deployed. Two builds failed; both causes found and fixed. The fix for the second is pushed and awaiting a rebuild.**
+**Deployment status:** ✅ **Live and verified.** Three builds failed first; all three causes found, fixed and recorded.
 **Public URL:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
 
 > **Read §4a before quoting this report.** The audit passed, the deployment
 > failed, the fix was verified three ways, and the deployment failed again for a
-> different reason none of the three could see. That is the most useful thing
-> this phase produced, and it is worth more than the 25 checks that now pass.
+> different reason none of the three could see. It then failed a third time
+> because the error message itself had no reason attached. That sequence is the
+> most useful thing this phase produced, and it is worth more than the 25 checks
+> that now pass.
 
 ---
 
@@ -272,26 +274,33 @@ stopped there.
 | The fix resolves on Linux | All 12 manifest keys matched against `git ls-files` **verbatim**, no normalisation at any step |
 | The model is unchanged | Retrained set `6892a4f9ef27`: segments 841 / 1,030 / 607 / 522 and tiers identical to the previous set |
 
-### The remaining action
+### Verified live
 
-The fix is committed and pushed. Community Cloud rebuilt within minutes last time,
-so it should pick this up on its own. **Open the app and confirm:**
+Opened in a browser on 20 September 2026 and exercised, not inferred from a
+successful build:
 
-<https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
-
-If it still shows an artifacts page after a few minutes, force it:
-**Manage app → ⋮ → Reboot app** (requires the owner's Community Cloud sign-in).
-
-### Verifying it worked
-
-| Check | What it proves |
+| Observed | Evidence |
 | --- | --- |
-| Sidebar shows `edupro-1.0.0 · artifact set 6892a4f9ef27` | The committed artifact set loaded, and it is the one in the repository |
-| **Model Analytics** renders its tables | Experiment artifacts load end to end |
-| **Recommendations → New learner** returns 10 courses across 10 categories | Routing, scoring and explanation all work in the deployed process |
+| The model loads | Sidebar reports `edupro-1.0.0 · artifact set 6892a4f9ef27` — the set committed in this repository |
+| Segmentation serves | Executive Overview renders 3,000 learners, 60 courses, 10,000 enrolments and all four segments with their sizes |
+| Recommendation serves | Recommendations routes learner `U00001` (history 1, route `minimal`, 59 candidates) and returns ranked courses, each with its own explanation |
+| Experiment artifacts serve | Model Analytics renders the baseline comparison for all 11 methods |
+| The negative finding is shown, not buried | The page states "0 of 11 methods are significantly better than random" and "Random ranking places 7th of 12" |
+| Privacy holds in the deployed app | Learners appear as `U00001`; no name or email is rendered |
 
-If it fails again, the page names the reason. That is now the most reliable
-instrument this project has for a deployment failure — §4a explains why.
+### The third failure, and what it cost
+
+The second fix was correct, and the app still showed an empty state — this time
+with **no reason attached at all**, because the reason lived in a module-level
+variable beside the cache. Streamlit keys `cache_resource` by module and qualified
+name rather than identity, so a freshly imported copy of the module hit the cache,
+never ran the body, and read a global the cached value had never set (D-076).
+
+The reason now travels inside the cached object. Two of the three deployment
+failures were prolonged not by the defect but by the absence of a working error
+message; the defects themselves took minutes once the page could describe itself.
+
+---
 
 ---
 
@@ -303,12 +312,13 @@ instrument this project has for a deployment failure — §4a explains why.
 | Manifest keys resolve verbatim (**new probe 3d**) | ✅ 12 of 12 POSIX-relative, no separator repair anywhere |
 | Committed bytes vs recorded hashes (probe 3c) | ✅ 12 of 12 identical from `git show :<path>` |
 | Linux resolution simulated | ✅ 12 of 12 manifest keys present in `git ls-files` as written |
-| Full test suite | ✅ **382 passed** |
+| Full test suite | ✅ **385 passed** |
 | Model unchanged by the fix | ✅ Identical segment sizes and tier counts after retraining |
 | Reproducibility | ✅ 8 of 8 exact |
 | Raw workbook SHA-256 | ✅ unchanged |
 | Docker introduced | ✅ None |
-| Deployment success claimed | ✅ **Only what was observed.** The first diagnosis was wrong and is corrected in place rather than quietly replaced (D-072, D-075) |
+| Live app verified | ✅ Opened and exercised in a browser: model, segments, recommendations, explanations and experiment tables all serve |
+| Deployment success claimed | ✅ **Only what was observed.** The first diagnosis was wrong and is corrected in place rather than quietly replaced (D-072, D-075, D-076) |
 
 ---
 
@@ -328,21 +338,18 @@ instrument this project has for a deployment failure — §4a explains why.
 | No fabricated deployment success | §6, §7 — observed and unobserved stated separately |
 | A wrong diagnosis corrected rather than buried | D-072 annotated in place; D-075 supersedes it and says why the evidence was not enough |
 
-**[Design decision]** This phase is marked PASS with a live failure outstanding,
-which needs justifying. The phase's deliverable was a deployable repository and an
-honest account of its state. The repository is deployable — demonstrated by clone,
-not asserted. The outstanding item is a rebuild on a third-party host behind a
-sign-in this project cannot perform, and it is documented with the exact steps.
-Marking it FAIL would say the engineering is unfinished; it is not. Marking it
-PASS *silently* would be the dishonesty the phase brief warns against, which is
-why the status line, §4a and §7 all state it plainly.
+**[Design decision]** The phase is PASS on a verified live deployment, but the
+record deliberately keeps all three failures rather than presenting the working
+app as the outcome. Two of them survived a passing audit, and one survived a fix
+that had been verified three separate ways. A report that showed only the green
+result would omit the phase's actual finding, which is about how verification
+fails, not about whether the app runs.
 
 ---
 
 ## 10. Open items
 
-1. **The live build needs to pick up the path-separator fix** — §7. Community
-   Cloud rebuilt on its own last time; if not, a reboot forces it.
+1. **Nothing outstanding on the deployment.** The app is live and verified (§7).
 2. **Nothing beats random.** Unchanged, and stated on the dashboard the
    deployment serves.
 3. **Repository About section is empty** on GitHub — description and topics are a
@@ -356,9 +363,8 @@ why the status line, §4a and §7 all state it plainly.
 
 ## 11. Stop
 
-Per CLAUDE.md §28 and the phase brief, work **stops here** — at confirming the
-rebuild, and at the Community Cloud reboot if one is needed, which requires the
-account holder.
+Per CLAUDE.md §28 and the phase brief, work **stops here**. The deployment is
+live and verified; nothing in this phase is outstanding.
 
 🔒 The ML design remains frozen. This phase changed configuration, artifact
 encoding and error reporting; it changed **no model behaviour**. The artifact set
