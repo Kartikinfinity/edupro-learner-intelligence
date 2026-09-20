@@ -224,3 +224,46 @@ def test_gitattributes_exempts_artifact_json_from_eol_conversion():
     rules = (config.PROJECT_ROOT / ".gitattributes").read_text(encoding="utf-8")
     assert "models/*.json" in rules and "-text" in rules
     assert "artifacts/production/*.json" in rules
+
+
+# ---------------------------------------------------------------------------
+# Finding 5 — the empty state misdiagnosed the failure it was reporting
+# ---------------------------------------------------------------------------
+# The first failed deployment was an *integrity* failure: every artifact was
+# present and readable, and three of them no longer hashed to the manifest value.
+# The page announced "Model artifacts not found", which sent the reader looking
+# for missing files that were sitting in the checkout. Same class as Finding 2 —
+# an error that blames the wrong cause is worse than a bare exception, because it
+# is confidently wrong and people believe it.
+
+
+def _loaders_module():
+    """Import `app/lib/loaders.py`, which is not on the package path."""
+    import importlib.util
+
+    path = config.PROJECT_ROOT / "app" / "lib" / "loaders.py"
+    spec = importlib.util.spec_from_file_location("edupro_app_loaders", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_each_load_failure_has_its_own_heading():
+    from edupro.persistence import ArtifactIntegrityError, ArtifactVersionError
+
+    guide = _loaders_module()._FAILURE_GUIDE
+
+    assert set(guide) == {ArtifactIntegrityError, ArtifactVersionError, FileNotFoundError}
+    headings = [entry[0] for entry in guide.values()]
+    assert len(set(headings)) == 3, f"failures share a heading: {headings}"
+
+
+def test_an_integrity_failure_is_not_reported_as_a_missing_file():
+    """The exact misdiagnosis the first deployment showed."""
+    from edupro.persistence import ArtifactIntegrityError
+
+    heading, cause, _ = _loaders_module()._FAILURE_GUIDE[ArtifactIntegrityError]
+
+    assert "not found" not in heading.lower()
+    assert "not found" not in cause.lower()
+    assert "integrity" in heading.lower()

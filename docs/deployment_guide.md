@@ -174,17 +174,24 @@ missed one of exactly that kind.
 
 1. `.gitattributes` marks `models/*.json` and `artifacts/production/*.json` as
    `-text`, so git never rewrites their bytes at checkout.
-2. The pipeline writes every JSON artifact with an explicit `newline="
-"`, so the
-   bytes are the same whichever platform produced them.
+2. The pipeline writes every JSON artifact with an explicit LF newline (the `LF`
+   constant in `src/edupro/persistence.py`), so the bytes are the same whichever
+   platform produced them.
 3. A new probe (**3c**) and three regression tests compare the manifest against
    what **git** stores, not against the working copy — which is the only comparison
    that could have caught this.
 
-**If you see this symptom again**, the app now prints the loader's actual error on
-the empty-state page. The first failure showed nothing, because the diagnostic was
-written to `st.session_state` from inside a `@st.cache_resource` function, where it
-does not survive to the rendering session. It is now a module-level value.
+**If you see this symptom again**, the page now tells you which failure it is.
+Two things changed after the first deployment:
+
+- The loader's actual error is printed on the empty-state page. The first failure
+  showed nothing, because the diagnostic was written to `st.session_state` from
+  inside a `@st.cache_resource` function, where it does not survive to the
+  rendering session. It is now a module-level value.
+- The heading names the real cause. "Model artifacts failed their integrity
+  check", "came from a different environment" and "not found" are three different
+  problems with three different fixes, and the first deployment showed the wrong
+  one of the three.
 
 ### 6.2 Other symptoms
 
@@ -198,6 +205,7 @@ does not survive to the rendering session. It is now a module-level value.
 | **App builds but is blank** | Usually a crashed first run | Open **Manage app → Logs**. With `showErrorDetails = "type"` the browser shows only the exception type; the full traceback is in the log |
 | **Charts render but tables are empty** | A parquet file failed to load | The manifest hash check would have flagged a corrupt file; re-run `python scripts/train_production_model.py` and push |
 | **Slow first load after idle** | Community Cloud sleeps inactive apps | Expected. The first visitor wakes it; subsequent loads use the cached model |
+| **A fix is pushed but the app still shows the old behaviour** | Community Cloud did not pick up the commit. It usually redeploys within a minute or two of a push, and occasionally does not | **Manage app → ⋮ → Reboot app.** If that does not take, delete the app and redeploy from `main`, which forces a clean checkout |
 | **Changes pushed but not live** | Redeploy not triggered | **Manage app → Reboot app** |
 
 ### Verifying a live deployment
@@ -269,6 +277,10 @@ git-ignored), and **public error disclosure**.
 | App created on Community Cloud | ✅ Deployed 20 September 2026 |
 | **Public URL** | **<https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>** |
 | First deployment | ❌ Failed — artifacts rejected by their own integrity check (§6.1) |
-| After the fix | ✅ Artifact bytes are now platform-independent and verified against git |
+| Fix pushed | ✅ Commit `64532da`; artifact bytes are now platform-independent |
+| Fix verified | ✅ A fresh `git clone` of that commit reproduces **12 of 12** recorded hashes, with no CRLF in any JSON artifact |
+| Hosted build carrying the fix | ⏳ **Not yet.** The live page still shows the pre-fix empty state, so Community Cloud has not rebuilt. **Reboot app** from the dashboard (§6.2) |
 
-The URL above is the real one, recorded only after the app existed.
+The URL above is the real one, recorded only after the app existed. The last row is
+the honest state of the hosted build, not a prediction: the pushed code always
+renders the loader's error on a failed load, and the live page does not.

@@ -1553,6 +1553,29 @@ where the distinction does not arise. It worked everywhere except the one situat
 it was written for. An error path that has never been exercised in the environment
 it is meant for is not an error path; it is an intention.
 
+### D-074 — An empty state must name the failure it is actually reporting
+**Status:** Fixed
+
+The first failed deployment displayed **"Model artifacts not found"**. Every
+artifact was present and readable; three of them simply no longer hashed to the
+value the manifest recorded (D-072). The heading therefore sent whoever read it
+looking for missing files that were sitting in the checkout, while the real
+question - why do the bytes differ from the hashes - went unasked.
+
+`require_service()` now selects heading, cause and remedy from a table keyed by
+exception type, so `ArtifactIntegrityError`, `ArtifactVersionError` and
+`FileNotFoundError` each announce themselves. Two regression tests assert the
+three headings are distinct and that the integrity heading never says "not found".
+
+**Why this is the same defect as D-055, not a cosmetic one:** that finding was an
+error message blaming filters that had never been applied. Both are errors that
+misdiagnose their own cause, and both are more expensive than no message at all,
+because a confident wrong explanation is acted upon. This project's own audit
+caught the first instance in the recommender and missed the second in the page
+that reports the audit's subject.
+
+---
+
 ---
 
 ## Open questions carried into later phases

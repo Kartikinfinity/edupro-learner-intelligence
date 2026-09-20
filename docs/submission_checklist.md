@@ -17,7 +17,7 @@ py -3.13 -m venv .venv && .venv/Scripts/activate
 pip install -r requirements.txt -r requirements-dev.txt
 pip install -e . --no-deps
 
-python -m pytest tests -q                    # 376 passed
+python -m pytest tests -q                    # 378 passed
 python scripts/verify_reproducibility.py     # 8 stored results recomputed exactly
 python scripts/verify_paper_claims.py        # 96 document figures vs the artifacts
 streamlit run app/streamlit_app.py           # the dashboard
@@ -79,7 +79,7 @@ promoted, and where it is still addressed. None was skipped.
 | 20 | **No Docker** | No Dockerfile or compose file; asserted by test | ✅ |
 | 21 | App loads artifacts, never retrains | `st.cache_resource`; no ML call under `app/` (tested) | ✅ |
 | 22 | Artifacts version-consistent | Manifest with library versions + per-file hashes | ✅ |
-| 23 | Tests incl. failure and edge cases | 376 tests | ✅ |
+| 23 | Tests incl. failure and edge cases | 378 tests | ✅ |
 | 24 | Commits at phase boundaries | 13 commits, one per phase | ✅ |
 | 25 | Decision log, experiment log, ADRs | 62 decisions, 29 experiments, 6 ADRs | ✅ |
 | 27 | Phase reports with PASS/FAIL and evidence | 11 reports in `research/` | ✅ |
@@ -116,7 +116,7 @@ Each is a script an assessor can run.
 
 | Instrument | Command | Result |
 | --- | --- | --- |
-| Test suite | `python -m pytest tests -q` | **376 passed** |
+| Test suite | `python -m pytest tests -q` | **378 passed** |
 | Reproducibility | `python scripts/verify_reproducibility.py` | **8 of 8 exact** |
 | Document traceability | `python scripts/verify_paper_claims.py` | **96 of 96 figures match** |
 | Adversarial audit | `python scripts/adversarial_audit.py` | **59 probes, 0 fail** |
@@ -168,7 +168,7 @@ Carried honestly into submission rather than quietly closed. Closed items are st
 | --- | --- |
 | Phases completed | 0, 1, 2, 3A, 3B, 4, 5A, 5B, 6A, 6B, 6C, 6D |
 | Commits | 13, one per phase boundary |
-| Tests | 376 |
+| Tests | 378 |
 | Decisions recorded | 62 |
 | Experiments logged | 29, including failures |
 | References verified | 40 |

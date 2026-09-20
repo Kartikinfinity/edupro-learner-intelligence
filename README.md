@@ -3,7 +3,7 @@
 A reproducible, explainable learner segmentation and course recommendation system,
 built as a research-grade engineering project rather than a notebook.
 
-**Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 376 passing
+**Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 378 passing
 **Live dashboard:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
 **Deliverables:** [research paper](docs/research_paper.md) · [executive summary](docs/executive_summary.md) · [dashboard](https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/)
 
@@ -421,7 +421,7 @@ clean environment built from `requirements.txt`:
 ├── research/               decision log, experiment log, ADRs, phase reports
 ├── scripts/                reproducible entry points (18)
 ├── src/edupro/             production package (32 modules)
-└── tests/                  376 tests across 9 suites
+└── tests/                  378 tests across 9 suites
 ```
 
 | Area | Files | Lines |
@@ -434,7 +434,7 @@ clean environment built from `requirements.txt`:
 # Testing
 
 ```bash
-python -m pytest tests -q        # 376 passed, ~3 minutes
+python -m pytest tests -q        # 378 passed, ~3 minutes
 ```
 
 | Suite | Tests | Covers |
@@ -502,7 +502,7 @@ artifact availability from a fresh clone, startup cost, determinism, dependency
 compatibility, path safety, Linux filename case sensitivity, and the absence of
 container configuration.
 
-**Status: deployed and live** at <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>.
+**Status: deployed** at <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>. If that page reports an artifact problem, the hosted build predates the fix below and needs a **Reboot app** from the Community Cloud dashboard; a fresh clone of `main` loads correctly, verified by hashing all twelve artifacts straight out of `git clone`.
 
 The first deployment failed — every page showed "Model artifacts not found"
 although the artifacts were committed. The manifest hashes each artifact and the
@@ -511,8 +511,7 @@ three JSON artifacts, so bytes hashed on Windows (CRLF) did not match the bytes 
 Linux runner received (LF), and the integrity check correctly rejected them. The
 artifacts are now written and stored platform-independently, and a probe compares
 the manifest against what **git** stores rather than against the working copy —
-the only comparison that could have caught it. Full account:
-[`docs/deployment_guide.md`](docs/deployment_guide.md) §6.1.
+the only comparison that could have caught it. The empty state also said "not found" for artifacts that were present but failed their hash check, and now names the actual failure. Full account: [`docs/deployment_guide.md`](docs/deployment_guide.md) §6.1.
 
 Step-by-step guide, settings and troubleshooting:
 [`docs/deployment_guide.md`](docs/deployment_guide.md).

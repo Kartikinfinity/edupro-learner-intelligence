@@ -38,15 +38,50 @@ from edupro.persistence import ArtifactIntegrityError, ArtifactVersionError  # n
 #: process and its session context is not the one that later renders the error,
 #: so anything written to session state there is lost. That is why the first
 #: failed deployment showed an empty state with no reason attached (D-072).
-_LOAD_ERROR: str | None = None
+_LOAD_ERROR: Exception | None = None
+
+#: Heading, cause and remedy for each way the load can fail.
+#:
+#: One entry per exception type, because the three failures are not the same
+#: problem and must not share a heading. The first failed deployment was an
+#: *integrity* failure — the artifacts were present and readable, and their bytes
+#: disagreed with the manifest — but the page announced "not found", sending the
+#: reader to look for missing files that were sitting right there. An error that
+#: misdiagnoses its own cause costs more than no error at all (D-074).
+_FAILURE_GUIDE: dict[type[Exception], tuple[str, str, str]] = {
+    ArtifactIntegrityError: (
+        "Model artifacts failed their integrity check",
+        "The artifact files are present, but at least one no longer hashes to the "
+        "value `models/manifest.json` recorded for it. The loader refuses a set it "
+        "cannot vouch for, because a half-updated set pairs a fresh model with a "
+        "stale lookup table and answers confidently with the wrong numbers.",
+        "Usually the committed bytes differ from the bytes that were hashed - the "
+        "line-ending case is documented in `docs/deployment_guide.md` §6.1. "
+        "Retraining rewrites the set and the manifest together.",
+    ),
+    ArtifactVersionError: (
+        "Model artifacts came from a different environment",
+        "The artifacts were written by library versions, a code version or a source "
+        "workbook that differ from the ones running now. scikit-learn does not "
+        "support loading an estimator across versions: it usually loads and then "
+        "returns subtly different numbers rather than raising.",
+        "Install the pinned versions in `requirements.txt`, or retrain.",
+    ),
+    FileNotFoundError: (
+        "Model artifacts not found",
+        "This dashboard serves a **persisted** model and does not train one, so the "
+        "artifact set has to exist before any page can render.",
+        "Generate it once; it is written to `models/` and `artifacts/production/`.",
+    ),
+}
 
 
 @st.cache_resource(show_spinner="Loading the model…")
 def load_service() -> RecommendationService | None:
-    """The production model, loaded once. ``None`` when the artifacts are absent.
+    """The production model, loaded once. ``None`` when it cannot be served.
 
     Returning ``None`` rather than raising lets every page render a useful empty
-    state that says how to produce the artifacts, instead of a stack trace.
+    state naming the actual cause, instead of a stack trace.
     """
     global _LOAD_ERROR
     try:
@@ -54,26 +89,28 @@ def load_service() -> RecommendationService | None:
         _LOAD_ERROR = None
         return service
     except (ArtifactIntegrityError, ArtifactVersionError, FileNotFoundError) as error:
-        _LOAD_ERROR = f"{type(error).__name__}: {error}"
+        _LOAD_ERROR = error
         return None
 
 
 def require_service() -> RecommendationService:
-    """Return the loaded service, or stop the page with instructions."""
+    """Return the loaded service, or stop the page explaining why it could not."""
     service = load_service()
     if service is None:
-        st.title("Model artifacts not found")
-        st.info(
-            "This dashboard serves a **persisted** model and does not train one. "
-            "Generate the artifact set first:"
+        heading, cause, remedy = _FAILURE_GUIDE.get(
+            type(_LOAD_ERROR),
+            (
+                "The model could not be loaded",
+                "The artifact set could not be opened.",
+                "Regenerate it and check the server log for the reason.",
+            ),
         )
+        st.title(heading)
+        st.info(cause)
+        st.caption(remedy)
         st.code("python scripts/train_production_model.py", language="bash")
-        if _LOAD_ERROR:
-            st.error("**The loader reported:** " + _LOAD_ERROR)
-            st.caption(
-                "If this mentions a changed artifact, the committed bytes differ from "
-                "the hashes the manifest recorded - see docs/deployment_guide.md §6."
-            )
+        if _LOAD_ERROR is not None:
+            st.error(f"**The loader reported:** {type(_LOAD_ERROR).__name__}: {_LOAD_ERROR}")
         st.stop()
     return service
 
