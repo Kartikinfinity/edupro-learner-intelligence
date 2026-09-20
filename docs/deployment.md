@@ -118,9 +118,18 @@ asserts that no ML call appears anywhere under `app/`.
 
 `.streamlit/config.toml` is deliberately minimal: usage statistics off, full error
 details shown in the browser so a deployment problem is visible to whoever opens
-the page, and no theme override — the dashboard is legible under both the light and
-dark Streamlit themes, and chart colours are chosen in `app/lib/shell.py` to work
-against either background.
+the page, and the theme **pinned to light**.
+
+The theme is pinned rather than following the viewer's system preference for two
+reasons. The dashboard is documented with screenshots in `README.md`, and a theme
+that follows the system means those screenshots match only half the people who open
+it. It also made the screenshots non-deterministic — the same capture script
+produced light or dark output depending on the machine that ran it, which is not a
+property a regenerable artifact should have.
+
+Chart colours in `app/lib/shell.py` were chosen to be legible against either
+background, so nothing depends on the theme being light; unpinning it would change
+the appearance and break nothing.
 
 ---
 

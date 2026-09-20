@@ -1,8 +1,20 @@
 # Streamlit configuration for the EduPro dashboard.
 #
-# Deliberately minimal. Theme colours are left to Streamlit's light/dark defaults
-# so the dashboard is legible under both; chart colours are chosen in
-# app/lib/shell.py to work against either background.
+# Deliberately minimal.
+
+[theme]
+# Pinned to light rather than following the viewer's system preference.
+#
+# Two reasons. The dashboard is documented with screenshots in README.md, and a
+# theme that follows the system means those screenshots match only half of the
+# people who open it. It also made the screenshots non-deterministic: the same
+# capture script produced light or dark output depending on the machine that ran
+# it, which is not a property a regenerable artifact should have.
+#
+# Chart colours in app/lib/shell.py were chosen to be legible on either
+# background, so nothing depends on this being light - it is a determinism and
+# documentation-consistency choice, not a design constraint.
+base = "light"
 
 [server]
 # The dashboard is read-only: it loads a persisted artifact set and never writes.
