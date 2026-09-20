@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from dataclasses import dataclass
 from typing import Any
 
 import pandas as pd
@@ -33,12 +34,30 @@ from edupro.inference import RecommendationService  # noqa: E402
 from edupro.persistence import ArtifactIntegrityError, ArtifactVersionError  # noqa: E402
 
 
-#: Why the last load failed, if it did. A module-level variable rather than
-#: ``st.session_state``: a ``cache_resource`` function runs once for the whole
-#: process and its session context is not the one that later renders the error,
-#: so anything written to session state there is lost. That is why the first
-#: failed deployment showed an empty state with no reason attached (D-072).
-_LOAD_ERROR: Exception | None = None
+@dataclass(frozen=True)
+class LoadOutcome:
+    """The model, or the reason there isn't one. **One cached value, not two.**
+
+    The failure reason has now escaped twice. First it was written to
+    ``st.session_state`` from inside a ``@st.cache_resource`` function, whose
+    session context is not the one that later renders the page (D-073). Then it
+    was a module-level variable — which is still *parallel* state: the cache
+    holds ``None`` and the variable holds the reason, and nothing keeps them
+    together. A rerun that hits the cache without re-running the body renders
+    from a variable the cached value never set, and the page falls back to "could
+    not be loaded" with nothing attached (D-076).
+
+    Returning both in one object removes the failure mode rather than relocating
+    it: whatever the cache hands back carries its own explanation.
+    """
+
+    service: RecommendationService | None
+    error: Exception | None = None
+
+    @property
+    def ok(self) -> bool:
+        return self.service is not None
+
 
 #: Heading, cause and remedy for each way the load can fail.
 #:
@@ -79,42 +98,54 @@ _FAILURE_GUIDE: dict[type[Exception], tuple[str, str, str]] = {
 
 
 @st.cache_resource(show_spinner="Loading the model…")
-def load_service() -> RecommendationService | None:
-    """The production model, loaded once. ``None`` when it cannot be served.
+def load_outcome() -> LoadOutcome:
+    """The production model, loaded once — or the reason it could not be.
 
-    Returning ``None`` rather than raising lets every page render a useful empty
-    state naming the actual cause, instead of a stack trace.
+    Catching rather than raising lets every page render a useful empty state
+    naming the actual cause, instead of a stack trace. ``Exception`` is
+    deliberately broad: the three expected failures are matched to specific
+    guidance below, and anything else must still reach the page rather than
+    disappearing, which is how the last two outages stayed invisible.
     """
-    global _LOAD_ERROR
     try:
-        service = RecommendationService.load()
-        _LOAD_ERROR = None
-        return service
-    except (ArtifactIntegrityError, ArtifactVersionError, FileNotFoundError) as error:
-        _LOAD_ERROR = error
-        return None
+        return LoadOutcome(RecommendationService.load())
+    except Exception as error:  # noqa: BLE001 - see docstring
+        return LoadOutcome(None, error)
+
+
+def load_service() -> RecommendationService | None:
+    """The model, or ``None``. Kept for the cached table helpers below."""
+    return load_outcome().service
 
 
 def require_service() -> RecommendationService:
     """Return the loaded service, or stop the page explaining why it could not."""
-    service = load_service()
-    if service is None:
-        heading, cause, remedy = _FAILURE_GUIDE.get(
-            type(_LOAD_ERROR),
-            (
-                "The model could not be loaded",
-                "The artifact set could not be opened.",
-                "Regenerate it and check the server log for the reason.",
-            ),
-        )
-        st.title(heading)
-        st.info(cause)
-        st.caption(remedy)
-        st.code("python scripts/train_production_model.py", language="bash")
-        if _LOAD_ERROR is not None:
-            st.error(f"**The loader reported:** {type(_LOAD_ERROR).__name__}: {_LOAD_ERROR}")
-        st.stop()
-    return service
+    outcome = load_outcome()
+    if outcome.ok:
+        return outcome.service
+
+    error = outcome.error
+    heading, cause, remedy = _FAILURE_GUIDE.get(
+        type(error),
+        (
+            "The model could not be loaded",
+            "The artifact set could not be opened. The exact error is below.",
+            "Regenerate the set, and check the server log for the full traceback.",
+        ),
+    )
+    st.title(heading)
+    st.info(cause)
+    st.caption(remedy)
+    st.code("python scripts/train_production_model.py", language="bash")
+    # Unconditional: an empty state with no reason is what made the last two
+    # deployment failures take three attempts to diagnose (D-073, D-076).
+    st.error(
+        f"**The loader reported:** `{type(error).__name__}`: {error}"
+        if error is not None
+        else "**No reason was recorded** — this should be impossible; "
+        "please report it with the server log."
+    )
+    st.stop()
 
 
 @st.cache_data(show_spinner=False)

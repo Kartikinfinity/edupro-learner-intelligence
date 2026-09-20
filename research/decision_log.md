@@ -1621,6 +1621,41 @@ cause in one line.
 
 ---
 
+### D-076 — The failure reason travels inside the cached value
+**Status:** Fixed. Third attempt at the same problem.
+
+The reason a model load failed has now escaped three times:
+
+| Attempt | Where the reason lived | How it was lost |
+| --- | --- | --- |
+| 1 | `st.session_state`, written inside `@st.cache_resource` | That function's session context is not the one that renders the page (D-073) |
+| 2 | A module-level variable | Streamlit keys `cache_resource` by the function's module and qualified name, not by identity. A freshly imported copy of the module hits the cache, never runs the body, and reads a global the cached value never set |
+| 3 | Inside the cached object itself | — |
+
+Attempt 2 failed on a live deployment: the page rendered its fallback heading,
+"The model could not be loaded", with no reason attached at all.
+
+`load_outcome()` now returns a frozen `LoadOutcome(service, error)`. Whatever the
+cache hands back carries its own explanation, so there is no second piece of state
+to drift out of step with it.
+
+**Why this kept happening.** Attempts 1 and 2 both treated the problem as *where
+to put the variable*. It was never that. The defect was having a variable at all:
+any state stored beside a cache has to be kept in step with the cache by hand, and
+the cache is the thing that decides whether the code that would update it runs.
+Moving the variable changes which mechanism drops it. Putting it inside the cached
+value removes the question.
+
+`except Exception` is now deliberate in the loader, rather than the three expected
+types. The three are matched to specific guidance; anything else must still reach
+the page. A narrow `except` beside a bare empty state is how two outages stayed
+undiagnosed across three deployments.
+
+Three regression tests: the outcome carries its reason, the source contains no
+`_LOAD_ERROR`, and the loader's `except` is broad.
+
+---
+
 ---
 
 ## Open questions carried into later phases

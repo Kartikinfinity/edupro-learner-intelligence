@@ -241,10 +241,24 @@ def _loaders_module():
     """Import `app/lib/loaders.py`, which is not on the package path."""
     import importlib.util
 
+    import sys
+
+    name = "edupro_app_loaders"
+    if name in sys.modules:
+        return sys.modules[name]
+
     path = config.PROJECT_ROOT / "app" / "lib" / "loaders.py"
-    spec = importlib.util.spec_from_file_location("edupro_app_loaders", path)
+    spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # Registered *before* exec: `dataclasses` resolves a field's annotation by
+    # looking the class's module up in sys.modules, so a dataclass in a module
+    # that is not registered raises AttributeError at class-creation time.
+    sys.modules[name] = module
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        del sys.modules[name]
+        raise
     return module
 
 
@@ -328,3 +342,50 @@ def test_a_windows_style_key_still_resolves_on_a_posix_checkout(tmp_path):
 
     assert resolve_manifest_key("models" + chr(92) + "scaler.joblib", tmp_path) == target
     assert resolve_manifest_key("models/scaler.joblib", tmp_path) == target
+
+
+# ---------------------------------------------------------------------------
+# Finding 7 — the failure reason must travel with the cached value
+# ---------------------------------------------------------------------------
+# Third attempt at the same problem. The reason a load failed was first written
+# to `st.session_state` from inside a `@st.cache_resource` function, where the
+# session context is not the one that renders the page (D-073). It was then moved
+# to a module-level variable — still *parallel* state. Streamlit keys
+# `cache_resource` by the function's module and qualified name, not by identity,
+# so a freshly imported copy of the module hits the cache, never runs the body,
+# and reads a global the cached value never set. The page then fell back to "The
+# model could not be loaded" with no reason attached, on a live deployment.
+#
+# The fix is structural rather than another relocation: one cached object holds
+# the service *and* the reason, so whatever the cache returns explains itself.
+
+
+def test_the_load_outcome_carries_its_own_failure_reason():
+    loaders = _loaders_module()
+
+    failed = loaders.LoadOutcome(None, ValueError("boom"))
+    assert not failed.ok
+    assert failed.error is not None
+
+    loaded = loaders.LoadOutcome(object())
+    assert loaded.ok
+    assert loaded.error is None
+
+
+def test_no_parallel_module_state_holds_the_failure_reason():
+    """A module global for the reason is the defect, not an implementation detail."""
+    source = (config.PROJECT_ROOT / "app" / "lib" / "loaders.py").read_text(encoding="utf-8")
+    assert "_LOAD_ERROR" not in source, (
+        "the failure reason is parallel to the cache again; it belongs in LoadOutcome"
+    )
+
+
+def test_an_unexpected_load_failure_still_reaches_the_page():
+    """The three known failures are named; anything else must not vanish."""
+    import inspect
+
+    source = inspect.getsource(_loaders_module().load_outcome)
+    assert "except Exception" in source, (
+        "a narrow except drops unknown failures into a bare empty state, which is "
+        "how two deployment outages stayed undiagnosed"
+    )

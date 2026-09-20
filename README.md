@@ -3,7 +3,7 @@
 A reproducible, explainable learner segmentation and course recommendation system,
 built as a research-grade engineering project rather than a notebook.
 
-**Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 382 passing
+**Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 385 passing
 **Live dashboard:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
 **Deliverables:** [research paper](docs/research_paper.md) · [executive summary](docs/executive_summary.md) · [dashboard](https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/)
 
@@ -421,7 +421,7 @@ clean environment built from `requirements.txt`:
 ├── research/               decision log, experiment log, ADRs, phase reports
 ├── scripts/                reproducible entry points (18)
 ├── src/edupro/             production package (32 modules)
-└── tests/                  382 tests across 9 suites
+└── tests/                  385 tests across 9 suites
 ```
 
 | Area | Files | Lines |
@@ -434,7 +434,7 @@ clean environment built from `requirements.txt`:
 # Testing
 
 ```bash
-python -m pytest tests -q        # 382 passed, ~3 minutes
+python -m pytest tests -q        # 385 passed, ~3 minutes
 ```
 
 | Suite | Tests | Covers |
