@@ -225,9 +225,11 @@ No unresolved **critical** finding. Carried forward:
    leaves old artifacts in place silently.
 4. **Phase 0's two open items remain open**: the empty `claude.md.txt`, and the
    git-identity/authorship question (`Kartik <kartikshreekumar2006@gmail.com>` in
-   the global git config vs the session account; `pyproject.toml` records *Anushree
-   Menon*, inferred). Both need confirmation before publication.
+   the global git config vs the session account; `pyproject.toml` recorded a name
+   inferred from that account). Both need confirmation before publication.
 5. **The project has not been deployed publicly yet.** Phase 6B.
+
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
 
 ---
 

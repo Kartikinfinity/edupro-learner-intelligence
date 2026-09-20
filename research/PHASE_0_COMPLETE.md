@@ -350,10 +350,12 @@ None blocking. Three items carried forward:
 
 2. **Git identity vs project authorship.** The machine's global git config is
    `Kartik <kartikshreekumar2006@gmail.com>`, while the session account is
-   `menonanushree897@gmail.com`. The existing global config was used for the
+   a different account. The existing global config was used for the
    commit rather than silently overridden. `pyproject.toml` records the author as
-   *Anushree Menon*, **inferred** from the account email. *Both should be
+   a name **inferred** from the session account email. *Both should be
    confirmed before the repository is published.*
+
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
 
 3. **Seven open research questions** (Q-1…Q-7) are registered in the decision log
    with the phase that settles each. They are open by design — settling them now

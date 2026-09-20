@@ -1361,6 +1361,46 @@ looking.
 
 ---
 
+## Authorship resolution (20 September 2026)
+
+### D-067 — The author is Kartik; the inferred attribution is corrected everywhere
+**Status:** Settled by the project owner. Closes the open item carried since Phase 0.
+
+At bootstrap, `pyproject.toml` was filled in with a name **inferred from the
+session account email** rather than from anything the user had stated. That guess
+was wrong, and it was recorded as an open item in every phase report since — never
+silently accepted, but also never resolved until now.
+
+The project owner has confirmed: **the author is Kartik
+(`kartikshreekumar2006@gmail.com`)**, which matches the git identity on all 13
+commits and the GitHub account the repository was published under.
+
+**Corrected in the live documents:** `pyproject.toml`, the research paper byline,
+the rendered HTML paper, and the submission checklist.
+
+**Prevented from recurring:** `scripts/build_paper.py` previously hardcoded the
+byline in two places, which is exactly how it drifted from `pyproject.toml`. It now
+reads the author from the project metadata, so there is one source of truth.
+
+**Two judgement calls in how the historical record was handled.**
+
+*The record is kept, not erased.* Each phase report still shows that authorship was
+inferred and unconfirmed at the time, with a resolution marker appended. A project
+that documents its open questions and then deletes them once answered has a weaker
+record than one that shows the question being closed.
+
+*The third party's name and email are removed.* The historical fact worth keeping
+is "the author was inferred from the session account and the inference was wrong".
+Naming the unrelated account holder adds nothing to that record and would publish a
+real person's name and email address in a public repository. The reports now say
+"a name inferred from the session account" instead.
+
+**Generalisable:** metadata filled in by inference at bootstrap should be marked as
+inferred at the moment it is written, which is what made this recoverable. The
+failure mode avoided was not "guessing wrong" — it was guessing wrong *silently*.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were

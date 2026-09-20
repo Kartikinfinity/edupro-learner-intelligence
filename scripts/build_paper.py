@@ -17,11 +17,25 @@ from __future__ import annotations
 
 import html
 import re
+import tomllib
 from pathlib import Path
 
 import mistune
 
 from edupro import config
+
+
+def project_author() -> str:
+    """Read the author from pyproject.toml.
+
+    Hardcoding a byline in the renderer is how it drifts from the project
+    metadata; this keeps one source of truth.
+    """
+    metadata = tomllib.loads(
+        (config.PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    )
+    authors = metadata["project"].get("authors") or []
+    return ", ".join(a["name"] for a in authors if a.get("name")) or "Unattributed"
 
 SOURCE = config.DOCS_DIR / "research_paper.md"
 OUTPUT = config.DOCS_DIR / "research_paper.html"
@@ -234,13 +248,14 @@ def main() -> int:
     markup, toc = build_toc(markup)
 
     title = "Student Segmentation and Personalized Course Recommendation System for EduPro"
+    author = project_author()
     document = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title>
-<meta name="author" content="Anushree Menon">
+<meta name="author" content="{html.escape(author)}">
 <meta name="description" content="A reproducible study of learner segmentation and course recommendation on the EduPro online learning platform.">
 <style>{STYLE}</style>
 </head>
@@ -250,7 +265,7 @@ def main() -> int:
   <p class="subtitle">A reproducible study of learner segmentation and course
      recommendation on the EduPro online learning platform</p>
   <div class="meta">
-    <strong>Anushree Menon</strong> &middot; 19 September 2026<br>
+    <strong>{html.escape(author)}</strong> &middot; 19 September 2026<br>
     Model version <code>edupro-1.0.0</code> &middot; artifact set <code>b658773c9db8</code><br>
     Source data SHA-256 <code>ed555e46&hellip;8cc0</code> &middot; seed 42 &middot; Python 3.13.9<br>
     All results reproducible via <code>scripts/verify_reproducibility.py</code>

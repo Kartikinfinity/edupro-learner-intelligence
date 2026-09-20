@@ -251,6 +251,8 @@ One rendering defect was found in the browser and fixed: the learner header read
 5. **Phase 0's two open items remain open**: the empty `claude.md.txt`, and the
    git-identity/authorship question. Both need confirmation before publication.
 
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
+
 ---
 
 ## 11. Stop

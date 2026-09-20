@@ -326,11 +326,13 @@ Two load-time guarantees, both failing loudly and both tested:
    uncorrected, in a system using no demographic feature.
 5. **Phase 0's two open items remain open**: the empty `claude.md.txt`, and the
    git-identity/authorship question (`Kartik <kartikshreekumar2006@gmail.com>` in
-   the global git config vs the session account; `pyproject.toml` records *Anushree
-   Menon*, inferred). Both need confirmation before publication.
+   the global git config vs the session account; `pyproject.toml` recorded a name
+   inferred from that account). Both need confirmation before publication.
 6. **Artifact freshness is not automated.** Editing the pipeline without re-running
    it leaves a stale set on disk. The manifest detects an *inconsistent* set, not an
    *old* one. Phase 6 should add a staleness check to the validation run.
+
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
 
 ---
 

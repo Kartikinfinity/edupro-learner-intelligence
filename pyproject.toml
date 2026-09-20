@@ -9,7 +9,7 @@ description = "Student segmentation and personalized course recommendation syste
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 license = { text = "MIT" }
-authors = [{ name = "Anushree Menon" }]
+authors = [{ name = "Kartik", email = "kartikshreekumar2006@gmail.com" }]
 keywords = ["segmentation", "clustering", "recommender-system", "education", "streamlit"]
 classifiers = [
     "Programming Language :: Python :: 3.13",

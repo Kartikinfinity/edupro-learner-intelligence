@@ -212,6 +212,8 @@ unexplained technical terms**: `NDCG@10`, `silhouette`, `bootstrap Jaccard`,
 4. **Phase 0's two open items remain open**: the empty `claude.md.txt`, and the
    git-identity/authorship question. The summary carries no byline, so this blocks
    the paper rather than this document — but both need settling before submission.
+
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
 5. **No PDF rendering** of the executive summary. The research paper has an HTML
    submission copy; the summary is currently Markdown only. Producing a matching
    HTML would be a small addition if a formatted copy is wanted.

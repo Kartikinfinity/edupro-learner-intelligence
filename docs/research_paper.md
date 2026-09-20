@@ -2,7 +2,7 @@
 
 **A reproducible study of learner segmentation and course recommendation on the EduPro online learning platform**
 
-**Author:** Anushree Menon
+**Author:** Kartik
 **Date:** 19 September 2026
 **Model version:** `edupro-1.0.0` · artifact set `b658773c9db8`
 **Source data:** `EduPro Online Platform.xlsx`, SHA-256 `ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0`

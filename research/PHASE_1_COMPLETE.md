@@ -401,9 +401,11 @@ None blocking. Two carried forward:
 2. **Phase 0's two open items remain open**: the empty `claude.md.txt` in the
    project root, and the git-identity/authorship question
    (`Kartik <kartikshreekumar2006@gmail.com>` in the global git config vs the
-   session account `menonanushree897@gmail.com`; `pyproject.toml` records
-   *Anushree Menon*, inferred). Both still need the user's confirmation before the
+   session account a different account; `pyproject.toml` records
+   a name inferred from the session account, inferred). Both still need the user's confirmation before the
    repository is published.
+
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
 
 ---
 

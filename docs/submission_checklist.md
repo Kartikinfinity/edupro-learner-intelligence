@@ -148,11 +148,11 @@ six synthetic violating sentences.
 
 ## 7. Known open items
 
-Carried honestly into submission rather than quietly closed.
+Carried honestly into submission rather than quietly closed. Closed items are struck through rather than deleted, so the record of what was open remains.
 
 | # | Item | Impact | Owner |
 | --- | --- | --- | --- |
-| 1 | **Authorship unconfirmed.** The paper credits *Anushree Menon*, taken from `pyproject.toml`. The git identity on these commits is `Kartik <kartikshreekumar2006@gmail.com>` | Must be settled before submission | **User decision** |
+| ~~1~~ | ~~Authorship unconfirmed~~ — **resolved 20 September 2026.** The author is **Kartik** (`kartikshreekumar2006@gmail.com`), confirmed by the project owner and matching the git identity on all commits. | ✅ Closed | — |
 | 2 | `claude.md.txt` at the repository root is empty (0 bytes) and git-ignored | Cosmetic; left because deleting a user file is not the agent's call | **User decision** |
 | 3 | Root-level duplicates of the source workbook and brief | None — git-ignored, byte-identical to the tracked copies | **User decision** |
 | 4 | **Not yet deployed publicly** to Streamlit Community Cloud | Procedure documented in `docs/deployment.md`; requires a GitHub push | Pending instruction |

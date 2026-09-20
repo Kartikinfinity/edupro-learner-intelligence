@@ -283,10 +283,12 @@ how it was investigated, why it was not retained, and **how it is still addresse
    be committed. The `.gitignore` rule is relaxed in Phase 5.
 5. **Phase 0's two open items remain open**: the empty `claude.md.txt`, and the
    git-identity/authorship question (`Kartik <kartikshreekumar2006@gmail.com>` in the
-   global git config vs the session account; `pyproject.toml` records *Anushree
-   Menon*, inferred). Both need confirmation before publication.
+   global git config vs the session account; `pyproject.toml` recorded a name
+   inferred from that account). Both need confirmation before publication.
 6. **The segmentation is a course-level split** (D-031) and must be described as
    one in the paper and the dashboard, not as a psychological typology.
+
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
 
 ---
 

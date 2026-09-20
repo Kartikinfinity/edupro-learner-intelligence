@@ -237,8 +237,10 @@ instead of copying it forward — which is the practice worth keeping.
 5. **Gender gap monitoring** remains carried forward, and is still not surfaced in
    the dashboard.
 6. **Phase 0's two open items remain open**: the empty `claude.md.txt`, and the
-   git-identity/authorship question. The paper currently credits *Anushree Menon*,
-   taken from `pyproject.toml`; this needs confirmation before submission.
+   git-identity/authorship question. The paper carried a name inferred from the
+   session account; this needs confirmation before submission.
+
+   **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.**
 
 ---
 

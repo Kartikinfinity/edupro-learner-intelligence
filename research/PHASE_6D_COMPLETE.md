@@ -223,7 +223,7 @@ engineering gaps.
 
 | # | Item | Owner |
 | --- | --- | --- |
-| 1 | **Authorship unconfirmed** — the paper credits *Anushree Menon* from `pyproject.toml`; the git identity is `Kartik <kartikshreekumar2006@gmail.com>` | **User** |
+| 1 | **Authorship unconfirmed** — the paper carried a name inferred from the session account; the git identity is `Kartik <kartikshreekumar2006@gmail.com>` — **RESOLVED 20 September 2026: the author is Kartik (`kartikshreekumar2006@gmail.com`), confirmed by the project owner. `pyproject.toml`, the paper byline and the rendered paper now all say so.** | **User** |
 | 2 | `claude.md.txt` (0 bytes, git-ignored) | **User** |
 | 3 | Root-level duplicates of the workbook and brief (git-ignored, byte-identical) | **User** |
 | 4 | Not yet deployed publicly; not yet pushed to GitHub | Pending instruction |
