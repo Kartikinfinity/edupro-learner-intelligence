@@ -182,8 +182,19 @@ def test_manifest_records_the_training_window(trained):
 
 
 def test_missing_manifest_is_an_actionable_error(tmp_path):
-    with pytest.raises(ArtifactIntegrityError, match="train_production_model"):
+    """A manifest that was never written is *not found*, not *corrupt*.
+
+    It raised ``ArtifactIntegrityError`` until the app smoke test caught the
+    consequence: a fresh checkout with no artifact set was told its artifacts had
+    failed an integrity check, which sends the reader to compare hashes for files
+    that do not exist (D-077).
+    """
+    with pytest.raises(FileNotFoundError, match="train_production_model"):
         load_manifest(tmp_path)
+    assert not isinstance(
+        pytest.raises(FileNotFoundError, load_manifest, tmp_path).value,
+        ArtifactIntegrityError,
+    ), "a missing manifest must not also present as an integrity failure"
 
 
 def test_model_version_mismatch_is_rejected(trained):

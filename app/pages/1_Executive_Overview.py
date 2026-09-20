@@ -158,7 +158,11 @@ with columns[3]:
     st.metric(
         "Cluster stability",
         f"{quality['mean_bootstrap_jaccard']:.3f}",
-        help="Mean bootstrap Jaccard. Above 0.75 is considered reliable; all four clusters pass.",
+        help=(
+            f"Mean bootstrap Jaccard over {quality['n_bootstrap']} resamples. Above "
+            f"0.75 is the conventional reliability threshold; "
+            f"{quality['n_clusters_reliable']} of {quality['k']} clusters clear it."
+        ),
         border=True,
     )
 

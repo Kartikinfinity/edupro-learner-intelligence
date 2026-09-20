@@ -221,7 +221,7 @@ The first build that could describe itself named the cause in one line.
 
 Once the URL is live, three checks confirm it is serving the real model:
 
-1. The sidebar shows **`edupro-1.0.0 · artifact set b658773c9db8`** — the same set
+1. The sidebar shows **`edupro-1.0.0 · artifact set 6892a4f9ef27`** — the same set
    as `models/manifest.json` in the repository.
 2. **Model Analytics** loads its tables. Those numbers come from the committed
    experiment artifacts; if they render, artifact loading works end to end.

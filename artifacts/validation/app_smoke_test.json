@@ -13,7 +13,7 @@
     {
       "probe": "page renders: 2_Learner_Profile",
       "severity": "pass",
-      "detail": "1 title, 4 sections, 4 metrics, 1 tables, 0.4s",
+      "detail": "1 title, 4 sections, 4 metrics, 1 tables, 0.5s",
       "evidence": {}
     },
     {

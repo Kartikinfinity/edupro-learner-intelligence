@@ -87,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         service = RecommendationService.load(strict=not args.no_strict)
-    except (ArtifactIntegrityError, ArtifactVersionError) as error:
+    except (ArtifactIntegrityError, ArtifactVersionError, FileNotFoundError) as error:
         print(f"Could not load artifacts: {error}", file=sys.stderr)
         print(
             "Train the production model first: python scripts/train_production_model.py",

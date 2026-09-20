@@ -576,8 +576,11 @@ for reproducibility of this submission, not redistributed under the MIT licence.
 | [Technical architecture](docs/technical_architecture.md) | Engineers |
 | [Deployment guide](docs/deployment_guide.md) · [operations](docs/deployment.md) | Whoever deploys it |
 | [Requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md) | Assessors |
-| [Submission checklist](docs/submission_checklist.md) | Assessors |
+| **[Submission checklist](SUBMISSION_CHECKLIST.md)** | **Assessors — the final, authoritative checklist** |
+| [Final audit report](research/FINAL_AUDIT_REPORT.md) | Independent pre-submission review + traceability matrix |
+| [Final freeze](research/FINAL_FREEZE.md) | The submitted configuration of record |
+| [Assessor checklist, per-phase](docs/submission_checklist.md) | Command-by-command variant |
 | [Architecture freeze](research/ARCHITECTURE_FREEZE.md) | The frozen design + evidence |
-| [Final validation report](research/final_validation_report.md) | The adversarial audit |
-| [Decision log](research/decision_log.md) | 62 recorded decisions |
-| [Experiment log](research/experiment_log.md) | 29 experiments, including failures |
+| [Final validation report](research/final_validation_report.md) | The Phase 6A adversarial audit |
+| [Decision log](research/decision_log.md) | 77 recorded decisions |
+| [Experiment log](research/experiment_log.md) | 31 registered experiments, 20 written up in full, failures included |

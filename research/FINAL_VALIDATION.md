@@ -4,6 +4,8 @@
 **Model:** `edupro-1.0.0`, artifact set `b658773c9db8`
 **Data:** `EduPro Online Platform.xlsx`, SHA-256 `ed555e46…8cc0`, verified unchanged
 
+
+> **Historical record.** The artifact set named here is the one current when this report was written. The submitted configuration is `6892a4f9ef27`, recorded in [`FINAL_FREEZE.md`](FINAL_FREEZE.md). The set was rewritten twice afterwards for platform-independent encoding; no model was refitted and the segments are identical.
 This is the one-page verdict and the exact reproduction procedure. The evidence
 behind it is in [`final_validation_report.md`](final_validation_report.md).
 

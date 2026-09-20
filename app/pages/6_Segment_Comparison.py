@@ -105,8 +105,8 @@ figure.add_hline(y=0, line_color=shell.REFERENCE_COLOR, line_width=1)
 figure.update_layout(barmode="group", yaxis_title="deviation from population mean (SD)")
 shell.show(shell.style_figure(figure, height=440))
 st.caption(
-    "Zero is the population average across all 3,000 learners. A bar beyond ±0.40 SD "
-    "is what the naming procedure treats as a defining characteristic."
+    f"Zero is the population average across all {len(learners):,} learners. A bar "
+    "beyond ±0.40 SD is what the naming procedure treats as a defining characteristic."
 )
 
 # --- absolute values -------------------------------------------------------

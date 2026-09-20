@@ -4,7 +4,7 @@
 
 **Author:** Kartik
 **Date:** 19 September 2026
-**Model version:** `edupro-1.0.0` · artifact set `b658773c9db8`
+**Model version:** `edupro-1.0.0` · artifact set `6892a4f9ef27`
 **Source data:** `EduPro Online Platform.xlsx`, SHA-256 `ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0`
 **Code and artifacts:** all results in this paper are reproducible via `scripts/verify_reproducibility.py`
 
@@ -243,6 +243,8 @@ stored under `artifacts/eda/`. No figure in this paper was drawn by hand.
 | **5–8** | **0** | **0.0%** |
 | 9–16 | 454 | 15.1% |
 
+![01 interaction distribution](../artifacts/eda/01_interaction_distribution.png)
+
 **[OBSERVED]** The distribution is **bimodal with a hard empty band at 5–8
 enrollments**. 2,546 "light" learners (1–4 courses) account for 3,914 interactions;
 454 "heavy" learners (9–16) account for 6,086 — more than half the data from 15% of
@@ -266,6 +268,9 @@ Activity is heavily over-dispersed relative to Poisson (mean 3.33, variance 18.9
 | **Gini coefficient** | **0.042** |
 | χ² against uniform | 55.52 (dof 59), **p = 0.605** |
 
+![02 course popularity](../artifacts/eda/02_course_popularity.png)
+![03 lorenz concentration](../artifacts/eda/03_lorenz_concentration.png)
+
 **[INTERPRETATION]** This is the single most consequential property of the
 dataset. Real catalogues are heavily long-tailed, and popularity is a strong
 recommendation signal precisely because of that skew [R28]. Here popularity is
@@ -287,6 +292,8 @@ with the observed popularity distribution, what would these statistics look like
 | Mean free-course share | 0.650 | 0.639 | [0.626, 0.654] | +1.51 | No |
 | **Mean distinct levels** | **1.556** | 1.571 | [1.560, 1.582] | **−2.65** | **Yes** |
 
+![06 signal detection](../artifacts/eda/06_signal_detection.png)
+
 **[EXPERIMENT]** Three of four statistics fall inside the null. The fourth —
 learners concentrate on slightly *fewer* course levels than chance — is marginally
 outside it.
@@ -307,6 +314,8 @@ grouping.
 | Gender × level | 0.20 | 2 | 0.906 | No |
 | Age band × category | 33.17 | 33 | 0.459 | No |
 | Age band × level | 8.43 | 6 | 0.208 | No |
+
+![07 demographics](../artifacts/eda/07_demographics.png)
 
 **[EXPERIMENT]** No demographic attribute is associated with course choice.
 **[INTERPRETATION]** This is the first of three independent lines of evidence
@@ -426,6 +435,9 @@ representation is 25-dimensional in four blocks.
 | 14 | `category_entropy`, `top_category_share` | Facets | Breadth and concentration | ❌ | Used in an ablation arm only |
 | 15 | Teacher block (3) | Teacher | Loyalty, count, mean rating | ❌ | Rejected on evidence (§11.4, §13.6) |
 
+![08 feature correlation](../artifacts/eda/08_feature_correlation.png)
+![09 feature distributions](../artifacts/eda/09_feature_distributions.png)
+
 **[ENGINEERING]** Two representation decisions deserve explicit justification.
 
 **Category as a share vector, not a modal label.** The brief asks for "preferred
@@ -520,6 +532,9 @@ All results below are measured on the fit window (2,650 learners) and stored in
 | 9 | 0.2613 | 4.7% | 6 | ❌ |
 | 10 | 0.2685 | 4.4% | 5 | ❌ |
 
+![01 elbow and silhouette](../artifacts/segmentation/01_elbow_and_silhouette.png)
+![02 k selection constraints](../artifacts/segmentation/02_k_selection_constraints.png)
+
 **[EXPERIMENT]** Silhouette rises monotonically with k. Unconstrained, it selects
 k = 10 — where **five of ten clusters fail to reappear under bootstrap
 resampling**. The constraints leave k ∈ {2, 3, 4}, and 4 has the highest silhouette
@@ -557,6 +572,8 @@ structure** — a real limitation (§21).
 | B_one_hot | 25 | 2 | 0.2115 | 0.285 | 20.0% | Rejected — discards distribution |
 | **B_proportion** ✅ | 25 | **4** | 0.1946 | **0.416** | **19.7%** | **SELECTED** |
 
+![06 representation comparison](../artifacts/segmentation/06_representation_comparison.png)
+
 **[INTERPRETATION]** The selected representation has the *lowest* silhouette in the
 table. It was chosen because it is the only arm that combines an interpretable
 category representation, a stable partition at an actionable k, and the highest
@@ -573,6 +590,8 @@ actually names. Optimising the headline number would have selected a pathology
 | B_proportion (behaviour only) | 25 | **0.1946** | — |
 | A_proportion (+ age, gender) | 27 | 0.1729 | **0.0004** |
 | **Adjusted Rand Index between the two partitions** | | **1.000** | |
+
+![07 variant and teacher](../artifacts/segmentation/07_variant_and_teacher.png)
 
 **[EXPERIMENT]** The two variants produce an **identical partition**. The
 demographic block explains 0.04% of between-cluster variance, and adding it
@@ -629,6 +648,8 @@ optimised for structure rather than for metrics.
 | K-Means vs average linkage | **0.019** |
 | Ward vs average linkage | 0.026 |
 
+![09 hierarchical validation](../artifacts/segmentation/09_hierarchical_validation.png)
+
 **[EXPERIMENT]** Average linkage places 2,406 of 2,650 learners (91%) in a single
 cluster. Agreement with K-Means is essentially zero.
 
@@ -648,6 +669,10 @@ one rather than omitted because the brief asked for hierarchical clustering as
 | 1 | Category-repeating High-volume learners | 522 | 19.7% | **9.65** | 6.84 | 0.98 | **227.0** | 3.12 | 93.8 | Advanced 44%, Beginner 39%, Intermediate 16% |
 | 2 | Advanced-level Non-repeating learners | 881 | 33.3% | 1.51 | 1.50 | 1.77 | 40.5 | 2.87 | 78.0 | Advanced 100% |
 | 3 | Intermediate-level Single-session learners | 532 | 20.1% | 1.25 | 1.25 | 1.00 | 18.3 | 3.39 | 83.5 | Intermediate 100% |
+
+![03 cluster sizes and stability](../artifacts/segmentation/03_cluster_sizes_and_stability.png)
+![04 cluster profile heatmap](../artifacts/segmentation/04_cluster_profile_heatmap.png)
+![05 level composition](../artifacts/segmentation/05_level_composition.png)
 
 **Table 11.7 — Segment stability** *(source: `EXP-013_stability`)*
 
@@ -773,6 +798,8 @@ window — never asserted.
 | `content_based` | 0.000 |
 | `user_user_profile` | 0.000 |
 
+![05 weights and ablation](../artifacts/recommendation/05_weights_and_ablation.png)
+
 **Table 14.2 — Component ablation** *(source: `EXP-024b_ablation`; validation NDCG@10 of the full hybrid = 0.1148)*
 
 | Removed | Δ NDCG@10 | Δ Coverage |
@@ -879,6 +906,10 @@ without that ceiling would understate performance by a factor of five.
 | rating | 0.1034 | 0.3325 | 0.0397 | 0.1885 | 0.1363 | 0.30 | 0.811 | −0.0010 | [−0.0193, +0.0163] | No |
 | user_user_history | 0.0947 | 0.3097 | 0.0362 | 0.1738 | 0.1233 | 1.00 | 0.193 | −0.0098 | [−0.0269, +0.0067] | No |
 
+![01 method comparison](../artifacts/recommendation/01_method_comparison.png)
+![02 significance vs random](../artifacts/recommendation/02_significance_vs_random.png)
+![08 precision ceiling](../artifacts/recommendation/08_precision_ceiling.png)
+
 **[EXPERIMENT] Zero of eleven methods is significantly better than random.** Every
 95% CI on the paired per-learner NDCG@10 difference contains zero. Random ranks
 **7th of 12**. Five methods score below it, including global popularity.
@@ -951,6 +982,8 @@ halves of that sentence are necessary.
 | moderate (2–8) | 193 | 0.0986 | 0.3264 | 0.73 | **−0.0112** | [−0.0463, +0.0229] |
 | rich (≥ 9) | 385 | 0.1265 | 0.4390 | 0.33 | +0.0079 | [−0.0165, +0.0342] |
 
+![04 tier behaviour](../artifacts/recommendation/04_tier_behaviour.png)
+
 **[EXPERIMENT]** No tier shows a significant improvement over random, and in the
 moderate tier the selected method is *worse* than random on average.
 
@@ -996,6 +1029,8 @@ Conducted on `cluster_popularity` over the 791 test learners
 | 4 | 65 | 0.569 |
 | 5 | 44 | 0.659 |
 | 6 | 13 | 0.846 |
+
+![07 error analysis](../artifacts/recommendation/07_error_analysis.png)
 
 **[INTERPRETATION]** More chances to be right produce more hits. Any claim that the
 system "works better for engaged learners" must control for this; the per-tier

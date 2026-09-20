@@ -137,11 +137,21 @@ def save_manifest(manifest: Manifest, directory: Path | None = None) -> Path:
 
 
 def load_manifest(directory: Path | None = None) -> Manifest:
-    """Read the manifest, with an actionable error when it is absent."""
+    """Read the manifest, with an actionable error when it is absent.
+
+    An absent manifest raises ``FileNotFoundError``, not ``ArtifactIntegrityError``.
+    The distinction is not pedantry: callers map the two to different guidance, and
+    "the artifact set failed its integrity check" sends the reader to compare
+    hashes for a set that was never written. This raised ``ArtifactIntegrityError``
+    until the smoke test caught the resulting misdiagnosis (D-077).
+
+    An *integrity* error means the set exists and cannot be trusted. A *missing*
+    manifest means there is nothing to distrust yet.
+    """
     directory = directory or config.MODELS_DIR
     path = directory / MANIFEST_NAME
     if not path.exists():
-        raise ArtifactIntegrityError(
+        raise FileNotFoundError(
             f"No manifest at {path}. Train the production model first: "
             "python scripts/train_production_model.py"
         )

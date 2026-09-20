@@ -558,6 +558,7 @@ stored under <code>artifacts/eda/</code>. No figure in this paper was drawn by h
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/eda/01_interaction_distribution.png" alt="01 interaction distribution" /></p>
 <p><span class="tag tag-observed">OBSERVED</span> The distribution is <strong>bimodal with a hard empty band at 5–8
 enrollments</strong>. 2,546 &quot;light&quot; learners (1–4 courses) account for 3,914 interactions;
 454 &quot;heavy&quot; learners (9–16) account for 6,086 — more than half the data from 15% of
@@ -595,6 +596,8 @@ learners, so it is handed over by the data rather than tuned.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/eda/02_course_popularity.png" alt="02 course popularity" />
+<img src="../artifacts/eda/03_lorenz_concentration.png" alt="03 lorenz concentration" /></p>
 <p><span class="tag tag-interpretation">INTERPRETATION</span> This is the single most consequential property of the
 dataset. Real catalogues are heavily long-tailed, and popularity is a strong
 recommendation signal precisely because of that skew [R28]. Here popularity is
@@ -651,6 +654,7 @@ with the observed popularity distribution, what would these statistics look like
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/eda/06_signal_detection.png" alt="06 signal detection" /></p>
 <p><span class="tag tag-experiment">EXPERIMENT</span> Three of four statistics fall inside the null. The fourth —
 learners concentrate on slightly <em>fewer</em> course levels than chance — is marginally
 outside it.</p>
@@ -702,6 +706,7 @@ grouping.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/eda/07_demographics.png" alt="07 demographics" /></p>
 <p><span class="tag tag-experiment">EXPERIMENT</span> No demographic attribute is associated with course choice.
 <span class="tag tag-interpretation">INTERPRETATION</span> This is the first of three independent lines of evidence
 against including demographics in the model (§11.3).</p>
@@ -934,6 +939,8 @@ representation is 25-dimensional in four blocks.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/eda/08_feature_correlation.png" alt="08 feature correlation" />
+<img src="../artifacts/eda/09_feature_distributions.png" alt="09 feature distributions" /></p>
 <p><span class="tag tag-engineering">ENGINEERING</span> Two representation decisions deserve explicit justification.</p>
 <p><strong>Category as a share vector, not a modal label.</strong> The brief asks for &quot;preferred
 course category&quot;. At a mean of 3.3 enrollments the <em>modal</em> category is close to a
@@ -1071,6 +1078,8 @@ support.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/segmentation/01_elbow_and_silhouette.png" alt="01 elbow and silhouette" />
+<img src="../artifacts/segmentation/02_k_selection_constraints.png" alt="02 k selection constraints" /></p>
 <p><span class="tag tag-experiment">EXPERIMENT</span> Silhouette rises monotonically with k. Unconstrained, it selects
 k = 10 — where <strong>five of ten clusters fail to reappear under bootstrap
 resampling</strong>. The constraints leave k ∈ {2, 3, 4}, and 4 has the highest silhouette
@@ -1194,6 +1203,7 @@ structure</strong> — a real limitation (§21).</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/segmentation/06_representation_comparison.png" alt="06 representation comparison" /></p>
 <p><span class="tag tag-interpretation">INTERPRETATION</span> The selected representation has the <em>lowest</em> silhouette in the
 table. It was chosen because it is the only arm that combines an interpretable
 category representation, a stable partition at an actionable k, and the highest
@@ -1232,6 +1242,7 @@ actually names. Optimising the headline number would have selected a pathology
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/segmentation/07_variant_and_teacher.png" alt="07 variant and teacher" /></p>
 <p><span class="tag tag-experiment">EXPERIMENT</span> The two variants produce an <strong>identical partition</strong>. The
 demographic block explains 0.04% of between-cluster variance, and adding it
 <em>lowers</em> silhouette.</p>
@@ -1320,6 +1331,7 @@ optimised for structure rather than for metrics.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/segmentation/09_hierarchical_validation.png" alt="09 hierarchical validation" /></p>
 <p><span class="tag tag-experiment">EXPERIMENT</span> Average linkage places 2,406 of 2,650 learners (91%) in a single
 cluster. Agreement with K-Means is essentially zero.</p>
 <p><span class="tag tag-interpretation">INTERPRETATION</span> The structure is <strong>not algorithm-independent</strong>. It is found by
@@ -1400,6 +1412,9 @@ one rather than omitted because the brief asked for hierarchical clustering as
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/segmentation/03_cluster_sizes_and_stability.png" alt="03 cluster sizes and stability" />
+<img src="../artifacts/segmentation/04_cluster_profile_heatmap.png" alt="04 cluster profile heatmap" />
+<img src="../artifacts/segmentation/05_level_composition.png" alt="05 level composition" /></p>
 <p><strong>Table 11.7 — Segment stability</strong> <em>(source: <code>EXP-013_stability</code>)</em></p>
 <table>
 <thead>
@@ -1651,6 +1666,7 @@ window — never asserted.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/recommendation/05_weights_and_ablation.png" alt="05 weights and ablation" /></p>
 <p><strong>Table 14.2 — Component ablation</strong> <em>(source: <code>EXP-024b_ablation</code>; validation NDCG@10 of the full hybrid = 0.1148)</em></p>
 <table>
 <thead>
@@ -1988,6 +2004,9 @@ without that ceiling would understate performance by a factor of five.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/recommendation/01_method_comparison.png" alt="01 method comparison" />
+<img src="../artifacts/recommendation/02_significance_vs_random.png" alt="02 significance vs random" />
+<img src="../artifacts/recommendation/08_precision_ceiling.png" alt="08 precision ceiling" /></p>
 <p><strong>[EXPERIMENT] Zero of eleven methods is significantly better than random.</strong> Every
 95% CI on the paired per-learner NDCG@10 difference contains zero. Random ranks
 <strong>7th of 12</strong>. Five methods score below it, including global popularity.</p>
@@ -2111,6 +2130,7 @@ halves of that sentence are necessary.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/recommendation/04_tier_behaviour.png" alt="04 tier behaviour" /></p>
 <p><span class="tag tag-experiment">EXPERIMENT</span> No tier shows a significant improvement over random, and in the
 moderate tier the selected method is <em>worse</em> than random on average.</p>
 <p><span class="tag tag-interpretation">INTERPRETATION</span> The apparent rise in Hit Rate with history (0.244 → 0.439) is
@@ -2215,6 +2235,7 @@ tested anything.</p>
 </tr>
 </tbody>
 </table>
+<p><img src="../artifacts/recommendation/07_error_analysis.png" alt="07 error analysis" /></p>
 <p><span class="tag tag-interpretation">INTERPRETATION</span> More chances to be right produce more hits. Any claim that the
 system &quot;works better for engaged learners&quot; must control for this; the per-tier
 figures in §16.5 do not, which is why they are reported alongside the significance

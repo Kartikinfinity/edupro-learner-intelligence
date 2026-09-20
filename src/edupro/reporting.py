@@ -321,6 +321,10 @@ def segmentation_quality() -> dict[str, Any]:
         "mean_bootstrap_jaccard": stability["mean_jaccard"],
         "seed_stability_ari": selected["seed_stability_ari"],
         "per_cluster_silhouette": selected["per_cluster_silhouette"],
+        # Surfaced so the dashboard can state how many clusters clear the
+        # reliability threshold instead of asserting it in static text.
+        "n_clusters_reliable": stability["n_reliable_above_0.75"],
+        "n_bootstrap": stability["n_bootstrap"],
     }
 
 

@@ -1,12 +1,17 @@
 # Submission Checklist
 
 **Project:** Student Segmentation and Personalized Course Recommendation System for EduPro
-**Model version:** `edupro-1.0.0` · artifact set `b658773c9db8`
+**Model version:** `edupro-1.0.0` · artifact set `6892a4f9ef27`
 **Date:** 20 September 2026
 **Source data:** SHA-256 `ed555e4613e6a210b73af0d4f64e34bd43cb59650041e2bd05f8a8ffbf5d8cc0`, verified unchanged
 
 This checklist is written for an assessor. Every row names **where to look** and, where
 possible, **a command that checks it** — so nothing here has to be taken on trust.
+
+> **The authoritative final checklist is [`SUBMISSION_CHECKLIST.md`](../SUBMISSION_CHECKLIST.md)**
+> in the repository root, produced by the independent pre-submission audit. This
+> document remains because it gives the *commands*; where the two differ on a
+> status, the root checklist is current.
 
 ---
 

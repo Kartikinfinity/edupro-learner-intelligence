@@ -9,6 +9,9 @@
 *.joblib binary
 *.pkl   binary
 *.parquet binary
+# Hashed in the manifest. Git would auto-detect it as binary from its NUL
+# bytes, but auto-detection is a heuristic and these bytes must never change.
+*.npy   binary
 
 # ---------------------------------------------------------------------------
 # Generated model artifacts: never line-ending converted.

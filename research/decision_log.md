@@ -1656,6 +1656,30 @@ Three regression tests: the outcome carries its reason, the source contains no
 
 ---
 
+### D-077 — A missing manifest is *not found*, not *corrupt*
+**Status:** Fixed during the final audit.
+
+`load_manifest()` raised `ArtifactIntegrityError` when the manifest file did not
+exist. Once D-074 gave each exception type its own guidance, a **fresh checkout
+with no artifact set** was told its artifacts had *failed an integrity check* -
+sending the reader to compare hashes for files that had never been written.
+
+An absent manifest now raises `FileNotFoundError`, which the app already maps to
+"Model artifacts not found". `scripts/recommend.py` catches it too, so the CLI
+still prints guidance rather than a traceback.
+
+**Why this is worth recording.** It is the fourth instance of one defect: an
+error that misdiagnoses its own cause (D-055, D-074, and the deployment's own
+empty state). It was *introduced by the fix for the third instance*, and it was
+caught by `scripts/app_smoke_test.py`, which hides the manifest and asserts the
+page says "artifacts not found". The probe existed before the defect did.
+
+That is the argument for writing a test that pins the *wording* of an error path,
+not merely that one exists: the guidance is the product, and it regressed while
+every other check stayed green.
+
+---
+
 ---
 
 ## Open questions carried into later phases

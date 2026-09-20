@@ -201,7 +201,7 @@ with recommendation_tab:
             )
 
     with right:
-        st.subheader("Engagement lift")
+        st.subheader("Engagement lift (proxy)")
         shell.evidence(shell.PROXY, "the official impact metric")
         proxy = loaders.engagement_lift_proxy()
         columns = st.columns(2)
@@ -368,8 +368,13 @@ with segmentation_tab:
             )
         )
         st.caption(
-            "An ARI of 1.000 means the two variants produce the identical partition. "
-            "Demographics were excluded on this evidence, not by assumption."
+            (
+                "An ARI of 1.000 means the two variants produce the identical "
+                "partition. "
+                if ari is not None and round(ari, 3) == 1.000
+                else "ARI measures how far the two partitions agree; 1.000 is identical. "
+            )
+            + "Demographics were excluded on this evidence, not by assumption."
         )
     with right:
         st.markdown("**Does another algorithm find the same structure?**")

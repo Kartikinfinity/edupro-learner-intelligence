@@ -88,7 +88,7 @@
     {
       "check": "6. no platform-specific dependencies",
       "severity": "pass",
-      "detail": "12 pinned packages, none Windows- or macOS-only",
+      "detail": "11 pinned packages, none Windows- or macOS-only",
       "evidence": {}
     },
     {

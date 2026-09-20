@@ -6,6 +6,8 @@
 **Artifact set:** `edupro-1.0.0`, set `b658773c9db8`
 **Next phase:** Phase 6B — research paper, executive summary, deployment (**not started; awaiting go-ahead**)
 
+
+> **Historical record.** The artifact set named here is the one current when this report was written. The submitted configuration is `6892a4f9ef27`, recorded in [`FINAL_FREEZE.md`](FINAL_FREEZE.md). The set was rewritten twice afterwards for platform-independent encoding; no model was refitted and the segments are identical.
 ---
 
 ## 1. Objective
