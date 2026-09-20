@@ -5,7 +5,7 @@ built as a research-grade engineering project rather than a notebook.
 
 **Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 385 passing
 **Live dashboard:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
-**Deliverables:** [research paper](docs/research_paper.md) · [executive summary](docs/executive_summary.md) · [dashboard](https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/)
+**Deliverables:** [research paper](docs/research_paper.md) ([web edition](docs/paper.html)) · [executive summary](docs/executive_summary.md) · [dashboard](https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/)
 
 ---
 
@@ -571,7 +571,7 @@ for reproducibility of this submission, not redistributed under the MIT licence.
 
 | Document | Audience |
 | --- | --- |
-| [Research paper](docs/research_paper.md) · [HTML](docs/research_paper.html) | Technical reviewer |
+| [Research paper](docs/research_paper.md) · [web edition](docs/paper.html) · [plain HTML](docs/research_paper.html) | Technical reviewer |
 | [Executive summary](docs/executive_summary.md) | Management, administrators, reviewers |
 | [Technical architecture](docs/technical_architecture.md) | Engineers |
 | [Deployment guide](docs/deployment_guide.md) · [operations](docs/deployment.md) | Whoever deploys it |
