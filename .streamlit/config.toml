@@ -25,6 +25,13 @@ enableCORS = true
 gatherUsageStats = false
 
 [client]
-# Show errors in the browser rather than only in the server log, so a deployment
-# problem is visible to whoever opens the page.
-showErrorDetails = "full"
+# "type" rather than "full", because this app is deployed to a public URL.
+#
+# A visitor sees the exception type and a generic message - enough for a reviewer
+# to report "it showed a KeyError" - while the full message and traceback go to
+# the server log only, where the owner can read them in the Community Cloud log
+# viewer. "full" would print server-side file paths, library versions and
+# internal structure to anyone who triggered an error.
+#
+# Set this back to "full" when running locally if you are debugging.
+showErrorDetails = "type"

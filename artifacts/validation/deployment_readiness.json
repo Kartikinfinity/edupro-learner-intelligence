@@ -1,0 +1,149 @@
+{
+  "summary": {
+    "n_checks": 23,
+    "n_pass": 23,
+    "n_warn": 0,
+    "n_fail": 0,
+    "deployment_ready": true
+  },
+  "findings": [
+    {
+      "check": "1. no hardcoded secrets",
+      "severity": "pass",
+      "detail": "191 tracked files scanned, 0 matches",
+      "evidence": {}
+    },
+    {
+      "check": "1b. secrets file not committed",
+      "severity": "pass",
+      "detail": "not tracked and explicitly git-ignored",
+      "evidence": {}
+    },
+    {
+      "check": "1c. app requires no secrets",
+      "severity": "pass",
+      "detail": "the app reads no secrets, so none need configuring on the platform",
+      "evidence": {}
+    },
+    {
+      "check": "2. no personal data served",
+      "severity": "pass",
+      "detail": "25 served files scanned against 3000 emails and 3058 names, 0 matches",
+      "evidence": {}
+    },
+    {
+      "check": "2b. identifiers are pseudonymous",
+      "severity": "pass",
+      "detail": "learners keyed by UserID, e.g. U00001",
+      "evidence": {}
+    },
+    {
+      "check": "3. artifacts committed",
+      "severity": "pass",
+      "detail": "all 12 manifest files tracked (293 KB); a fresh clone can serve immediately",
+      "evidence": {}
+    },
+    {
+      "check": "3b. artifact set is internally consistent",
+      "severity": "pass",
+      "detail": "every file matches its recorded hash (set b658773c9db8)",
+      "evidence": {}
+    },
+    {
+      "check": "4. no training on startup",
+      "severity": "pass",
+      "detail": "11 app files contain no model-fitting call",
+      "evidence": {}
+    },
+    {
+      "check": "4b. model cached per process",
+      "severity": "pass",
+      "detail": "RecommendationService.load is wrapped in st.cache_resource",
+      "evidence": {}
+    },
+    {
+      "check": "5. deterministic startup",
+      "severity": "pass",
+      "detail": "two loads agree on all 3,000 segment labels and produce an identical top-10",
+      "evidence": {}
+    },
+    {
+      "check": "5b. seeded",
+      "severity": "pass",
+      "detail": "edupro.config.RANDOM_SEED = 42",
+      "evidence": {}
+    },
+    {
+      "check": "6. no platform-specific dependencies",
+      "severity": "pass",
+      "detail": "12 pinned packages, none Windows- or macOS-only",
+      "evidence": {}
+    },
+    {
+      "check": "6b. versions pinned",
+      "severity": "pass",
+      "detail": "every dependency is pinned to an exact version",
+      "evidence": {}
+    },
+    {
+      "check": "6c. every import is declared",
+      "severity": "pass",
+      "detail": "8 third-party imports, all declared: ['joblib', 'matplotlib', 'numpy', 'pandas', 'plotly', 'scikit-learn', 'scipy', 'streamlit']",
+      "evidence": {}
+    },
+    {
+      "check": "6d. Python version declared",
+      "severity": "pass",
+      "detail": "requires-python = '>=3.11,<3.14'; Community Cloud must be set to a version inside this range",
+      "evidence": {}
+    },
+    {
+      "check": "7. no absolute paths",
+      "severity": "pass",
+      "detail": "every path is derived from config.PROJECT_ROOT or __file__",
+      "evidence": {}
+    },
+    {
+      "check": "7b. project root is relative to the package",
+      "severity": "pass",
+      "detail": "PROJECT_ROOT: Final[Path] = Path(__file__).resolve().parents[2]",
+      "evidence": {}
+    },
+    {
+      "check": "8. filename case matches on Linux",
+      "severity": "pass",
+      "detail": "18 referenced filenames, no case mismatch against the tracked tree",
+      "evidence": {}
+    },
+    {
+      "check": "9. no Docker or container config",
+      "severity": "pass",
+      "detail": "no container or process-manager files",
+      "evidence": {}
+    },
+    {
+      "check": "10. error detail on a public URL",
+      "severity": "pass",
+      "detail": "showErrorDetails = 'type'",
+      "evidence": {}
+    },
+    {
+      "check": "10b. theme pinned",
+      "severity": "pass",
+      "detail": "base = 'light', so every viewer sees what the README shows",
+      "evidence": {}
+    },
+    {
+      "check": "10c. entry point",
+      "severity": "pass",
+      "detail": "app\\streamlit_app.py exists and is the documented main file",
+      "evidence": {}
+    },
+    {
+      "check": "11. no file over GitHub's limit",
+      "severity": "pass",
+      "detail": "repository 13 MB, largest tracked file 3.1 MB",
+      "evidence": {}
+    }
+  ]
+}

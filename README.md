@@ -495,7 +495,20 @@ Streamlit Community Cloud, deployed from this repository. **No Docker.**
 No secrets, environment variables or external services are required. The artifact
 set is committed because the platform cannot run the training pipeline.
 
-Full notes, including verification: [`docs/deployment.md`](docs/deployment.md).
+**Deployment readiness: 23 of 23 checks pass**
+(`python scripts/deployment_readiness.py`), covering secrets, personal data,
+artifact availability from a fresh clone, startup cost, determinism, dependency
+compatibility, path safety, Linux filename case sensitivity, and the absence of
+container configuration.
+
+**Status: not yet deployed.** Creating the app requires signing in to Streamlit
+Community Cloud with the repository owner's GitHub account — the one step that
+cannot be automated. The public URL will be recorded here once it exists; no
+deployment success is claimed until then.
+
+Step-by-step guide, settings and troubleshooting:
+[`docs/deployment_guide.md`](docs/deployment_guide.md).
+Operational notes: [`docs/deployment.md`](docs/deployment.md).
 
 # References
 
@@ -535,7 +548,7 @@ for reproducibility of this submission, not redistributed under the MIT licence.
 | [Research paper](docs/research_paper.md) · [HTML](docs/research_paper.html) | Technical reviewer |
 | [Executive summary](docs/executive_summary.md) | Management, administrators, reviewers |
 | [Technical architecture](docs/technical_architecture.md) | Engineers |
-| [Deployment guide](docs/deployment.md) | Whoever deploys it |
+| [Deployment guide](docs/deployment_guide.md) · [operations](docs/deployment.md) | Whoever deploys it |
 | [Requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md) | Assessors |
 | [Submission checklist](docs/submission_checklist.md) | Assessors |
 | [Architecture freeze](research/ARCHITECTURE_FREEZE.md) | The frozen design + evidence |

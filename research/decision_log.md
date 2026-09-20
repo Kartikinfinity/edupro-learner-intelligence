@@ -1401,6 +1401,94 @@ failure mode avoided was not "guessing wrong" — it was guessing wrong *silentl
 
 ---
 
+## Phase 6E — Public deployment readiness (20 September 2026)
+
+### D-068 — A public URL changes what error detail is acceptable
+**Status:** Settled; `showErrorDetails` changed from `full` to `type`
+
+Phase 5B set `showErrorDetails = "full"` so that a deployment problem would be
+visible to whoever opened the page. That reasoning was correct for a local app and
+wrong for a public one: `"full"` prints server-side file paths, library versions
+and internal structure to anyone who triggers an error.
+
+`"type"` is the balance. A visitor sees the exception type and a generic message —
+enough for a reviewer to report "it showed a `KeyError`" — while the full message
+and traceback go to the server log, where the owner reads them in the Community
+Cloud log viewer. Nothing is lost for the person who needs the detail; nothing is
+disclosed to the person who does not.
+
+The four valid values were read from Streamlit's own
+`ShowErrorDetailsConfigOptions` enum rather than guessed, and the app was restarted
+to confirm the config still parses and serves.
+
+**Generalisable:** a setting chosen for a local audience should be re-examined when
+the audience becomes the public internet. The setting did not change; the audience
+did.
+
+---
+
+### D-069 — A deployment audit must test what breaks deployments
+**Status:** Settled as the design principle for `scripts/deployment_readiness.py`
+
+It is easy to write a deployment checklist that confirms the obvious and misses
+everything that actually goes wrong between a Windows laptop and a Linux container.
+Three of the twenty-three probes exist specifically for failures that are
+**invisible on the development machine**:
+
+**Linux case sensitivity.** Windows treats `Models/Scaler.joblib` and
+`models/scaler.joblib` as the same file; Linux does not. A case mismatch works
+locally forever and fails on the first deploy. The probe extracts every filename
+referenced in code and matches it case-exactly against the tracked tree.
+
+**Fresh-clone availability.** The probe checks every artifact in the manifest
+against `git ls-files`, deliberately **not** against the filesystem. An artifact
+that exists on the author's disk but is git-ignored produces an app that works for
+its author and shows an empty state to everyone else.
+
+**Public error disclosure.** Which is the probe that found D-068.
+
+---
+
+### D-070 — The audit found a bug in itself, and it is recorded
+**Status:** Fixed
+
+The secrets probe contained `if "\.streamlit/secrets\.toml" in " ".join(tracked)`
+— regex escaping inside a plain string comparison. It raised a `SyntaxWarning` and
+could never match.
+
+**The check still passed**, because the second half of the `or` did the real work.
+That is the part worth recording: a probe that passes for the wrong reason is
+exactly what an audit is meant to catch in other people's code, and this one was in
+mine. It is the third time in the late phases that a verification instrument has
+needed verifying — after the PII scanner's false positive (D-066) and the
+forbidden-claim test firing on correct writing (D-062).
+
+**Generalisable:** the instruments need the same scrutiny as the thing they
+measure, and "it passed" is not evidence that it tested anything.
+
+---
+
+### D-071 — No deployment success is claimed without a URL
+**Status:** Standing rule
+
+Creating the Streamlit Community Cloud app requires signing in with the repository
+owner's GitHub account and authorising a third-party OAuth application. Neither is
+something an agent should do on someone's behalf, and the phase brief directed
+stopping at exactly that action.
+
+Everything up to it is done and audited. The URL field reads "not yet issued" in
+`docs/deployment_guide.md`, `README.md` and `docs/submission_checklist.md`, and
+will stay that way until a real URL exists. Writing a plausible-looking
+`*.streamlit.app` address would have been the single worst output this phase could
+produce — it is the one claim a reviewer would check first and the one that would
+discredit every other number in the project.
+
+The sign-in flow was verified against the live site so the instructions name
+buttons that exist: <https://share.streamlit.io> presents a single **Continue to
+sign-in** button on a signed-out landing page. No sign-in was attempted.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were

@@ -155,7 +155,7 @@ Carried honestly into submission rather than quietly closed. Closed items are st
 | ~~1~~ | ~~Authorship unconfirmed~~ — **resolved 20 September 2026.** The author is **Kartik** (`kartikshreekumar2006@gmail.com`), confirmed by the project owner and matching the git identity on all commits. | ✅ Closed | — |
 | 2 | `claude.md.txt` at the repository root is empty (0 bytes) and git-ignored | Cosmetic; left because deleting a user file is not the agent's call | **User decision** |
 | 3 | Root-level duplicates of the source workbook and brief | None — git-ignored, byte-identical to the tracked copies | **User decision** |
-| 4 | **Not yet deployed publicly** to Streamlit Community Cloud | Procedure documented in `docs/deployment.md`; requires a GitHub push | Pending instruction |
+| 4 | **Not yet deployed publicly** to Streamlit Community Cloud. Readiness audited: **23 of 23 checks pass**. The remaining action is a GitHub sign-in at share.streamlit.io, documented step by step in `docs/deployment_guide.md` §5 | **User — requires account sign-in** |
 | 5 | Gender gap is disclosed in the paper and summary but **not surfaced in the dashboard** | Deliberate; whether a fairness panel belongs in a stakeholder dashboard is a product decision | **User decision** |
 | 6 | No PDF of the executive summary | The paper has an HTML copy that prints to PDF; the summary is Markdown only | Optional |
 | 7 | Artifact staleness is not automated | The manifest detects an *inconsistent* artifact set, not an *old* one | Future work |
@@ -174,7 +174,8 @@ Carried honestly into submission rather than quietly closed. Closed items are st
 | References verified | 40 |
 | Documentation | 35 Markdown files |
 | Source data | Unmodified — checksum verified |
-| Pushed to GitHub | **No** — awaiting explicit instruction |
+| Pushed to GitHub | ✅ Yes — `Kartikinfinity/edupro-learner-intelligence` |
+| Deployed publicly | **Not yet** — see open item 4 |
 
 ---
 
