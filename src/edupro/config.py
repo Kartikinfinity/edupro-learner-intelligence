@@ -30,12 +30,15 @@ REFERENCES_DIR: Final[Path] = PROJECT_ROOT / "references"
 OFFICIAL_DIR: Final[Path] = REFERENCES_DIR / "official"
 
 RESEARCH_DIR: Final[Path] = PROJECT_ROOT / "research"
-EXPERIMENTS_DIR: Final[Path] = PROJECT_ROOT / "experiments"
 MODELS_DIR: Final[Path] = PROJECT_ROOT / "models"
-ARTIFACTS_DIR: Final[Path] = PROJECT_ROOT / "artifacts"
-REPORTS_DIR: Final[Path] = PROJECT_ROOT / "reports"
-FIGURES_DIR: Final[Path] = REPORTS_DIR / "figures"
 DOCS_DIR: Final[Path] = PROJECT_ROOT / "docs"
+
+#: Every generated output - experiment results, figures and the production
+#: artifact set - lives under here. Phase 1 had planned separate `experiments/`
+#: and `reports/figures/` trees; the implementation consolidated on one location
+#: and those directories were never written to, so they were removed in Phase 6D
+#: rather than left in the repository as empty shells.
+ARTIFACTS_DIR: Final[Path] = PROJECT_ROOT / "artifacts"
 
 # ---------------------------------------------------------------------------
 # Authoritative source materials
@@ -104,7 +107,5 @@ def ensure_directories() -> None:
         PROCESSED_DIR,
         MODELS_DIR,
         ARTIFACTS_DIR,
-        FIGURES_DIR,
-        EXPERIMENTS_DIR,
     ):
         directory.mkdir(parents=True, exist_ok=True)

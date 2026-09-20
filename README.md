@@ -1,368 +1,544 @@
 # Student Segmentation and Personalized Course Recommendation System for EduPro
 
-Learner segmentation and personalised course recommendation for the EduPro
-online learning platform — built as a reproducible, explainable research-grade
-system rather than a single notebook.
+A reproducible, explainable learner segmentation and course recommendation system,
+built as a research-grade engineering project rather than a notebook.
 
-> **Project status: Phase 5B complete — the dashboard runs on the production model.**
-> The ML design is frozen as `edupro-1.0.0`
-> ([`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md)), implemented
-> as reusable modules with a versioned artifact set, and served by a seven-page
-> Streamlit dashboard that contains **no machine learning of its own**:
->
-> ```bash
-> streamlit run app/streamlit_app.py
-> ```
->
-> The artifact set is committed, so a fresh clone runs immediately. Remaining work
-> is Phase 6: the research paper, the executive summary and public deployment.
-> Sections marked *(Phase N)* below describe planned work, not shipped work.
-
-> ### ⚠ Headline finding from the Phase 2 audit
-> **Course choice in this dataset is statistically indistinguishable from
-> popularity-weighted random selection.** Category concentration, top-category
-> share, free-course share and item–item co-occurrence all fall inside a
-> permutation null; course popularity is near-uniform (Gini 0.042); demographics
-> are unrelated to choice. One real signal exists — learners reuse instructors far
-> more than chance — but it lifts next-course prediction only 1.10×.
-> The dataset is also **assessed as almost certainly synthetic**.
->
-> **Phase 3B confirmed the consequence: no recommendation method beats random
-> ranking.** Across eleven methods on a leakage-free temporal split of 791
-> learners, every 95% confidence interval on the paired NDCG@10 difference against
-> random contains zero. Global popularity is *worse* than random.
->
-> This is reported up front because it bounds what the project can honestly claim.
-> It does **not** mean the methods or the pipeline are wrong — every component is
-> tested and transfers unchanged to real data.
-> Full evidence: [`research/dataset_audit.md`](research/dataset_audit.md) and
-> [`research/recommendation_results.md`](research/recommendation_results.md).
+**Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 373 passing
+**Deliverables:** [research paper](docs/research_paper.md) · [executive summary](docs/executive_summary.md) · [dashboard](app/streamlit_app.py)
 
 ---
 
-## What this project does
-
-EduPro's learners are not homogeneous: some sample beginner courses across many
-domains, some specialise deeply, others pursue career-oriented certifications.
-One-size-fits-all recommendations serve none of them well.
-
-This system:
-
-1. **Segments learners** into interpretable behavioural groups from their
-   enrollment history, using K-Means with hierarchical clustering as an
-   independent validation.
-2. **Recommends courses** personalised to each learner's segment, content
-   preferences and history — with an explicit fallback path for learners whose
-   history is too thin to personalise honestly.
-3. **Explains every recommendation** in plain language, derived from the actual
-   scoring contributions rather than written to sound plausible.
-
----
-
-## Dataset
-
-`data/raw/EduPro Online Platform.xlsx` — 4 sheets, no missing values anywhere.
-
-| Sheet | Rows | Columns | Role |
-| --- | --- | --- | --- |
-| `Users` | 3,000 | 5 | Learner demographics |
-| `Courses` | 60 | 8 | Course catalogue |
-| `Transactions` | 10,000 | 7 | Enrollment interactions |
-| `Teachers` | 60 | 7 | Instructor attributes — *opt-in experiment only* |
-
-The interaction matrix is **5.56% dense**: 10,000 enrollments across 3,000
-learners and 60 courses, all distinct `(UserID, CourseID)` pairs, giving a mean
-of **3.333 courses per learner**. Sparse learner histories are therefore an
-inherent property of this problem, not an edge case — and there are no repeat
-enrollments, so the interaction signal is purely implicit/binary.
-
-Full structural inventory: [`PROJECT_MANIFEST.md`](PROJECT_MANIFEST.md) §3.
+> ### ⚠ The headline finding, stated first
+>
+> **No recommendation method in this study performs better than random ranking on
+> this dataset.** Eleven methods were evaluated on a leakage-free temporal split of
+> 791 learners; every 95% confidence interval on the difference against random
+> contains zero, and five methods score *below* random.
+>
+> This is a property of the data, not a defect in the system. Before any
+> recommender was built, a permutation test established that course choice here is
+> statistically indistinguishable from popularity-weighted chance. Course
+> popularity is near-uniform (Gini 0.042) and 54% of learners have taken exactly
+> one course.
+>
+> The **segmentation works** and is usable. The recommendation system is built,
+> tested, deployable, and honest about what it cannot demonstrate. Reporting that
+> plainly is the point of the project.
 
 ---
 
-## Quickstart
+# Project Overview
 
-Requires **Python 3.11–3.13** (3.13 recommended; see ADR-0002 for the reasoning,
-including a Phase 1 correction to its original rationale).
+EduPro is an online learning platform with 3,000 learners and 60 courses. This
+project answers two questions with evidence:
 
-```bash
-python -m venv .venv
+1. **Can learners be grouped into stable, interpretable segments?** Yes — four of
+   them, each reappearing reliably under resampling.
+2. **Can course choice be predicted from enrollment history?** Not from this data.
+   The system that would do it is built and measured; the measurement says no.
+
+The work follows a phase-gated method: research → data audit → experiments →
+architecture freeze → implementation → validation → documentation. Each phase
+produced a report with a PASS/FAIL decision backed by evidence
+([`research/`](research/)).
+
+# Problem Statement
+
+Given an enrollment history, group learners into actionable segments and recommend
+the next course to each one — with explanations a learner or administrator can
+check, and without claiming performance that has not been measured.
+
+The harder problem underneath: **determine whether the data supports personalised
+recommendation at all**, and report that determination either way. On a 60-course
+catalogue a ranker that has learned nothing still achieves Hit Rate@10 ≈ 0.35, so a
+system evaluated without a random baseline will look successful regardless of
+whether it works.
+
+# Objectives
+
+| # | Objective | Outcome |
+| --- | --- | --- |
+| 1 | Aggregate transactions to learner level with behavioural, engagement and preference features | 25 features in 4 blocks; all 11 brief-mandated features implemented |
+| 2 | Segment learners with K-Means, validated by hierarchical clustering | k = 4, selected by a pre-registered rule |
+| 3 | Compare at least five recommendation approaches on evidence | 11 methods evaluated on two protocols |
+| 4 | Evaluate with leakage control | 6 controls, verified by experiment |
+| 5 | Explain every recommendation faithfully | 30,000 explanations verified exhaustively |
+| 6 | Handle sparse and cold-start learners explicitly | 4-tier routing; 100% of learners served |
+| 7 | Deliver a deployable, reproducible system | 12 artifacts, 276 KB; app loads in 0.41 s |
+| 8 | Report limitations honestly | The negative result leads every document |
+
+# Key Features
+
+- **Evidence-based model selection.** Ten feature representations and eleven
+  recommenders compared; the highest-scoring option was rejected in both cases for
+  documented reasons.
+- **Leakage control verified by experiment.** A synthetic future interaction is
+  injected and the training features must come back byte-identical.
+- **Explanations generated from the scorer's own decomposition** — the number in
+  *"127 learners in your segment enrolled in this course"* is the value the ranking
+  used, checked across all 30,000 explanations.
+- **Honest degradation.** Learners who cannot be personalised are told so, not
+  shown a popularity list dressed as personalisation.
+- **Privacy by construction.** Names and emails are dropped at ingestion; a scan of
+  858 real values across 190 tracked files finds zero.
+- **Reproducible.** Eight headline results recompute exactly, in two independent
+  environments.
+- **Adversarially validated.** A 59-probe audit that found and fixed three real
+  defects in this codebase.
+
+# Architecture
+
+```
+Raw workbook (immutable, checksum-verified)
+        │
+        ▼  load ─── PII dropped here
+   validate ─── 12 check families, refuses to train on error
+        │
+        ▼  join ─── 10,000 interactions
+   temporal split ─── train │ validation │ test (opened once)
+        │
+        ├──▶ learner features (25) ──▶ StandardScaler ──▶ K-Means k=4 ──▶ 4 segments
+        │
+        ▼
+   FitContext ──▶ TieredRecommender ──▶ ranked list + explanation
+        │
+        ▼
+   persisted artifacts (12 files, 276 KB) ──▶ Streamlit dashboard
 ```
 
-Activate it — Windows PowerShell:
+The application contains **no machine learning**: it loads persisted artifacts
+through `edupro.inference`. A test greps every file under `app/` for model calls
+and fails if any appears.
+
+Full detail: [`docs/technical_architecture.md`](docs/technical_architecture.md) ·
+[`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md) ·
+[`research/architecture_diagram.md`](research/architecture_diagram.md)
+
+# Dataset
+
+`data/raw/EduPro Online Platform.xlsx` — SHA-256 `ed555e46…8cc0`, immutable and
+verified before every run.
+
+| Property | Value |
+| --- | --- |
+| Learners / Courses / Enrollments | 3,000 / 60 / 10,000 |
+| Categories | 12, exactly 5 courses each |
+| Matrix density | 5.56% |
+| Repeat (learner, course) pairs | **0** — the signal is purely binary |
+| Enrollments per learner: mean / median / max | 3.333 / **1** / 16 |
+| Learners with exactly one enrollment | **54.0%** |
+| Course popularity range | 140–196 (Gini 0.042) |
+| Missing values | **0** across 4 sheets, 27 columns |
+| Validation errors | **0** |
+
+**The dataset is assessed as almost certainly synthetic** — zero missing values,
+perfectly balanced categories, uniform demographics. Findings should be read as
+provisional until confirmed on live data.
+
+Audit: [`research/dataset_audit.md`](research/dataset_audit.md)
+
+# Feature Engineering
+
+25 features in four blocks. All eleven features named in the official brief are
+implemented.
+
+| Block | Features |
+| --- | --- |
+| Engagement (4) | `total_courses`, `avg_courses_per_category`, `enrollment_frequency`, `activity_span_days` |
+| Behavioural (6) | `avg_course_rating`, `avg_spend`, `diversity_score`, `learning_depth_index`, `free_ratio`, `diversity_ratio` |
+| Category (12) | `cat_share_*` — a row-normalised share vector |
+| Level (3) | one-hot preferred level |
+
+**Excluded on evidence, not preference:** age and gender (identical partition,
+ARI 1.000); teacher features (+0.0009 silhouette, correlate +0.963 with enrollment
+volume); `total_spend` (r = +0.84 with `total_courses`); a level-progression slope
+(measured p = 0.664 — no progression exists).
+
+`avg_spend` is retained because the brief mandates it, with its degeneracy
+documented: `Amount` equals `CoursePrice` on all 10,000 rows.
+
+Course side: an 18-dimensional content vector (category, level, type, rating,
+duration). Titles are excluded — 58 distinct names across 60 courses.
+
+# Learner Segmentation
+
+**Behaviour-only features → StandardScaler → K-Means (k-means++, n_init=10, seed 42), k = 4.**
+
+k was chosen by a **pre-registered rule**: maximise silhouette subject to *every*
+segment holding ≥5% of learners **and** reaching bootstrap Jaccard ≥0.60.
+Unconstrained, silhouette selects k = 10 — where five of ten clusters fail to
+reappear under resampling.
+
+| Segment | Learners | Share | Courses | Active span |
+| --- | --- | --- | --- | --- |
+| Advanced-level Non-repeating | 1,030 | 34.3% | 1.6 | 62 days |
+| Beginner-level Single-course | 841 | 28.0% | 1.5 | 46 days |
+| Intermediate-level Single-session | 607 | 20.2% | 1.4 | 29 days |
+| **Category-repeating High-volume** | **522** | **17.4%** | **12.0** | **296 days** |
+
+Quality: silhouette 0.1946 · intra-cluster similarity 0.416 · mean bootstrap
+Jaccard 0.9892 · seed-stability ARI 0.99959.
+
+**Stated plainly:** three of the four segments are largely *course-level*
+groupings, not behavioural personas. Only the high-volume segment is a distinct
+behavioural group. Hierarchical validation is a **negative result** — average
+linkage agrees with K-Means at ARI 0.019.
+
+Detail: [`research/segmentation_results.md`](research/segmentation_results.md) ·
+[`research/cluster_profiles.md`](research/cluster_profiles.md)
+
+# Recommendation System
+
+A **four-tier switching recommender**, routed on training-window history only:
+
+| History | Learners | Route |
+| --- | --- | --- |
+| 0 | new learners only | `DiversifiedFallback` — popularity + rating, re-ranked round-robin across categories |
+| 1 | 1,620 | `ContentBased` |
+| 2–8 | 926 | `ClusterPopularity` |
+| ≥ 9 | 454 | `ClusterPopularity` |
+
+Tier boundaries come from the data: the enrollment histogram has a hard empty band
+at 5–8, so the moderate/rich cut passes through a region containing no learners.
+
+Eleven methods were evaluated before the hybrid was proposed. A weighted hybrid led
+the field but **lost a pre-registered parsimony rule** (0.0051 margin against a
+0.01 threshold), so the simpler method was deployed.
+
+Detail: [`research/recommendation_results.md`](research/recommendation_results.md)
+
+# Evaluation
+
+**Protocol A — global temporal split**, the primary and leakage-free protocol:
+train < 2025-09-12 · validation → 2025-10-18 · test ≥ 2025-10-18, **opened once**.
+
+Test window, 791 evaluable learners, K = 10:
+
+| Method | NDCG@10 | Hit Rate | Coverage | Δ vs random | Significant? |
+| --- | --- | --- | --- | --- | --- |
+| hybrid | 0.1206 | 0.3578 | 0.92 | +0.0162 | No |
+| content_based | 0.1191 | 0.3666 | 1.00 | +0.0147 | No |
+| **cluster_popularity** *(deployed core)* | 0.1138 | 0.3590 | 0.75 | +0.0093 | No |
+| tiered *(deployed architecture)* | 0.1117 | 0.3451 | **1.00** | +0.0072 | No |
+| **random** *(reference)* | **0.1102** | **0.3464** | 1.00 | — | — |
+| global_popularity | 0.1072 | 0.3312 | **0.32** | +0.0028 | No |
+| user_user_history | 0.0947 | 0.3097 | 1.00 | −0.0098 | No |
+
+**0 of 11 methods are significantly better than random.** Random ranks 7th of 12.
+
+Precision@10 is always reported against its analytical ceiling of **0.2054** —
+learners have ~2 held-out courses, so a perfect ranker still fills eight of ten
+slots with courses it cannot be credited for.
+
+**Impact proxy.** The brief requires an impact metric; the data supports no causal
+one. Engagement Lift is reported as a **proxy**, always beside random's own value:
+**1.084 against 1.046**. It is not a measure of engagement, completion or retention
+— EduPro records none of those.
+
+Six leakage controls are verified in-run, and the leakage checker is itself tested
+against a deliberately leaky fixture so it is known capable of failing.
+
+# Explainability
+
+Explanations are **model-intrinsic**: the scoring interface returns per-component
+contributions, a decision taken before any recommender was written because
+faithfulness cannot be retrofitted.
+
+> *"127 learners in your segment (Category-repeating High-volume learners) enrolled
+> in this course."*
+
+Three rules, enforced in code and verified across **all 30,000 explanations**
+(3,000 learners × 10):
+
+| Property | Violations |
+| --- | --- |
+| Names only components the model used | 0 |
+| The quoted number equals the scorer's contribution | 0 |
+| Category claims true of the learner's real history | 0 |
+| Cold-start lists never imply personalisation | 0 |
+
+# Privacy
+
+`UserName`, `Email` and `TeacherName` are dropped **at ingestion** — not filtered
+later. Nothing downstream has them, so a leak would require circumventing the
+loader.
+
+| Check | Result |
+| --- | --- |
+| PII in any persisted artifact | **None** — 858 real values searched across 184 tracked files |
+| Learner identification | Pseudonymous `UserID` only |
+| Email as a modelling feature | Never — it does not exist downstream |
+| Age/gender in the model | No. Retained for fairness auditing only |
+
+**Fairness.** Demographic strata show female learners at NDCG@10 0.1002 against
+male learners at 0.1285 — nominally significant, uncorrected for four strata tests,
+on a system that uses no demographic feature and performs at chance overall. It is
+reported, bounded, and flagged for monitoring on real data rather than dismissed.
+
+# Streamlit Application
+
+Seven pages, built entirely on the production model:
+
+| Page | Shows |
+| --- | --- |
+| Executive Overview | Population, segments, routing, validated metrics, key insights |
+| Learner Profile | One learner's behaviour, preferences, segment and history |
+| Recommendations | Explained top-K, category/level filters, explicit cold-start mode |
+| Segment Intelligence | Segment behaviour and **the evidence behind each name** |
+| Cluster Visualization | 2D view, with its 30.7% retained variance stated up front |
+| Segment Comparison | Segments against the population average |
+| Model Analytics | Every measured number, loaded from experiment artifacts |
+
+Three rules the dashboard enforces rather than leaving to the reader: every figure
+is badged **observed / model output / proxy**; no quality figure renders without its
+random reference; and nothing is typed in — measured values are read from artifacts,
+so the dashboard *cannot* display a number no experiment produced.
+
+# Screenshots / Demo
+
+Generated from the running app by
+[`scripts/capture_screenshots.py`](scripts/capture_screenshots.py) — regenerable in
+one command, so they cannot silently go stale.
+
+**Executive Overview**
+![Executive Overview](docs/screenshots/01_executive_overview.png)
+
+**Personalized Recommendations** — every course carries the reason it appears
+![Recommendations](docs/screenshots/03_recommendations.png)
+
+**Cluster Visualization** — the caveat is shown *before* the chart
+![Cluster Visualization](docs/screenshots/05_cluster_visualization.png)
+
+**Model Analytics** — the random baseline is a row in the table, not a footnote
+![Model Analytics](docs/screenshots/06_model_analytics.png)
+
+Also captured: [Learner Profile](docs/screenshots/02_learner_profile.png) ·
+[Segment Intelligence](docs/screenshots/04_segment_intelligence.png)
+
+# Installation
 
 ```bash
-.venv\Scripts\Activate.ps1
+py -3.13 -m venv .venv
+.venv/Scripts/activate          # Windows;  source .venv/bin/activate elsewhere
+pip install -r requirements.txt
+pip install -e . --no-deps
 ```
 
-macOS/Linux:
+**Python 3.13.9** (supported: ≥3.11, <3.14). Dependencies are pinned exactly;
+`requirements.lock.txt` records the fully frozen environment.
+
+> Use `py -3.13` explicitly. On a machine whose default `python` is 3.14 the project
+> correctly refuses to install, but the first error you see is an unrelated
+> dependency failure. On Windows, install at a short path — a ~250-character path
+> fails with an opaque missing-DLL error (`MAX_PATH`, not a broken dependency).
+
+For tests and tooling: `pip install -r requirements-dev.txt`.
+
+# Running the Pipeline
+
+The production artifact set is **committed**, so this is only needed if the data
+changes:
 
 ```bash
-source .venv/bin/activate
+python scripts/train_production_model.py
 ```
 
-Install the runtime dependencies and the package itself:
+~16 seconds; writes 12 files (276 KB) to `models/` and `artifacts/production/`.
 
-```bash
-pip install -r requirements.txt && pip install -e .
-```
-
-Verify the environment and the integrity of the source materials:
-
-```bash
-pytest -q
-```
-
-A clean run reports **331 passed**. That result confirms the modelling stack is
-functional, the seed is deterministic, the repository layout is intact, and both
-source materials match their recorded checksums.
-
-For exploration and research tooling, add the dev extras:
-
-```bash
-pip install -r requirements-dev.txt
-```
-
-To reproduce the exact environment behind any reported number, use the full
-freeze instead:
-
-```bash
-pip install -r requirements.lock.txt
-```
-
----
-
-## The dashboard
+# Running the Application
 
 ```bash
 streamlit run app/streamlit_app.py
 ```
 
-Seven pages, written for stakeholders, administrators, analysts and reviewers:
+Opens at <http://localhost:8501>. Loads in 0.41 s and fits nothing.
 
-| Page | Shows |
-| --- | --- |
-| **Executive Overview** | population, segments, the recommendation design, validated metrics, key insights |
-| **Learner Profile** | one learner's behaviour, preferences, assigned segment and history |
-| **Recommendations** | explained top-K with category and level filters, plus an explicit cold-start mode |
-| **Segment Intelligence** | segment sizes, behaviour, dominant categories and levels, and the evidence behind each name |
-| **Cluster Visualization** | a 2D view of the segmentation space, with how much variance it retains |
-| **Segment Comparison** | segments compared against the population average |
-| **Model Analytics** | every measured number: baselines, significance, coverage, cluster quality, architecture selection |
+Without the dashboard:
 
-Three rules the dashboard enforces rather than leaves to the reader:
+```bash
+python scripts/recommend.py --describe                 # which artifact set is loaded
+python scripts/recommend.py --user U00001              # explained top-10
+python scripts/recommend.py --user U00001 --category "Data Science" --level Beginner
+python scripts/recommend.py --user NEW-LEARNER         # cold-start route
+```
 
-- **Every figure is labelled** *observed data*, *model output*, or *proxy metric*.
-- **No quality figure renders without its reference.** The random baseline is a
-  required argument, not an optional extra.
-- **Nothing is typed in.** Measured values are read from experiment artifacts, so
-  the dashboard cannot display a number no experiment produced.
+# Retraining / Reproducing Results
 
-Launch, dependency and deployment notes: [`docs/deployment.md`](docs/deployment.md).
+```bash
+python scripts/verify_reproducibility.py     # 8 stored results, recomputed from scratch
+python scripts/verify_paper_claims.py        # 96 document figures vs the artifacts
+python scripts/adversarial_audit.py          # 59 probes across data, leakage, privacy
+python scripts/app_smoke_test.py             # 20 probes across the dashboard
+```
 
----
+To regenerate the research artifacts themselves:
 
-## Repository layout
+```bash
+python scripts/run_data_audit.py
+python scripts/run_segmentation_experiments.py
+python scripts/run_recommendation_experiments.py
+python scripts/validate_final_architecture.py
+```
+
+Every script writes a JSON artifact whose `provenance` block records the workbook
+checksum, the seed, the split dates and the evaluable-learner count.
+
+**Reproducibility evidence** — recomputed in the development environment *and* in a
+clean environment built from `requirements.txt`:
+
+| Result | Stored | Recomputed |
+| --- | --- | --- |
+| Silhouette, k=4 | 0.194600 | 0.194600 |
+| Mean bootstrap Jaccard | 0.989200 | 0.989200 |
+| NDCG@10, random | 0.110215 | 0.110215 |
+| NDCG@10, cluster popularity | 0.113773 | 0.113773 |
+| NDCG@10, architecture C | 0.110354 | 0.110354 |
+
+**8 of 8 exact.** Seed 42 governs every stochastic operation.
+
+# Project Structure
 
 ```
 .
-├── app/                  Streamlit dashboard: 7 pages, no ML of its own
-├── artifacts/            generated artifacts: source inventory, rendered PDF pages
-├── data/
-│   ├── raw/              IMMUTABLE authoritative dataset
-│   ├── interim/          intermediate outputs
-│   └── processed/        modelling-ready datasets
-├── docs/                 technical docs, requirements traceability, deliverables
-├── experiments/          experiment configs and results               (Phase 3)
-├── models/               persisted model artifacts             (frozen v1.0.0)
-├── notebooks/            exploration only — never the sole implementation
-├── references/official/  authoritative PDF + verbatim transcript
-├── reports/figures/      generated figures
-├── research/             decision log, experiment log, ADRs, phase reports
-├── scripts/              reproducible entry points
-├── src/edupro/           production package
-└── tests/                test suite
+├── app/                    Streamlit dashboard — 7 pages, no ML of its own
+│   ├── streamlit_app.py    entry point; declares navigation
+│   ├── lib/                page furniture and cached loaders
+│   └── pages/              the seven pages
+├── artifacts/              every generated output
+│   ├── eda/                10 figures from the data audit
+│   ├── segmentation/       10 figures + results JSON + CSVs
+│   ├── recommendation/     8 figures + results JSON
+│   ├── architecture/       assembled-architecture measurement
+│   ├── validation/         adversarial audit + smoke-test results
+│   └── production/         the served artifact set (8 files)
+├── data/raw/               IMMUTABLE source workbook
+├── docs/                   paper, executive summary, architecture, deployment,
+│                           traceability, screenshots
+├── models/                 fitted scaler + clusterer + manifest (4 files)
+├── notebooks/              exploration only — never the sole implementation
+├── references/official/    authoritative brief + verbatim transcript
+├── research/               decision log, experiment log, ADRs, phase reports
+├── scripts/                reproducible entry points (18)
+├── src/edupro/             production package (32 modules)
+└── tests/                  373 tests across 9 suites
 ```
 
-### The `edupro` package
-
-One subpackage per pipeline stage, so each is independently testable and the
-boundaries that matter (especially leakage) are visible in the structure itself:
-
-| Module | Responsibility |
-| --- | --- |
-| `edupro.config` | Paths, sheet names, seed, PII column list, source checksums |
-| `edupro.data` | Workbook ingestion and schema validation |
-| `edupro.features` | Learner-level aggregation and feature engineering |
-| `edupro.segmentation` | Scaling, encoding, clustering, selection, profiling |
-| `edupro.recommendation` | Candidate generation, scoring, ranking, sparse-history tiers |
-| `edupro.evaluation` | Segmentation and recommendation metrics |
-| `edupro.explainability` | Human-readable justifications |
-
-The Streamlit app and every notebook are **consumers** of this package. Neither
-defines modelling logic, and the app loads persisted artifacts rather than
-training on startup.
-
----
-
-## Methodology
-
-A six-phase gated sequence; each phase must pass its acceptance criteria before
-the next begins, and each ends with a `research/PHASE_N_COMPLETE.md` report
-carrying an evidence-backed PASS/FAIL.
-
-| Phase | Scope | Status |
+| Area | Files | Lines |
 | --- | --- | --- |
-| 0 | Project initialization | ✅ **PASS** |
-| 1 | Research and methodology investigation | ✅ **PASS** |
-| 2 | Dataset audit and EDA | ✅ **PASS** |
-| 3A | ML experimentation — segmentation | ✅ **PASS** |
-| 3B | ML experimentation — recommendation | ✅ **PASS** |
-| 4 | Model selection and architecture freeze | ✅ **PASS** — 🔒 `edupro-1.0.0` |
-| 5A | Production ML implementation | ✅ **PASS** |
-| 5B | Streamlit application | ✅ **PASS** |
-| 6 | Validation, documentation, deployment | Not started |
+| `src/edupro/` | 32 | 5,972 |
+| `scripts/` | 18 | 5,989 |
+| `tests/` | 9 | 2,855 |
+| `app/` | 11 | 2,041 |
 
-### Segmentation — **frozen**
+# Testing
 
-Behaviour-only features (25 columns, all 11 brief-mandated features present), a
-12-dimensional category share vector, StandardScaler, **K-Means at k = 4**.
+```bash
+python -m pytest tests -q        # 373 passed, ~3 minutes
+```
 
-Ten representations were swept across k = 2…10. Demographics were excluded on
-evidence: Variant A and Variant B produce **identical partitions** (ARI 1.000) and
-the demographic block explains 0.04% of between-cluster variance. k = 4 was chosen
-by a pre-registered rule requiring every cluster to hold ≥5% of learners **and**
-reach bootstrap Jaccard ≥0.60 — silhouette alone would have chosen k = 10, where
-half the clusters fail to reappear under resampling. Hierarchical clustering was
-run as validation and **returned a negative result**, reported as one.
-
-### Recommendation — **frozen**
-
-A **four-tier switching recommender**, routed on training-window history only:
-
-| Training history | Learners | Route |
+| Suite | Tests | Covers |
 | --- | --- | --- |
-| 0 | 11.7% | `DiversifiedFallback` — popularity + rating, re-ranked round-robin by category |
-| 1 | 50.5% | `ContentBased` |
-| 2–8 | 24.4% | `ClusterPopularity` |
-| ≥ 9 | 13.5% | `ClusterPopularity` |
+| `test_phase0_environment.py` | 29 | Layout, imports, config, no-Docker, determinism |
+| `test_data_pipeline.py` | 36 | Loading, checksum, **PII absence**, validation, joins, features |
+| `test_segmentation.py` | 37 | Representations, clustering, stability, naming guards |
+| `test_recommendation.py` | 59 | All scorers, candidate exclusion, tiering, metrics |
+| `test_production.py` | 56 | Artifacts, versioning, inference, explanations, privacy |
+| `test_app.py` | 26 | Every dashboard page executed via `AppTest` |
+| `test_regressions.py` | 12 | The three defects the adversarial audit found |
+| `test_paper.py` | 74 | Document structure, references, **forbidden claims** |
+| `test_repository.py` | 44 | Hygiene: no cruft, secrets, PII or local paths; README accuracy |
 
-Eleven methods were evaluated on a leakage-free temporal split before any hybrid
-was proposed. The weighted hybrid *led* the comparison and was **rejected** by a
-pre-registered parsimony margin it failed to clear. The tiered assembly was then
-measured against the flat scorer and reaches **full catalogue coverage (1.00 vs
-0.78) at equal accuracy**. 100% of learners receive a recommendation; none has an
-empty candidate pool.
+Notable guards, each protecting a mistake actually made during development: segment
+names may not use a feature the model did not see; the leakage checker must fail on
+a leaky fixture; a zero-weight component must not appear in an explanation; the
+dashboard's tables must reproduce the frozen document; and no document may *assert*
+an unsupported causal claim — while still being allowed to quote one in order to
+refuse it.
 
-Full evidence: [`research/ARCHITECTURE_FREEZE.md`](research/ARCHITECTURE_FREEZE.md)
-· [`docs/technical_architecture.md`](docs/technical_architecture.md) ·
-[`research/architecture_diagram.md`](research/architecture_diagram.md)
+# Limitations
+
+1. **No method beats random on this dataset.** The central limitation.
+2. **Engagement, completion and outcomes cannot be measured** — EduPro records none.
+3. **The dataset is assessed as almost certainly synthetic.**
+4. **Three of four segments are course-level groupings**, not behavioural personas.
+5. **The structure is not algorithm-independent** — average linkage agrees at ARI 0.019.
+6. **No instrument can falsify cluster structure here** — the gap statistic, added
+   for exactly that purpose, returned no verdict over k = 1…20.
+7. **Missing-not-at-random**: a non-enrollment is not a negative; no impression data.
+8. **The system is blind to level-switching** — 0.6% hit rate when the held-out
+   course is at an unseen level.
+9. **Popularity bias is present** despite near-uniform popularity.
+10. **A gender gap is under monitoring**, uncorrected for multiple comparisons.
+11. **Artifact staleness is not automated** — the manifest detects an *inconsistent*
+    set, not an *old* one.
+
+# Future Work
+
+1. **Re-run on real interaction data.** Every method and control transfers unchanged.
+2. **Capture what is missing**: completion, progress, dwell time, learner-given
+   ratings, and impression logs. Without impressions, missing-not-at-random cannot
+   be addressed at all.
+3. **Online evaluation.** No offline proxy can establish engagement impact.
+4. **Revisit matrix factorisation** once repeat interactions exist — the mechanical
+   objection disappears.
+5. **Address level-switching** with a curriculum-aware component.
+6. **Monitor the demographic gap** with multiple-comparison correction.
+
+# Deployment
+
+Streamlit Community Cloud, deployed from this repository. **No Docker.**
+
+1. Push to GitHub.
+2. At <https://share.streamlit.io>, point an app at `app/streamlit_app.py` on `main`.
+3. Set Python 3.13 in *Advanced settings* if offered.
+
+No secrets, environment variables or external services are required. The artifact
+set is committed because the platform cannot run the training pipeline.
+
+Full notes, including verification: [`docs/deployment.md`](docs/deployment.md).
+
+# References
+
+Forty references were verified by retrieval — title, authors, venue, year and
+identifier confirmed against a publisher page, DBLP or the canonical proceedings
+listing. The annotated review is in
+[`research/literature_review.md`](research/literature_review.md) and the citation
+list in [`docs/research_paper.md`](docs/research_paper.md) §25.
+
+Most directly load-bearing:
+
+- **Rousseeuw (1987)** — silhouette. DOI: 10.1016/0377-0427(87)90125-7
+- **Tibshirani, Walther & Hastie (2001)** — gap statistic. DOI: 10.1111/1467-9868.00293
+- **Hennig (2007)** — cluster-wise stability. DOI: 10.1016/j.csda.2006.11.025
+- **Burke (2002)** — hybrid recommender taxonomy. DOI: 10.1023/A:1021240730564
+- **Järvelin & Kekäläinen (2002)** — NDCG. DOI: 10.1145/582415.582418
+- **Meng et al. (2020)** — data-splitting strategies change method rankings. DOI: 10.1145/3383313.3418479
+- **Ferrari Dacrema, Cremonesi & Jannach (2019)** — baselines beat most published neural recommenders. DOI: 10.1145/3298689.3347058
+- **Ge, Delgado-Battenfeld & Jannach (2010)** — coverage beyond accuracy. DOI: 10.1145/1864708.1864761
+- **Zhang & Chen (2020)** — explainable recommendation. DOI: 10.1561/1500000066
+- **Sculley et al. (2015)** — hidden technical debt in ML systems.
+
+# License
+
+MIT — see `pyproject.toml`.
+
+The **source dataset and the official project brief** under `data/raw/` and
+`references/official/` are the property of their respective owners and are included
+for reproducibility of this submission, not redistributed under the MIT licence.
 
 ---
 
-## Reproducibility
+### Documentation index
 
-- **Single seed.** `edupro.config.RANDOM_SEED = 42` governs every stochastic
-  operation; determinism is asserted by test.
-- **Immutable inputs.** `data/raw/` is verified by SHA-256 on every test run, so
-  an accidental write becomes a loud failure rather than a silent invalidation of
-  every downstream result.
-- **Pinned environment.** Direct dependencies pinned exactly in
-  `requirements.txt`; the complete resolved environment frozen in
-  `requirements.lock.txt`.
-- **No hidden steps.** Reported results come from scripts in `scripts/` and code
-  in `src/`, never from a notebook that has to be run by hand.
-
----
-
-## Scientific integrity
-
-This project reports what it finds, including what does not work.
-
-- Failed and underperforming experiments are recorded in
-  `research/experiment_log.md`, not discarded — the record of what lost is what
-  makes the winner defensible.
-- The data is observational, so no causal claim is made. The engagement metric
-  the official brief requires is a **proxy** and is labelled as one everywhere it
-  appears.
-- No metric, citation, dataset statistic or result in this repository is
-  fabricated. Every number traces to a script that regenerates it.
-
----
-
-## Privacy
-
-`UserName`, `Email` and `TeacherName` are dropped at ingestion, not merely
-excluded by convention downstream — so PII is never present to leak into a
-feature matrix, a persisted artifact or a figure. Learners are identified in the
-dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
-
----
-
-## Documentation
-
-| Document | Contents |
+| Document | Audience |
 | --- | --- |
-| [`PROJECT_MANIFEST.md`](PROJECT_MANIFEST.md) | Source materials, dataset inventory, environment |
-| [`docs/REQUIREMENTS_TRACEABILITY.md`](docs/REQUIREMENTS_TRACEABILITY.md) | Every requirement → implementation → verification |
-| [`research/decision_log.md`](research/decision_log.md) | Decisions with evidence; open questions |
-| [`research/architecture_decision_record.md`](research/architecture_decision_record.md) | Durable architectural decisions (ADRs) |
-| [`research/experiment_log.md`](research/experiment_log.md) | Experiment results, successes and failures |
-| [`research/literature_review.md`](research/literature_review.md) | Eight research areas; 40 verified references |
-| [`research/methodology_comparison.md`](research/methodology_comparison.md) | 40 methods compared; decision status for each |
-| [`research/segmentation_research.md`](research/segmentation_research.md) | Feature design, encoding, k-selection, stability |
-| [`research/recommendation_evaluation_plan.md`](research/recommendation_evaluation_plan.md) | Pre-registered evaluation protocol and metrics |
-| [`research/production_research.md`](research/production_research.md) | Artifacts, deployment, testing strategy |
-| [`research/experiment_plan.md`](research/experiment_plan.md) | 8 research questions, 28 experiments |
-| [`research/dataset_audit.md`](research/dataset_audit.md) | **Full forensic data-quality report and EDA findings** |
-| [`research/segmentation_results.md`](research/segmentation_results.md) | All segmentation experiments, including the negative results |
-| [`research/segmentation_feature_decision.md`](research/segmentation_feature_decision.md) | The chosen representation and its reversal conditions |
-| [`research/cluster_profiles.md`](research/cluster_profiles.md) | The four segments, with limitations |
-| [`research/recommendation_results.md`](research/recommendation_results.md) | **All recommendation experiments and the headline negative result** |
-| [`research/recommendation_error_analysis.md`](research/recommendation_error_analysis.md) | Where recommendations miss, and which failure modes are ruled out |
-| [`references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md`](references/official/OFFICIAL_REQUIREMENTS_TRANSCRIPT.md) | Verbatim transcript of the official brief |
-| `research/PHASE_N_COMPLETE.md` | Per-phase report with PASS/FAIL and evidence |
-
----
-
-## Deliverables
-
-| # | Deliverable | Status |
-| --- | --- | --- |
-| 1 | Research paper (EDA, insights, recommendations) | ✅ [`docs/research_paper.md`](docs/research_paper.md) |
-| 2 | Streamlit dashboard (live analytics) | Phase 5B |
-| 3 | Executive summary for non-technical stakeholders | ✅ [`docs/executive_summary.md`](docs/executive_summary.md) |
-
----
-
-## Scripts
-
-| Script | Purpose |
-| --- | --- |
-| `scripts/inspect_sources.py` | Read-only structural inventory of the workbook → `artifacts/phase0_source_inventory.json` |
-| `scripts/render_official_pdf.py` | Rasterise the image-based official PDF so its requirements can be read and verified |
-| `scripts/analytical_baselines.py` | Random-ranker and Precision@K ceiling reference values implied by the 60-course catalogue |
-| `scripts/run_data_audit.py` | EXP-001…006 plus permutation signal detection → `artifacts/phase2_audit.json` |
-| `scripts/generate_eda_figures.py` | The ten EDA figures → `artifacts/eda/` |
-| `scripts/run_segmentation_experiments.py` | EXP-010…014 → `artifacts/segmentation/segmentation_results.json` |
-| `scripts/generate_segmentation_figures.py` | The ten segmentation figures → `artifacts/segmentation/` |
-| `scripts/run_recommendation_experiments.py` | EXP-019…027 → `artifacts/recommendation/recommendation_results.json` |
-| `scripts/generate_recommendation_figures.py` | The eight recommendation figures → `artifacts/recommendation/` |
-
-Both scripts re-verify the source checksum after reading, so even the inspection
-tooling proves it did not mutate its input.
-
----
-
-## Notes
-
-- **No Docker.** Deployment is a Python environment plus Streamlit, by design.
-- The official documentation PDF is image-based (no text layer), which is why a
-  rendering script and a transcript exist. The PDF remains authoritative on any
-  disagreement.
-
----
-
-## Acknowledgements
-
-Project brief and dataset provided by **Unified Mentor** (project `id=18743`).
+| [Research paper](docs/research_paper.md) · [HTML](docs/research_paper.html) | Technical reviewer |
+| [Executive summary](docs/executive_summary.md) | Management, administrators, reviewers |
+| [Technical architecture](docs/technical_architecture.md) | Engineers |
+| [Deployment guide](docs/deployment.md) | Whoever deploys it |
+| [Requirements traceability](docs/REQUIREMENTS_TRACEABILITY.md) | Assessors |
+| [Submission checklist](docs/submission_checklist.md) | Assessors |
+| [Architecture freeze](research/ARCHITECTURE_FREEZE.md) | The frozen design + evidence |
+| [Final validation report](research/final_validation_report.md) | The adversarial audit |
+| [Decision log](research/decision_log.md) | 62 recorded decisions |
+| [Experiment log](research/experiment_log.md) | 29 experiments, including failures |

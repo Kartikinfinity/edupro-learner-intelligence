@@ -406,6 +406,8 @@ comparison would confound segmentation quality with recommender tuning.
 | --- | --- |
 | Per-experiment entries (incl. failures) | `research/experiment_log.md` |
 | Machine-readable results | `experiments/<EXP-ID>/results.json` |
+
+> **Where these actually went (added in Phase 6D).** The implementation consolidated every generated output under `artifacts/` — `artifacts/phase2_audit.json`, `artifacts/segmentation/`, `artifacts/recommendation/`, `artifacts/architecture/`, `artifacts/validation/` — rather than the per-experiment tree and `reports/figures/` planned here. The planned paths in this document are left as written, because it is a record of the plan; the empty directories were removed.
 | Figures (elbow, silhouette, gap, stability, dendrogram, distributions) | `reports/figures/` |
 | Persisted split | `data/processed/splits/` |
 | Learner feature matrix | `data/processed/` |

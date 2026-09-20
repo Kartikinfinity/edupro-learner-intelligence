@@ -137,11 +137,25 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | `st.cache_resource` around a 0.41 s load; a test asserts no ML call appears anywhere under `app/` | **Verified** |
 | I15 | Artifacts persisted and version-consistent | 22 | `edupro.persistence` — manifest with library versions, workbook checksum and a per-file hash; 11 files; mismatch and half-update both asserted to raise | **Verified** |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **331 tests**; dashboard pages executed by `AppTest`, 12 regression tests, 74 document-integrity tests | **Verified** |
-| I17 | Commits at phase boundaries | 24 | git history | In progress |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **373 tests**; dashboard pages via `AppTest`, 12 regression tests, 74 document-integrity tests, 44 repository-hygiene tests | **Verified** |
+| I17 | Commits at phase boundaries | 24 | git history — 13 commits, one per phase | **Verified** |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
 | I20 | Reproducible environment | 3, 26 | `requirements*.txt`, `.venv` | **Verified** |
+
+---
+
+## Phase 6D status summary (20 September 2026)
+
+The repository is submission-ready. The README carries all 25 required sections with
+its links, images and test count verified by test; `docs/submission_checklist.md`
+maps every requirement to evidence an assessor can execute.
+
+Cleaning found no secrets, no personal data and no tracked caches. Two empty
+directories declared in Phase 1 but never written to were removed, and 44
+repository-hygiene tests now prevent cruft, credentials or PII being committed later.
+
+**Nothing has been pushed to GitHub.**
 
 ---
 

@@ -87,8 +87,6 @@ models/*
 !models/feature_schema.json
 !models/scaler.joblib
 !models/clusterer.joblib
-reports/figures/*
-!reports/figures/.gitkeep
 
 # Rendered pages of the official PDF: regenerable from the tracked source via
 # scripts/render_official_pdf.py, so the raster copies are not tracked.

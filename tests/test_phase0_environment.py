@@ -148,11 +148,9 @@ def test_seaborn_plots_on_the_installed_pandas_major_version():
         config.PROCESSED_DIR,
         config.OFFICIAL_DIR,
         config.RESEARCH_DIR,
-        config.EXPERIMENTS_DIR,
         config.MODELS_DIR,
         config.ARTIFACTS_DIR,
         config.DOCS_DIR,
-        config.FIGURES_DIR,
     ],
 )
 def test_required_directory_exists(directory):
