@@ -17,7 +17,7 @@ py -3.13 -m venv .venv && .venv/Scripts/activate
 pip install -r requirements.txt -r requirements-dev.txt
 pip install -e . --no-deps
 
-python -m pytest tests -q                    # 373 passed
+python -m pytest tests -q                    # 376 passed
 python scripts/verify_reproducibility.py     # 8 stored results recomputed exactly
 python scripts/verify_paper_claims.py        # 96 document figures vs the artifacts
 streamlit run app/streamlit_app.py           # the dashboard
@@ -79,7 +79,7 @@ promoted, and where it is still addressed. None was skipped.
 | 20 | **No Docker** | No Dockerfile or compose file; asserted by test | ✅ |
 | 21 | App loads artifacts, never retrains | `st.cache_resource`; no ML call under `app/` (tested) | ✅ |
 | 22 | Artifacts version-consistent | Manifest with library versions + per-file hashes | ✅ |
-| 23 | Tests incl. failure and edge cases | 373 tests | ✅ |
+| 23 | Tests incl. failure and edge cases | 376 tests | ✅ |
 | 24 | Commits at phase boundaries | 13 commits, one per phase | ✅ |
 | 25 | Decision log, experiment log, ADRs | 62 decisions, 29 experiments, 6 ADRs | ✅ |
 | 27 | Phase reports with PASS/FAIL and evidence | 11 reports in `research/` | ✅ |
@@ -116,7 +116,7 @@ Each is a script an assessor can run.
 
 | Instrument | Command | Result |
 | --- | --- | --- |
-| Test suite | `python -m pytest tests -q` | **373 passed** |
+| Test suite | `python -m pytest tests -q` | **376 passed** |
 | Reproducibility | `python scripts/verify_reproducibility.py` | **8 of 8 exact** |
 | Document traceability | `python scripts/verify_paper_claims.py` | **96 of 96 figures match** |
 | Adversarial audit | `python scripts/adversarial_audit.py` | **59 probes, 0 fail** |
@@ -155,7 +155,7 @@ Carried honestly into submission rather than quietly closed. Closed items are st
 | ~~1~~ | ~~Authorship unconfirmed~~ — **resolved 20 September 2026.** The author is **Kartik** (`kartikshreekumar2006@gmail.com`), confirmed by the project owner and matching the git identity on all commits. | ✅ Closed | — |
 | 2 | `claude.md.txt` at the repository root is empty (0 bytes) and git-ignored | Cosmetic; left because deleting a user file is not the agent's call | **User decision** |
 | 3 | Root-level duplicates of the source workbook and brief | None — git-ignored, byte-identical to the tracked copies | **User decision** |
-| 4 | **Not yet deployed publicly** to Streamlit Community Cloud. Readiness audited: **23 of 23 checks pass**. The remaining action is a GitHub sign-in at share.streamlit.io, documented step by step in `docs/deployment_guide.md` §5 | **User — requires account sign-in** |
+| ~~4~~ | ~~Not yet deployed publicly~~ — **resolved 20 September 2026.** Live at the URL above. The first attempt failed on a line-ending/integrity mismatch, fixed and documented in `docs/deployment_guide.md` §6.1. | ✅ Closed | — |
 | 5 | Gender gap is disclosed in the paper and summary but **not surfaced in the dashboard** | Deliberate; whether a fairness panel belongs in a stakeholder dashboard is a product decision | **User decision** |
 | 6 | No PDF of the executive summary | The paper has an HTML copy that prints to PDF; the summary is Markdown only | Optional |
 | 7 | Artifact staleness is not automated | The manifest detects an *inconsistent* artifact set, not an *old* one | Future work |
@@ -168,14 +168,14 @@ Carried honestly into submission rather than quietly closed. Closed items are st
 | --- | --- |
 | Phases completed | 0, 1, 2, 3A, 3B, 4, 5A, 5B, 6A, 6B, 6C, 6D |
 | Commits | 13, one per phase boundary |
-| Tests | 373 |
+| Tests | 376 |
 | Decisions recorded | 62 |
 | Experiments logged | 29, including failures |
 | References verified | 40 |
 | Documentation | 35 Markdown files |
 | Source data | Unmodified — checksum verified |
 | Pushed to GitHub | ✅ Yes — `Kartikinfinity/edupro-learner-intelligence` |
-| Deployed publicly | **Not yet** — see open item 4 |
+| Deployed publicly | ✅ <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/> |
 
 ---
 

@@ -3,8 +3,9 @@
 A reproducible, explainable learner segmentation and course recommendation system,
 built as a research-grade engineering project rather than a notebook.
 
-**Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 373 passing
-**Deliverables:** [research paper](docs/research_paper.md) · [executive summary](docs/executive_summary.md) · [dashboard](app/streamlit_app.py)
+**Status:** complete · **Model version:** `edupro-1.0.0` · **Tests:** 376 passing
+**Live dashboard:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
+**Deliverables:** [research paper](docs/research_paper.md) · [executive summary](docs/executive_summary.md) · [dashboard](https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/)
 
 ---
 
@@ -420,7 +421,7 @@ clean environment built from `requirements.txt`:
 ├── research/               decision log, experiment log, ADRs, phase reports
 ├── scripts/                reproducible entry points (18)
 ├── src/edupro/             production package (32 modules)
-└── tests/                  373 tests across 9 suites
+└── tests/                  376 tests across 9 suites
 ```
 
 | Area | Files | Lines |
@@ -433,7 +434,7 @@ clean environment built from `requirements.txt`:
 # Testing
 
 ```bash
-python -m pytest tests -q        # 373 passed, ~3 minutes
+python -m pytest tests -q        # 376 passed, ~3 minutes
 ```
 
 | Suite | Tests | Covers |
@@ -444,7 +445,7 @@ python -m pytest tests -q        # 373 passed, ~3 minutes
 | `test_recommendation.py` | 59 | All scorers, candidate exclusion, tiering, metrics |
 | `test_production.py` | 56 | Artifacts, versioning, inference, explanations, privacy |
 | `test_app.py` | 26 | Every dashboard page executed via `AppTest` |
-| `test_regressions.py` | 12 | The three defects the adversarial audit found |
+| `test_regressions.py` | 15 | Defects found by the adversarial audit and the first deployment |
 | `test_paper.py` | 74 | Document structure, references, **forbidden claims** |
 | `test_repository.py` | 44 | Hygiene: no cruft, secrets, PII or local paths; README accuracy |
 
@@ -495,16 +496,23 @@ Streamlit Community Cloud, deployed from this repository. **No Docker.**
 No secrets, environment variables or external services are required. The artifact
 set is committed because the platform cannot run the training pipeline.
 
-**Deployment readiness: 23 of 23 checks pass**
+**Deployment readiness: 24 of 24 checks pass**
 (`python scripts/deployment_readiness.py`), covering secrets, personal data,
 artifact availability from a fresh clone, startup cost, determinism, dependency
 compatibility, path safety, Linux filename case sensitivity, and the absence of
 container configuration.
 
-**Status: not yet deployed.** Creating the app requires signing in to Streamlit
-Community Cloud with the repository owner's GitHub account — the one step that
-cannot be automated. The public URL will be recorded here once it exists; no
-deployment success is claimed until then.
+**Status: deployed and live** at <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>.
+
+The first deployment failed — every page showed "Model artifacts not found"
+although the artifacts were committed. The manifest hashes each artifact and the
+loader re-hashes them at startup; `.gitattributes` was line-ending normalising the
+three JSON artifacts, so bytes hashed on Windows (CRLF) did not match the bytes a
+Linux runner received (LF), and the integrity check correctly rejected them. The
+artifacts are now written and stored platform-independently, and a probe compares
+the manifest against what **git** stores rather than against the working copy —
+the only comparison that could have caught it. Full account:
+[`docs/deployment_guide.md`](docs/deployment_guide.md) §6.1.
 
 Step-by-step guide, settings and troubleshooting:
 [`docs/deployment_guide.md`](docs/deployment_guide.md).

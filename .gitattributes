@@ -9,3 +9,18 @@
 *.joblib binary
 *.pkl   binary
 *.parquet binary
+
+# ---------------------------------------------------------------------------
+# Generated model artifacts: never line-ending converted.
+#
+# The manifest records a SHA-256 of every artifact and the loader re-hashes them
+# on startup. Line-ending normalisation rewrites those bytes at checkout time, so
+# a file written on Windows (CRLF) hashes differently after a Linux checkout (LF)
+# and the integrity check correctly reports it as changed - which is what broke
+# the first Streamlit Community Cloud deployment.
+#
+# The .parquet/.joblib/.npy artifacts were already safe because they are marked
+# binary above. These are the text ones.
+# ---------------------------------------------------------------------------
+models/*.json                  -text
+artifacts/production/*.json    -text

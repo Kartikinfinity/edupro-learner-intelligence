@@ -33,6 +33,14 @@ from edupro.inference import RecommendationService  # noqa: E402
 from edupro.persistence import ArtifactIntegrityError, ArtifactVersionError  # noqa: E402
 
 
+#: Why the last load failed, if it did. A module-level variable rather than
+#: ``st.session_state``: a ``cache_resource`` function runs once for the whole
+#: process and its session context is not the one that later renders the error,
+#: so anything written to session state there is lost. That is why the first
+#: failed deployment showed an empty state with no reason attached (D-072).
+_LOAD_ERROR: str | None = None
+
+
 @st.cache_resource(show_spinner="Loading the model…")
 def load_service() -> RecommendationService | None:
     """The production model, loaded once. ``None`` when the artifacts are absent.
@@ -40,10 +48,13 @@ def load_service() -> RecommendationService | None:
     Returning ``None`` rather than raising lets every page render a useful empty
     state that says how to produce the artifacts, instead of a stack trace.
     """
+    global _LOAD_ERROR
     try:
-        return RecommendationService.load()
+        service = RecommendationService.load()
+        _LOAD_ERROR = None
+        return service
     except (ArtifactIntegrityError, ArtifactVersionError, FileNotFoundError) as error:
-        st.session_state["_artifact_error"] = str(error)
+        _LOAD_ERROR = f"{type(error).__name__}: {error}"
         return None
 
 
@@ -57,9 +68,12 @@ def require_service() -> RecommendationService:
             "Generate the artifact set first:"
         )
         st.code("python scripts/train_production_model.py", language="bash")
-        detail = st.session_state.get("_artifact_error")
-        if detail:
-            st.caption(f"Loader reported: {detail}")
+        if _LOAD_ERROR:
+            st.error("**The loader reported:** " + _LOAD_ERROR)
+            st.caption(
+                "If this mentions a changed artifact, the committed bytes differ from "
+                "the hashes the manifest recorded - see docs/deployment_guide.md §6."
+            )
         st.stop()
     return service
 

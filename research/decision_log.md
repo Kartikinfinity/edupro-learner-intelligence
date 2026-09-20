@@ -1489,6 +1489,72 @@ sign-in** button on a signed-out landing page. No sign-in was attempted.
 
 ---
 
+## Phase 6E follow-up — the first deployment (20 September 2026)
+
+### D-072 — Hashed artifacts must be byte-identical across platforms
+**Status:** Settled by a production failure. The most instructive defect in the project.
+
+**What happened.** The first public deployment built and ran, and every page showed
+"Model artifacts not found" — the empty state meant for a repository with no model
+in it. The artifacts were committed and present.
+
+**Cause.** The manifest records a SHA-256 of every artifact and the loader re-hashes
+them at startup (D-046, the CACE guard). Three artifacts are JSON, and
+`.gitattributes` applied `* text=auto`, so git stored them with LF and checked them
+out with **CRLF on Windows**. The hashes were recorded against CRLF bytes; the Linux
+runner received LF bytes; `check_integrity` correctly reported them as changed.
+
+**The integrity check was not wrong.** The artifact set genuinely was not
+byte-identical to the one that had been hashed. A check designed to catch a
+half-updated artifact set caught a platform-dependent encoding instead, and could
+not tell the difference — because there is no difference at the level it operates.
+
+**Why the Phase 6E readiness audit missed it.** It ran `check_integrity` against
+the **Windows working copy**, where the hashes match by construction. The audit's
+own docstring claimed to test "failures invisible on the development machine", and
+this was exactly that kind of failure. Writing the principle down did not make the
+instance visible; only comparing against what *git* stores did.
+
+**Fix, in three parts:**
+
+1. `.gitattributes` marks `models/*.json` and `artifacts/production/*.json` as
+   `-text`, so git never rewrites their bytes at checkout.
+2. Every JSON artifact is written with an explicit `newline="\n"` (`persistence.LF`),
+   so the bytes do not depend on the platform that produced them.
+3. A readiness probe (3c) and three regression tests compare the manifest against
+   the **git blob**, not the working copy.
+
+Either of the first two alone is insufficient: writing LF still leaves git free to
+convert on checkout, and marking `-text` without writing LF just freezes whatever
+the producing platform happened to emit.
+
+**Generalisable, and the reason this is worth a long entry:** *any* check that
+hashes a file in version control is really a check on the bytes git decides to hand
+out, not the bytes you wrote. If the hash is recorded on one platform and verified
+on another, the verification must be written against the repository, not the
+filesystem.
+
+---
+
+### D-073 — A diagnostic written inside a cached function does not survive
+**Status:** Fixed
+
+When the deployment failed, the empty-state page showed no reason. The loader had
+written the exception to `st.session_state["_artifact_error"]` from inside a
+`@st.cache_resource` function — which runs once for the whole process, in a session
+context that is not the one later rendering the page. The value was silently lost.
+
+The failure reason is now a module-level variable and is rendered with `st.error`
+on the empty-state page.
+
+**Why it mattered more than it looks:** the diagnostic existed, was written
+deliberately, and was tested — but only via `AppTest` in a single-session process
+where the distinction does not arise. It worked everywhere except the one situation
+it was written for. An error path that has never been exercised in the environment
+it is meant for is not an error path; it is an intention.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were

@@ -11,6 +11,8 @@ these are the specific findings promoted to permanent checks.
 
 from __future__ import annotations
 
+import hashlib
+import subprocess
 from dataclasses import replace
 
 import pytest
@@ -156,3 +158,69 @@ def test_assignment_is_independent_of_input_column_order(service):
     assert normal.columns == shuffled.columns
     assert np.abs(normal.matrix - shuffled.matrix).max() == 0.0
     assert service.assign_segment(reversed_columns).equals(service.features["cluster"])
+
+
+# ---------------------------------------------------------------------------
+# Finding 4 (critical) — artifacts hashed on Windows failed on Linux
+# ---------------------------------------------------------------------------
+# The manifest records a SHA-256 of every artifact and the loader re-hashes them
+# at startup. Three artifacts are JSON, and `.gitattributes` had `* text=auto`,
+# so git stored them with LF and checked them out with CRLF on Windows. The hash
+# recorded on Windows therefore did not match the bytes a Linux runner received,
+# `check_integrity` correctly reported them as changed, and the first public
+# deployment showed the missing-artifacts empty state.
+#
+# The Phase 6E readiness audit missed it because it ran `check_integrity` against
+# the Windows working copy, where the hashes match by construction. The only check
+# that catches it compares the manifest against what *git* stores.
+
+
+def _git_blob(relative_path: str) -> bytes:
+    """The bytes git holds for this path — the staged index, not HEAD.
+
+    The index is what the next commit contains and therefore what a clone
+    receives. Comparing against HEAD would make this test red whenever artifacts
+    have been regenerated but not yet committed, which is a normal working state.
+    """
+    result = subprocess.run(
+        ["git", "show", f":{relative_path}"],
+        capture_output=True, cwd=config.PROJECT_ROOT,
+    )
+    return result.stdout
+
+
+def test_committed_artifact_bytes_match_the_recorded_hashes():
+    """What git hands a Linux runner must hash to what the manifest recorded."""
+    from edupro.persistence import load_manifest
+
+    manifest = load_manifest()
+    drifted = []
+    for relative, recorded in manifest.files.items():
+        blob = _git_blob(relative.replace("\\", "/"))
+        if not blob:
+            continue  # not yet committed; a different test covers tracked-ness
+        if hashlib.sha256(blob).hexdigest() != recorded:
+            drifted.append(relative)
+    assert not drifted, (
+        "these artifacts are stored by git with different bytes than the manifest "
+        f"recorded, so the app fails its integrity check after checkout: {drifted}"
+    )
+
+
+def test_json_artifacts_are_written_with_lf():
+    """CRLF in a hashed artifact reintroduces the platform dependency."""
+    from edupro.pipeline import artifact_files
+
+    for name, path in artifact_files().items():
+        if path.suffix != ".json" or not path.exists():
+            continue
+        assert b"\r\n" not in path.read_bytes(), f"{name} contains CRLF"
+    manifest = config.MODELS_DIR / "manifest.json"
+    assert b"\r\n" not in manifest.read_bytes(), "manifest.json contains CRLF"
+
+
+def test_gitattributes_exempts_artifact_json_from_eol_conversion():
+    """Writing LF is not enough on its own: git would convert it back on checkout."""
+    rules = (config.PROJECT_ROOT / ".gitattributes").read_text(encoding="utf-8")
+    assert "models/*.json" in rules and "-text" in rules
+    assert "artifacts/production/*.json" in rules

@@ -44,6 +44,14 @@ MODEL_VERSION: str = "edupro-1.0.0"
 #: Filename of the manifest inside the models directory.
 MANIFEST_NAME: str = "manifest.json"
 
+#: Line ending used for every JSON artifact this project writes.
+#:
+#: Explicit, because the default translates to the platform's native ending. The
+#: manifest hashes these files and the loader re-hashes them at startup, so a set
+#: written on Windows (CRLF) failed its own integrity check after a Linux checkout
+#: (LF). That is what broke the first public deployment (decision log D-072).
+LF: str = "\n"
+
 #: Libraries whose version is recorded. A mismatch in scikit-learn invalidates the
 #: pickled estimators; numpy and pandas affect the persisted arrays and frames.
 TRACKED_LIBRARIES: tuple[str, ...] = ("numpy", "pandas", "scikit-learn", "joblib")
@@ -116,8 +124,13 @@ def save_manifest(manifest: Manifest, directory: Path | None = None) -> Path:
     directory = directory or config.MODELS_DIR
     directory.mkdir(parents=True, exist_ok=True)
     destination = directory / MANIFEST_NAME
+    # LF on every platform: the manifest sits beside files whose hashes it
+    # records, and a platform-dependent encoding of the manifest itself would be
+    # the same trap one level up (D-072).
     destination.write_text(
-        json.dumps(manifest.to_dict(), indent=2, sort_keys=False), encoding="utf-8"
+        json.dumps(manifest.to_dict(), indent=2, sort_keys=False),
+        encoding="utf-8",
+        newline=LF,
     )
     logger.info("Wrote manifest to %s", destination)
     return destination

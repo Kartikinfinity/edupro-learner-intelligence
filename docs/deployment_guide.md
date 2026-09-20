@@ -2,16 +2,20 @@
 
 **Application:** EduPro learner segmentation and course recommendation dashboard
 **Repository:** <https://github.com/Kartikinfinity/edupro-learner-intelligence>
-**Model version:** `edupro-1.0.0` · artifact set `b658773c9db8`
+**Model version:** `edupro-1.0.0` · artifact set `d997e9092047`
 **Platform:** Streamlit Community Cloud. **No Docker** (CLAUDE.md §20).
 
-**Readiness:** audited by `scripts/deployment_readiness.py` — **23 of 23 checks pass**.
+**Live app:** <https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>
+**Readiness:** audited by `scripts/deployment_readiness.py` — **24 of 24 checks pass**.
 
-> **This guide stops at one step that cannot be automated.** Creating the app on
-> Streamlit Community Cloud requires signing in to <https://share.streamlit.io>
-> with the GitHub account that owns the repository. That is an interactive
-> authorisation only the account holder can give. Everything before it is done;
-> §5 is the exact sequence of clicks.
+> **Deployed.** The app is live at the URL above. Creating it required signing in
+> to <https://share.streamlit.io> with the GitHub account that owns the
+> repository — the one step that could not be automated. §5 records the settings
+> used.
+>
+> **The first deployment failed**, showing "Model artifacts not found" on every
+> page. The cause and the fix are in §6.1; it is the single most instructive
+> failure in this project and is documented rather than quietly patched.
 
 ---
 
@@ -101,8 +105,9 @@ not just assumed.
 
 ## 5. Streamlit deployment settings
 
-> **This section requires signing in to Streamlit Community Cloud with the
-> GitHub account `Kartikinfinity`. That authorisation cannot be automated.**
+> **Done.** These are the settings the live deployment uses. Signing in to
+> Community Cloud with the `Kartikinfinity` GitHub account was the one step that
+> could not be automated.
 
 1. Open <https://share.streamlit.io>. The landing page reads *"Streamlit
    Community Cloud — A place for the community to publicly share Streamlit
@@ -145,6 +150,43 @@ nothing to configure and nothing that can be left misconfigured.
 | `browser.gatherUsageStats` | `false` | No telemetry |
 
 ## 6. Troubleshooting
+
+### 6.1 The failure this deployment actually hit
+
+**Symptom.** The app built and ran, the navigation rendered — and every page showed
+**"Model artifacts not found"**, the empty state meant for a repository with no
+model in it. The artifacts were committed and present.
+
+**Cause.** The manifest records a SHA-256 of every artifact and the loader
+re-hashes them at startup. Three artifacts are JSON, and `.gitattributes` applied
+`* text=auto`, so git stored them with LF and checked them out with **CRLF on
+Windows**. The hashes were therefore recorded against CRLF bytes, the Linux runner
+received LF bytes, and `check_integrity` correctly reported the files as changed.
+The integrity check was not wrong — the artifact set genuinely was not
+byte-identical to the one that had been hashed.
+
+**Why the readiness audit missed it.** It ran `check_integrity` against the
+Windows working copy, where the hashes match by construction. The audit's own
+docstring claimed to test "failures invisible on the development machine" and then
+missed one of exactly that kind.
+
+**Fix, in three parts:**
+
+1. `.gitattributes` marks `models/*.json` and `artifacts/production/*.json` as
+   `-text`, so git never rewrites their bytes at checkout.
+2. The pipeline writes every JSON artifact with an explicit `newline="
+"`, so the
+   bytes are the same whichever platform produced them.
+3. A new probe (**3c**) and three regression tests compare the manifest against
+   what **git** stores, not against the working copy — which is the only comparison
+   that could have caught this.
+
+**If you see this symptom again**, the app now prints the loader's actual error on
+the empty-state page. The first failure showed nothing, because the diagnostic was
+written to `st.session_state` from inside a `@st.cache_resource` function, where it
+does not survive to the rendering session. It is now a module-level value.
+
+### 6.2 Other symptoms
 
 | Symptom | Cause | Fix |
 | --- | --- | --- |
@@ -209,7 +251,7 @@ python scripts/recommend.py --describe
 | 10c | Entry point exists | ✅ `app/streamlit_app.py` |
 | 11 | No file over GitHub's limit | ✅ 13 MB total, largest file 3.1 MB |
 
-**23 of 23 pass.**
+**24 of 24 pass.**
 
 Three of these exist because they catch failures invisible on the development
 machine: Linux **case sensitivity** (Windows treats `Models/` and `models/` as the
@@ -223,10 +265,10 @@ git-ignored), and **public error disclosure**.
 | | |
 | --- | --- |
 | Repository pushed | ✅ `main` at `Kartikinfinity/edupro-learner-intelligence` |
-| Readiness audit | ✅ 23 of 23 |
-| App created on Community Cloud | ⏳ **Requires the account holder to sign in** (§5) |
-| Public URL | *Not yet issued — will be recorded here once the app is deployed* |
+| Readiness audit | ✅ **24 of 24** |
+| App created on Community Cloud | ✅ Deployed 20 September 2026 |
+| **Public URL** | **<https://edupro-learner-intelligence-pmejbef8znwugts2gwtqik.streamlit.app/>** |
+| First deployment | ❌ Failed — artifacts rejected by their own integrity check (§6.1) |
+| After the fix | ✅ Artifact bytes are now platform-independent and verified against git |
 
-**Nothing about a live deployment is claimed in this repository until the URL
-exists.** When it does, record it in this table, in `README.md` under
-*Deployment*, and in `docs/submission_checklist.md`.
+The URL above is the real one, recorded only after the app existed.

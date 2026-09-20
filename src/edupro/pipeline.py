@@ -42,6 +42,7 @@ from edupro.data.validation import validate
 from edupro.features.course import build_course_catalogue, build_course_vectors, course_vector_columns
 from edupro.features.learner import build_learner_features
 from edupro.persistence import (
+    LF,
     MODEL_VERSION,
     Manifest,
     library_versions,
@@ -180,6 +181,21 @@ def _projection(matrix: np.ndarray, index: pd.Index) -> tuple[pd.DataFrame, dict
         ),
     }
     return frame, info
+
+
+def _write_json(path: Path, payload: Any) -> None:
+    """Write an artifact as JSON with **LF line endings on every platform**.
+
+    ``write_text`` translates newlines to the platform default, so the same
+    pipeline produced CRLF on Windows and LF on Linux. Because the manifest hashes
+    these files and the loader re-hashes them at startup, that difference made an
+    artifact set built on one platform fail its own integrity check on another.
+    Found when the first Community Cloud deployment showed the missing-artifacts
+    empty state (decision log D-072).
+    """
+    path.write_text(
+        json.dumps(payload, indent=2, default=str), encoding="utf-8", newline=LF
+    )
 
 
 def _level_composition(features: pd.DataFrame, labels: np.ndarray) -> pd.DataFrame:
@@ -398,18 +414,13 @@ def train(
 
     joblib.dump(representation.scaler, paths["scaler"])
     joblib.dump(clusterer, paths["clusterer"])
-    paths["feature_schema"].write_text(
-        json.dumps(_feature_schema(persisted, representation.columns), indent=2),
-        encoding="utf-8",
-    )
-    paths["model_config"].write_text(
-        json.dumps(_model_config(), indent=2), encoding="utf-8"
-    )
+    _write_json(paths["feature_schema"], _feature_schema(persisted, representation.columns))
+    _write_json(paths["model_config"], _model_config())
     persisted.to_parquet(paths["learner_features"])
     projection.to_parquet(paths["learner_projection"])
     profiles.to_parquet(paths["cluster_profiles"])
-    paths["segments"].write_text(
-        json.dumps(
+    _write_json(
+        paths["segments"],
             {
                 "segments": {
                     str(cluster): {
@@ -426,10 +437,6 @@ def train(
                     "level prefix where a cluster is at least 90% pure on one level."
                 ),
             },
-            indent=2,
-            default=str,
-        ),
-        encoding="utf-8",
     )
     catalogue.to_parquet(paths["course_catalogue"])
     np.save(paths["course_vectors"], vectors)

@@ -186,12 +186,37 @@ def check_artifacts_available(audit: Audit, tracked: set[str]) -> None:
                      f"all {len(manifest.files)} manifest files tracked "
                      f"({total / 1024:.0f} KB); a fresh clone can serve immediately")
 
-    problems = []
     from edupro.persistence import check_integrity
     problems = check_integrity(manifest)
     audit.record("3b. artifact set is internally consistent", "fail" if problems else "pass",
                  "; ".join(problems) if problems
                  else f"every file matches its recorded hash (set {manifest.artifact_set_version})")
+
+    # The check above passes on the machine that wrote the artifacts by
+    # construction. What matters for a deployment is whether the bytes git will
+    # hand to a Linux runner are the same bytes. A file that git line-ending
+    # normalises hashes differently after checkout, and the integrity check then
+    # correctly rejects an artifact set that is not actually corrupt.
+    import hashlib
+
+    drifted = []
+    for rel in manifest.files:
+        rel_posix = rel.replace("\\", "/")
+        blob = subprocess.run(["git", "show", f":{rel_posix}"],
+                              capture_output=True, cwd=config.PROJECT_ROOT).stdout
+        if not blob:
+            continue
+        if hashlib.sha256(blob).hexdigest() != manifest.files[rel]:
+            drifted.append(rel_posix)
+    if drifted:
+        audit.record("3c. committed bytes match the recorded hashes", "fail",
+                     f"{len(drifted)} artifact(s) are stored by git with different bytes "
+                     "than the manifest recorded; the app will fail its integrity check "
+                     "after a checkout on another platform", files=drifted)
+    else:
+        audit.record("3c. committed bytes match the recorded hashes", "pass",
+                     f"all {len(manifest.files)} artifacts hash identically from git, so a "
+                     "Linux checkout reproduces the manifest exactly")
 
 
 def check_no_training_on_startup(audit: Audit) -> None:

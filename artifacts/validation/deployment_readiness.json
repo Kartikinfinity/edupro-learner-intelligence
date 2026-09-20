@@ -1,7 +1,7 @@
 {
   "summary": {
-    "n_checks": 23,
-    "n_pass": 23,
+    "n_checks": 24,
+    "n_pass": 24,
     "n_warn": 0,
     "n_fail": 0,
     "deployment_ready": true
@@ -10,7 +10,7 @@
     {
       "check": "1. no hardcoded secrets",
       "severity": "pass",
-      "detail": "191 tracked files scanned, 0 matches",
+      "detail": "195 tracked files scanned, 0 matches",
       "evidence": {}
     },
     {
@@ -46,7 +46,13 @@
     {
       "check": "3b. artifact set is internally consistent",
       "severity": "pass",
-      "detail": "every file matches its recorded hash (set b658773c9db8)",
+      "detail": "every file matches its recorded hash (set d997e9092047)",
+      "evidence": {}
+    },
+    {
+      "check": "3c. committed bytes match the recorded hashes",
+      "severity": "pass",
+      "detail": "all 12 artifacts hash identically from git, so a Linux checkout reproduces the manifest exactly",
       "evidence": {}
     },
     {
