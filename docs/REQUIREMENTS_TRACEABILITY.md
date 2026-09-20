@@ -114,7 +114,7 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | --- | --- | --- | --- | --- |
 | H1 | Research paper (EDA, insights, recommendations) | `docs/research_paper.md` + `.html` | P1 | **Verified** — 25 sections; 77 numeric claims machine-checked against artifacts |
 | H2 | Streamlit dashboard (live analytics) | `app/` | P2 | **Implemented** — deployment pending |
-| H3 | Executive summary | `docs/` | P3 | Not started |
+| H3 | Executive summary for non-technical stakeholders | `docs/executive_summary.md` | P3 | **Verified** — 13 topics; 19 figures machine-checked; no unexplained technical terms |
 
 ---
 
@@ -137,11 +137,23 @@ Hit Rate@K, NDCG@K, catalogue coverage.
 | I13 | No Docker | 20 | `test_no_docker_artifacts_are_present` | **Verified** |
 | I14 | App loads artifacts; never retrains on startup | 21 | `st.cache_resource` around a 0.41 s load; a test asserts no ML call appears anywhere under `app/` | **Verified** |
 | I15 | Artifacts persisted and version-consistent | 22 | `edupro.persistence` — manifest with library versions, workbook checksum and a per-file hash; 11 files; mismatch and half-update both asserted to raise | **Verified** |
-| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **304 tests**; dashboard pages executed by `AppTest`, 12 regression tests, 47 paper-integrity tests | **Verified** |
+| I16 | Test coverage of the listed surfaces | 23 | `tests/` — **331 tests**; dashboard pages executed by `AppTest`, 12 regression tests, 74 document-integrity tests | **Verified** |
 | I17 | Commits at phase boundaries | 24 | git history | In progress |
 | I18 | Decision log, experiment log, ADRs maintained | 25 | `research/` | **Verified** |
 | I19 | Phase reports with PASS/FAIL and evidence | 27 | `research/PHASE_X_COMPLETE.md` | In progress |
 | I20 | Reproducible environment | 3, 26 | `requirements*.txt`, `.venv` | **Verified** |
+
+---
+
+## Phase 6C status summary (20 September 2026)
+
+**All three official deliverables (H1-H3) are now Verified.** The executive summary
+covers its thirteen required topics in 3,945 words with no unexplained technical
+terms, and its 19 figures are machine-checked against the artifacts alongside the
+paper's 77.
+
+Remaining scope: **public deployment** of the dashboard, and final repository
+packaging.
 
 ---
 

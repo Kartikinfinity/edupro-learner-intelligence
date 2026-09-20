@@ -113,7 +113,7 @@ Verify the environment and the integrity of the source materials:
 pytest -q
 ```
 
-A clean run reports **304 passed**. That result confirms the modelling stack is
+A clean run reports **331 passed**. That result confirms the modelling stack is
 functional, the seed is deterministic, the repository layout is intact, and both
 source materials match their recorded checksums.
 
@@ -331,7 +331,7 @@ dashboard by pseudonymous `UserID` only. Email is never a modelling feature.
 | --- | --- | --- |
 | 1 | Research paper (EDA, insights, recommendations) | ✅ [`docs/research_paper.md`](docs/research_paper.md) |
 | 2 | Streamlit dashboard (live analytics) | Phase 5B |
-| 3 | Executive summary for non-technical stakeholders | Phase 6 |
+| 3 | Executive summary for non-technical stakeholders | ✅ [`docs/executive_summary.md`](docs/executive_summary.md) |
 
 ---
 

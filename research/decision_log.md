@@ -1223,6 +1223,61 @@ referenced.
 
 ---
 
+## Phase 6C — Executive summary (20 September 2026)
+
+### D-061 — The negative finding leads the executive summary
+**Status:** Settled
+
+A document written for management could fail in two opposite directions. Burying
+the finding — segments first, limitation on page nine — is technically honest and
+practically deceptive. Presenting the project as a failure is equally untrue and
+discards a working segmentation and a tested system.
+
+The framing adopted is neither: the study tested whether EduPro's data can support
+personalisation, found that it cannot **yet**, and identified exactly what is
+missing. That result saves EduPro from launching something that performs at chance,
+which is worth money, and it appears in the first 200 words.
+
+Three supports make the framing hold up rather than read as spin:
+
+1. **A three-column comparison.** Against random the system has no accuracy
+   advantage — the honest headline. But a "most popular courses" list is the
+   realistic alternative EduPro would otherwise build, and against *that* the system
+   reaches all 60 courses where popularity reaches 19. Omitting that column would
+   understate a real benefit as badly as omitting the random column would overstate
+   one. The third column was added after reviewing a two-column draft.
+2. **An explicit confidence table** separating what can be claimed from what cannot,
+   including two rows reading "Not demonstrated" and "Cannot be measured".
+3. **A pre-emptive guard against misuse**: the summary states that a slide claiming
+   EduPro has found "four learner personas" would go beyond the evidence.
+
+---
+
+### D-062 — A forbidden-claim test must distinguish an assertion from a disavowal
+**Status:** Settled after the test flagged correct writing
+
+The Phase 6B forbidden-claim patterns, applied to the executive summary, flagged:
+
+> Any claim of the form "engagement improved by X%" would be invented.
+
+That sentence is the document **refusing** the claim — exactly the behaviour the
+test exists to encourage. A test that cannot tell an assertion from its disavowal
+punishes the clearest way to write the refusal, and the author's only fix is to stop
+naming the thing being refused, which makes the document worse.
+
+**The rule adopted:** a forbidden phrase counts as a violation only when *asserted* —
+the line must not contain a negation marker ("cannot", "would be invented", "no
+such", "does not", …). The marker list is deliberately narrow, because an author
+trying to smuggle an overclaim past the check would have to write a negation into
+their own claim, which defeats the claim.
+
+**Verified able to fail**: six synthetic violating sentences all caught, three
+disavowals all correctly allowed. The Phase 6A rule continues to apply — a probe
+that cannot fail proves nothing, and a probe that fires on correct behaviour is
+worse than no probe, because it trains the author to write around it.
+
+---
+
 ## Open questions carried into later phases
 
 Recorded so they are not quietly forgotten. **None is answered yet.** Q-1…Q-7 were

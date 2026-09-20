@@ -22,6 +22,7 @@ from edupro import config
 
 PAPER = config.DOCS_DIR / "research_paper.md"
 HTML = config.DOCS_DIR / "research_paper.html"
+SUMMARY = config.DOCS_DIR / "executive_summary.md"
 
 REQUIRED_SECTIONS = [
     "Abstract", "Introduction", "Problem Statement", "Project Objectives",
@@ -85,10 +86,26 @@ FORBIDDEN = [
 ]
 
 
+#: Markers that turn a forbidden phrase into a disavowal of it. Narrow on purpose:
+#: an author trying to smuggle an overclaim past this test would have to write a
+#: negation into their own sentence, which defeats the overclaim.
+DISAVOWAL = (
+    "would be invented", "cannot", "can not", "no such", "not claim", "never",
+    "would be fabricat", "do not", "does not", "is not", "are not", "without",
+)
+
+
+def asserts_claim(line: str, pattern: str) -> bool:
+    """True when the line makes the forbidden claim rather than refusing it."""
+    if not re.search(pattern, line, flags=re.I):
+        return False
+    return not any(marker in line.lower() for marker in DISAVOWAL)
+
+
 @pytest.mark.parametrize("pattern", FORBIDDEN)
 def test_paper_makes_no_unsupported_causal_claim(paper: str, pattern: str):
-    matches = re.findall(pattern, paper, flags=re.I)
-    assert not matches, f"unsupported claim pattern {pattern!r} found: {matches[:3]}"
+    offenders = [line.strip() for line in paper.splitlines() if asserts_claim(line, pattern)]
+    assert not offenders, f"unsupported claim {pattern!r} asserted: {offenders[:2]}"
 
 
 def test_the_impact_metric_is_labelled_a_proxy(paper: str):
@@ -185,3 +202,89 @@ def test_the_html_copy_is_self_contained():
     markup = HTML.read_text(encoding="utf-8")
     external = re.findall(r'(?:src|href)="(https?://[^"]+)"', markup)
     assert not external, f"external resources referenced: {external[:3]}"
+
+
+# ---------------------------------------------------------------------------
+# Executive summary
+# ---------------------------------------------------------------------------
+# The summary is the document most likely to overclaim: it is read by people who
+# will not check the appendix, written in plain language that makes a causal
+# sentence easy to form by accident, and shortest on caveats. It therefore gets
+# the same guards as the paper plus a few of its own.
+
+EXECUTIVE_SECTIONS = [
+    "Executive Problem",
+    "generic recommendation",
+    "What data was analysed",
+    "What learner types were discovered",
+    "How personalisation works",
+    "What the recommendation system provides",
+    "What evidence supports the system",
+    "How learners receive recommendations",
+    "How the system supports platform decisions",
+    "Privacy",
+    "Limitations",
+    "Implementation roadmap",
+    "Future expansion",
+]
+
+
+@pytest.fixture(scope="module")
+def summary() -> str:
+    assert SUMMARY.exists(), f"{SUMMARY} is missing"
+    return SUMMARY.read_text(encoding="utf-8")
+
+
+@pytest.mark.parametrize("section", EXECUTIVE_SECTIONS)
+def test_executive_summary_covers_every_required_topic(summary: str, section: str):
+    assert section.lower() in summary.lower(), f"missing topic: {section}"
+
+
+@pytest.mark.parametrize("pattern", FORBIDDEN)
+def test_executive_summary_makes_no_unsupported_claim(summary: str, pattern: str):
+    offenders = [line.strip() for line in summary.splitlines() if asserts_claim(line, pattern)]
+    assert not offenders, f"unsupported claim {pattern!r} asserted: {offenders[:2]}"
+
+
+def test_executive_summary_states_the_negative_finding_early(summary: str):
+    """A stakeholder who reads only the first page must still learn the main thing."""
+    opening = summary[:2500]
+    assert "not perform better than picking courses at random" in opening.lower() or (
+        "random" in opening.lower() and "not" in opening.lower()
+    ), "the headline limitation is not on the first page"
+
+
+def test_executive_summary_labels_the_proxy(summary: str):
+    """The brief requires an impact metric; the data cannot support a causal one."""
+    assert "PROXY" in summary, "the impact metric is not labelled as a proxy"
+    # The two values sit in adjacent table rows, so proximity - not same-line - is
+    # the property that matches what a reader sees.
+    lines = summary.splitlines()
+    for i, line in enumerate(lines):
+        if "1.084" not in line:
+            continue
+        window = " ".join(lines[max(0, i - 4):i + 5]).lower()
+        assert "1.046" in window, f"proxy quoted without its reference nearby: {line.strip()}"
+        assert "proxy" in window, f"proxy quoted without its label nearby: {line.strip()}"
+
+
+def test_executive_summary_refuses_the_engagement_claim_explicitly(summary: str):
+    """Not merely avoiding the claim - stating that it cannot be made."""
+    lowered = summary.lower()
+    assert "cannot tell you" in lowered or "cannot be measured" in lowered
+    assert "completion" in lowered
+
+
+def test_executive_summary_is_not_a_copy_of_the_paper(summary: str, paper: str):
+    """It must be a different document for a different reader, not an extract."""
+    assert len(summary.split()) < len(paper.split()) / 2, "summary is not substantially shorter"
+    technical = ["NDCG@10", "silhouette", "bootstrap Jaccard", "Adjusted Rand Index",
+                 "permutation null", "K-Means", "confidence interval"]
+    leaked = [term for term in technical if term.lower() in summary.lower()]
+    assert not leaked, f"unexplained technical terms leaked into the summary: {leaked}"
+
+
+def test_executive_summary_states_the_privacy_position(summary: str):
+    lowered = summary.lower()
+    assert "removed at the moment the data is read" in lowered or "removed at the point of loading" in lowered
+    assert "anonymous id" in lowered

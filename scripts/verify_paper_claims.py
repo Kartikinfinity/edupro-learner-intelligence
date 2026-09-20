@@ -1,4 +1,4 @@
-"""Check that the numbers printed in the research paper match the artifacts.
+"""Check that the numbers printed in the written deliverables match the artifacts.
 
 A paper can claim traceability; this measures it. Each check takes a value
 *computed from an experiment artifact*, formats it the way the paper prints it,
@@ -23,6 +23,7 @@ import pandas as pd
 from edupro import config
 
 PAPER = config.DOCS_DIR / "research_paper.md"
+SUMMARY = config.DOCS_DIR / "executive_summary.md"
 
 
 def load(path: Path) -> dict:
@@ -159,6 +160,42 @@ def main() -> int:
     for tier, n in coverage["learners_by_tier"].items():
         check(f"tier {tier} count", f"{n:,}")
 
+    # --- executive summary ------------------------------------------------
+    # The summary quotes fewer figures, in rounded plain-language form, so its
+    # checks are separate and formatted the way a stakeholder reads them.
+    summary_checks: list[tuple[str, str]] = []
+
+    def summary_check(label: str, value: str) -> None:
+        summary_checks.append((label, value))
+
+    features = pd.read_parquet(
+        config.ARTIFACTS_DIR / "production" / "learner_features.parquet"
+    )
+    sizes = features["cluster"].value_counts().sort_index()
+
+    summary_check("learners", f"{len(features):,}")
+    summary_check("single-course learners", f"{sparsity['n_with_1']:,}")
+    summary_check("single-course share", f"{sparsity['pct_with_1']:.0f}%")
+    summary_check("popularity range low", str(popularity["min"]))
+    summary_check("popularity range high", str(popularity["max"]))
+    for cluster, n in sizes.items():
+        summary_check(f"deployed segment {cluster} size", f"{n:,}")
+    heavy = sparsity["cohort_heavy_9_plus"]
+    summary_check("heavy cohort share of enrollments",
+                  f"{heavy['n_interactions'] / 10_000 * 100:.0f}%")
+    summary_check("evaluable learners", str(split["n_evaluable_learners"]))
+    for label, method in (("deployed", "cluster_popularity"), ("random", "random"),
+                          ("popularity", "global_popularity")):
+        rate = test[method]["overall"]["10"]["hit_rate"]
+        summary_check(f"{label} hit rate in plain form", f"{rate * 100:.0f} in 100")
+    summary_check("engagement proxy deployed",
+                  f"{test['cluster_popularity']['engagement_lift_proxy']:.3f}")
+    summary_check("engagement proxy random", f"{test['random']['engagement_lift_proxy']:.3f}")
+    reach = round(test["global_popularity"]["overall"]["10"]["coverage"] * 60)
+    summary_check("popularity catalogue reach", f"{reach} of the 60")
+    summary_check("female ranking quality", f"{strata['strata']['female']['ndcg']:.3f}")
+    summary_check("male ranking quality", f"{strata['strata']['male']['ndcg']:.3f}")
+
     # --- report ----------------------------------------------------------
     print(f"Checking {len(checks)} numeric claims in {PAPER.name} against the artifacts\n")
     missing = [(label, value) for label, value in checks if value not in text]
@@ -167,10 +204,26 @@ def main() -> int:
             continue
         print(f"  [MISSING] {label}: artifact says {value!r}, not found in the paper")
     print()
-    if missing:
-        print(f"FAILED: {len(missing)} of {len(checks)} artifact values do not appear in the paper")
+    normalise = str.maketrans({"−": "-", "–": "-", " ": "", " ": " "})
+    summary_text = (
+        SUMMARY.read_text(encoding="utf-8").translate(normalise) if SUMMARY.exists() else ""
+    )
+    summary_missing = [(l, v) for l, v in summary_checks if v not in summary_text]
+
+    print(f"Checking {len(summary_checks)} numeric claims in {SUMMARY.name}")
+    for label, value in summary_missing:
+        print(f"  [MISSING] {label}: artifact says {value!r}, not found in the summary")
+    print()
+
+    if missing or summary_missing:
+        if missing:
+            print(f"FAILED: {len(missing)} of {len(checks)} values missing from the paper")
+        if summary_missing:
+            print(f"FAILED: {len(summary_missing)} of {len(summary_checks)} values "
+                  "missing from the executive summary")
         return 1
-    print(f"All {len(checks)} artifact values appear verbatim in the paper.")
+    print(f"All {len(checks)} paper values and {len(summary_checks)} summary values "
+          "appear verbatim in their documents.")
     return 0
 
 
