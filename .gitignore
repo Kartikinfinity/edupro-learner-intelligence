@@ -95,3 +95,10 @@ artifacts/official_pdf_pages/
 # Local tool configuration (the launch config is Windows-specific; the
 # authoritative launch instructions are in docs/deployment.md).
 .claude/
+
+# ---------------------------------------------------------------------------
+# Demo video. Left untracked by default: at 15.5 MB it would more than double
+# a 13 MB repository, and every future clone would carry it permanently.
+# To ship it in the repo instead, delete this rule and `git add` the file.
+# ---------------------------------------------------------------------------
+/EduPro_Project_Demo.mp4
